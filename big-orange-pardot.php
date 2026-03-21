@@ -9,6 +9,7 @@
  * License:           GPL-2.0-or-later
  * License URI:       https://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain:       big-orange-pardot
+ * Requires Plugins:  kadence-blocks
  *
  * @package BigOrangePardot
  */
@@ -38,9 +39,9 @@ function big_orange_pardot_enqueue_attribution() {
 	wp_enqueue_script(
 		'big-orange-pardot-attribution',
 		plugins_url( 'assets/attribution.js', __FILE__ ),
-		array(),
+		[],
 		'0.1.0',
-		array( 'strategy' => 'defer' )
+		[ 'strategy' => 'defer' ]
 	);
 }
 add_action( 'wp_enqueue_scripts', 'big_orange_pardot_enqueue_attribution' );

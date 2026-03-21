@@ -11,9 +11,15 @@
   "supports": {
     "html": false
   },
+  "attributes": {
+    "pardotFormUrl": {
+      "type": "string",
+      "default": ""
+    }
+  },
   "textdomain": "big-orange-pardot",
   "editorScript": "file:./index.js",
   "editorStyle": "file:./index.css",
   "style": "file:./style-index.css",
-  "viewScript": "file:./view.js"
+  "render": "file:./render.php"
 }

@@ -1,12 +1,124 @@
 /**
- * The following styles get applied both on the front of your site
- * and in the editor.
+ * Big Orange Pardot — frontend & editor shared styles.
  *
- * Replace them with your own styles or remove the file completely.
+ * Uses WordPress global style CSS variables (--wp--preset--*) and Kadence
+ * palette variables (--global-palette*) with sensible fallbacks so the form
+ * inherits whatever theme is active without hardcoded colors or fonts.
  */
 
-.wp-block-create-block-big-orange-pardot {
-	background-color: #21759b;
-	color: #fff;
-	padding: 2px;
+.wp-block-bigorangelab-big-orange-pardot {
+	form {
+		width: 100%;
+	}
+
+	// -------------------------------------------------------------------------
+	// Field rows
+	// -------------------------------------------------------------------------
+
+	.bol-pardot-row {
+		display: flex;
+		flex-direction: column;
+		gap: var( --wp--preset--spacing--30, 1rem );
+	}
+
+	.bol-pardot-two-col {
+		@media ( min-width: 600px ) {
+			flex-direction: row;
+
+			.bol-pardot-field {
+				flex: 1 1 0;
+			}
+		}
+	}
+
+	// -------------------------------------------------------------------------
+	// Individual fields
+	// -------------------------------------------------------------------------
+
+	.bol-pardot-field {
+		display: flex;
+		flex-direction: column;
+		gap: 0.25rem;
+		margin-bottom: var( --wp--preset--spacing--30, 1rem );
+
+		label {
+			font-size: var( --wp--preset--font-size--small, 0.875rem );
+			font-weight: 600;
+			color: var( --global-palette3, var( --wp--preset--color--contrast, inherit ) );
+		}
+
+		input,
+		textarea {
+			width: 100%;
+			padding: 0.5rem 0.75rem;
+			font-size: var( --wp--preset--font-size--medium, 1rem );
+			font-family: inherit;
+			color: var( --global-palette3, var( --wp--preset--color--contrast, inherit ) );
+			background-color: var( --global-palette9, var( --wp--preset--color--base, #fff ) );
+			border: 1px solid var( --global-palette7, var( --wp--preset--color--accent-4, #ccc ) );
+			border-radius: 0.25rem;
+			box-sizing: border-box;
+			transition: border-color 0.15s ease;
+
+			&:focus {
+				outline: 2px solid var( --global-palette1, var( --wp--preset--color--accent-3, #000 ) );
+				outline-offset: 1px;
+				border-color: var( --global-palette1, var( --wp--preset--color--accent-3, #000 ) );
+			}
+
+			&:disabled {
+				opacity: 0.6;
+				cursor: not-allowed;
+			}
+		}
+
+		textarea {
+			resize: vertical;
+			min-height: 6rem;
+		}
+	}
+
+	// -------------------------------------------------------------------------
+	// Required asterisk
+	// -------------------------------------------------------------------------
+
+	.bol-required {
+		color: var( --global-palette6, #c00 );
+		margin-left: 0.2em;
+	}
+
+	// -------------------------------------------------------------------------
+	// Submit button
+	// -------------------------------------------------------------------------
+
+	.bol-pardot-submit {
+		margin-top: var( --wp--preset--spacing--30, 1rem );
+
+		// .kb-button and .wp-block-button__link on the element let Kadence and
+		// the active theme style the button automatically. The rules below are
+		// fallbacks only when neither Kadence nor a theme button style is found.
+		.kb-button,
+		.wp-block-button__link {
+			display: inline-block;
+			padding: 0.6rem 1.5rem;
+			font-size: var( --wp--preset--font-size--medium, 1rem );
+			font-weight: 600;
+			cursor: pointer;
+			border: none;
+			border-radius: 0.25rem;
+
+			// Kadence palette colours take precedence; WP preset as fallback.
+			background-color: var( --global-palette1, var( --wp--preset--color--accent-3, #333 ) );
+			color: var( --global-palette9, var( --wp--preset--color--base, #fff ) );
+
+			&:hover:not( :disabled ) {
+				background-color: var( --global-palette2, var( --wp--preset--color--contrast, #000 ) );
+			}
+
+			&:disabled {
+				opacity: 0.6;
+				cursor: not-allowed;
+			}
+		}
+	}
 }

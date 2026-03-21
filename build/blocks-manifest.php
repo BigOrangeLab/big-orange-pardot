@@ -16,10 +16,16 @@ return array(
 		'supports' => array(
 			'html' => false
 		),
+		'attributes' => array(
+			'pardotFormUrl' => array(
+				'type' => 'string',
+				'default' => ''
+			)
+		),
 		'textdomain' => 'big-orange-pardot',
 		'editorScript' => 'file:./index.js',
 		'editorStyle' => 'file:./index.css',
 		'style' => 'file:./style-index.css',
-		'viewScript' => 'file:./view.js'
+		'render' => 'file:./render.php'
 	)
 );

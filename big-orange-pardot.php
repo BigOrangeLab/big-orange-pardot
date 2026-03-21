@@ -39,9 +39,9 @@ function big_orange_pardot_enqueue_attribution() {
 	wp_enqueue_script(
 		'big-orange-pardot-attribution',
 		plugins_url( 'assets/attribution.js', __FILE__ ),
-		[],
+		array(),
 		'0.1.0',
-		[ 'strategy' => 'defer' ]
+		array( 'strategy' => 'defer' )
 	);
 }
 add_action( 'wp_enqueue_scripts', 'big_orange_pardot_enqueue_attribution' );

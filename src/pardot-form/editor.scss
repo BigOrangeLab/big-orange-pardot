@@ -5,27 +5,26 @@
  * fighting WordPress editor styles.
  */
 
-.wp-block-bigorangelab-big-orange-pardot {
+.wp-block-bigorangelab-pardot-form {
 	// Subtle outline so the block boundary is visible when not selected.
 	outline: 1px dashed rgba(0, 0, 0, 0.15);
 	padding: 1rem;
 
 	// Mirror the frontend CSS grid on Gutenberg's inner block container.
-	// useInnerBlocksProps merges .block-editor-block-list__layout onto the same
-	// element as the block wrapper, so we target both the same-element case (&.)
-	// and the nested case (.) for safety.
-	&.block-editor-block-list__layout {
+	// The inner blocks container is a separate child div (useInnerBlocksProps
+	// is passed {} so it doesn't merge onto the block wrapper element).
+	.block-editor-block-list__layout {
 		display: grid;
 		grid-template-columns: 1fr 1fr;
 		gap: var(--wp--preset--spacing--30, 1rem);
+		margin-bottom: var(--wp--preset--spacing--30, 1rem);
 	}
 
-	&.block-editor-block-list__layout > .wp-block:has(.bol-pardot-field--half) {
+	.block-editor-block-list__layout > .wp-block:has(.bol-pardot-field--half) {
 		grid-column: span 1;
 	}
 
-	&.block-editor-block-list__layout > .wp-block:has(.bol-pardot-field--full),
-	&.block-editor-block-list__layout > .wp-block:has(.bol-pardot-submit) {
+	.block-editor-block-list__layout > .wp-block:has(.bol-pardot-field--full) {
 		grid-column: span 2;
 	}
 
@@ -66,22 +65,6 @@
 
 		.bol-drag-handle {
 			opacity: 1;
-		}
-	}
-
-	// "Add field" insert row shown just above the submit button.
-	.bol-add-field-row {
-		display: flex;
-		align-items: center;
-		gap: 0.5rem;
-		margin-bottom: 0.5rem;
-
-		&::before,
-		&::after {
-			content: "";
-			flex: 1;
-			height: 1px;
-			background: rgba(0, 0, 0, 0.15);
 		}
 	}
 

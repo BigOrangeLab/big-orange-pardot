@@ -21,5 +21,5 @@
  */
 
 /* eslint-disable no-console */
-console.log( 'Hello World! (from create-block-big-orange-pardot block)' );
+console.log('Hello World! (from bigorangelab/pardot-form block)');
 /* eslint-enable no-console */

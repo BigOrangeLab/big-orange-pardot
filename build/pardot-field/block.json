@@ -8,7 +8,7 @@
   "icon": "edit-page",
   "description": "A single form field inside a Big Orange Pardot form block.",
   "parent": [
-    "bigorangelab/big-orange-pardot"
+    "bigorangelab/pardot-form"
   ],
   "supports": {
     "html": false,

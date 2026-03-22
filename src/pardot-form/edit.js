@@ -1,15 +1,21 @@
 import apiFetch from '@wordpress/api-fetch';
 import {
+	AlignmentControl,
+	BlockControls,
 	InspectorControls,
+	PanelColorSettings,
+	RichText,
 	useBlockProps,
 	useInnerBlocksProps,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { createBlock } from '@wordpress/blocks';
 import {
+	BoxControl,
 	Button,
 	Notice,
 	PanelBody,
+	RangeControl,
 	SelectControl,
 	Spinner,
 	TextControl,
@@ -96,10 +102,6 @@ const DEFAULT_TEMPLATE = [
 			width: 'full',
 		},
 	],
-	[
-		'bigorangelab/pardot-submit',
-		{ label: 'Submit', lock: { move: true, remove: true } },
-	],
 ];
 
 export default function Edit( { attributes, setAttributes, clientId } ) {
@@ -111,6 +113,18 @@ export default function Edit( { attributes, setAttributes, clientId } ) {
 		fieldBorderColor,
 		fieldFocusColor,
 		fieldBorderRadius,
+		submitLabel,
+		buttonTextColor,
+		buttonBgColor,
+		buttonBgGradient,
+		buttonHoverBgColor,
+		buttonBorderColor,
+		buttonBorderWidth,
+		buttonBorderStyle,
+		buttonBorderRadius,
+		buttonPadding,
+		buttonShadow,
+		buttonAlignment,
 	} = attributes;
 
 	// Emit field style attributes as CSS custom properties so child field
@@ -132,15 +146,58 @@ export default function Edit( { attributes, setAttributes, clientId } ) {
 		fieldCustomProps[ '--bol-field-radius' ] = fieldBorderRadius;
 	}
 
+	// Build inline style for the submit button preview.
+	const buttonStyle = {};
+	if ( buttonTextColor ) {
+		buttonStyle.color = buttonTextColor;
+	}
+	if ( buttonBgGradient ) {
+		buttonStyle.background = buttonBgGradient;
+	} else if ( buttonBgColor ) {
+		buttonStyle.backgroundColor = buttonBgColor;
+	}
+	if ( buttonBorderColor ) {
+		buttonStyle.borderColor = buttonBorderColor;
+	}
+	if ( buttonBorderWidth ) {
+		buttonStyle.borderWidth = buttonBorderWidth;
+	}
+	if ( buttonBorderStyle ) {
+		buttonStyle.borderStyle = buttonBorderStyle;
+	}
+	if ( buttonBorderRadius ) {
+		buttonStyle.borderRadius = buttonBorderRadius;
+	}
+	if ( buttonShadow ) {
+		buttonStyle.boxShadow = buttonShadow;
+	}
+	if ( buttonPadding ) {
+		if ( buttonPadding.top ) {
+			buttonStyle.paddingTop = buttonPadding.top;
+		}
+		if ( buttonPadding.right ) {
+			buttonStyle.paddingRight = buttonPadding.right;
+		}
+		if ( buttonPadding.bottom ) {
+			buttonStyle.paddingBottom = buttonPadding.bottom;
+		}
+		if ( buttonPadding.left ) {
+			buttonStyle.paddingLeft = buttonPadding.left;
+		}
+	}
+	if ( buttonHoverBgColor ) {
+		buttonStyle[ '--bol-btn-hover-bg' ] = buttonHoverBgColor;
+	}
+
 	const blockProps = useBlockProps( { style: fieldCustomProps } );
-	const innerBlocksProps = useInnerBlocksProps( blockProps, {
-		template: DEFAULT_TEMPLATE,
-		templateLock: false,
-		allowedBlocks: [
-			'bigorangelab/pardot-field',
-			'bigorangelab/pardot-submit',
-		],
-	} );
+	const innerBlocksProps = useInnerBlocksProps(
+		{},
+		{
+			template: DEFAULT_TEMPLATE,
+			templateLock: false,
+			allowedBlocks: [ 'bigorangelab/pardot-field' ],
+		}
+	);
 
 	const { replaceInnerBlocks } = useDispatch( blockEditorStore );
 
@@ -205,11 +262,7 @@ export default function Edit( { attributes, setAttributes, clientId } ) {
 						width: 'full',
 					} );
 				} );
-				const submitBlock = createBlock( 'bigorangelab/pardot-submit', {
-					label: 'Submit',
-					lock: { move: true, remove: true },
-				} );
-				replaceInnerBlocks( clientId, [ ...fieldBlocks, submitBlock ] );
+				replaceInnerBlocks( clientId, fieldBlocks );
 				setIsImporting( false );
 			} )
 			.catch( () => {
@@ -347,7 +400,199 @@ export default function Edit( { attributes, setAttributes, clientId } ) {
 				</PanelBody>
 			</InspectorControls>
 
-			<div { ...innerBlocksProps } />
+			<BlockControls>
+				<AlignmentControl
+					value={ buttonAlignment }
+					onChange={ ( value ) =>
+						setAttributes( { buttonAlignment: value || 'left' } )
+					}
+				/>
+			</BlockControls>
+
+			<InspectorControls>
+				<PanelColorSettings
+					title={ __( 'Button Colors', 'big-orange-pardot' ) }
+					initialOpen={ false }
+					colorSettings={ [
+						{
+							value: buttonTextColor,
+							onChange: ( value ) =>
+								setAttributes( {
+									buttonTextColor: value || '',
+								} ),
+							label: __( 'Text Color', 'big-orange-pardot' ),
+						},
+						{
+							value: buttonBgGradient || buttonBgColor,
+							gradientValue: buttonBgGradient,
+							onChange: ( value ) =>
+								setAttributes( {
+									buttonBgColor: value || '',
+									buttonBgGradient: '',
+								} ),
+							onGradientChange: ( value ) =>
+								setAttributes( {
+									buttonBgGradient: value || '',
+									buttonBgColor: '',
+								} ),
+							label: __( 'Background', 'big-orange-pardot' ),
+						},
+						{
+							value: buttonHoverBgColor,
+							onChange: ( value ) =>
+								setAttributes( {
+									buttonHoverBgColor: value || '',
+								} ),
+							label: __(
+								'Hover Background',
+								'big-orange-pardot'
+							),
+						},
+					] }
+				/>
+			</InspectorControls>
+
+			<InspectorControls>
+				<PanelBody
+					title={ __( 'Button Appearance', 'big-orange-pardot' ) }
+					initialOpen={ false }
+				>
+					<BoxControl
+						label={ __( 'Padding', 'big-orange-pardot' ) }
+						values={ buttonPadding }
+						onChange={ ( value ) =>
+							setAttributes( { buttonPadding: value } )
+						}
+					/>
+					<RangeControl
+						label={ __(
+							'Border Radius (px)',
+							'big-orange-pardot'
+						) }
+						value={
+							buttonBorderRadius
+								? parseInt( buttonBorderRadius, 10 )
+								: undefined
+						}
+						onChange={ ( value ) =>
+							setAttributes( {
+								buttonBorderRadius:
+									value !== undefined
+										? String( value ) + 'px'
+										: '',
+							} )
+						}
+						min={ 0 }
+						max={ 50 }
+						allowReset
+					/>
+					<PanelColorSettings
+						title={ __( 'Border', 'big-orange-pardot' ) }
+						initialOpen={ false }
+						colorSettings={ [
+							{
+								value: buttonBorderColor,
+								onChange: ( value ) =>
+									setAttributes( {
+										buttonBorderColor: value || '',
+									} ),
+								label: __(
+									'Border Color',
+									'big-orange-pardot'
+								),
+							},
+						] }
+					>
+						<RangeControl
+							label={ __(
+								'Border Width (px)',
+								'big-orange-pardot'
+							) }
+							value={
+								buttonBorderWidth
+									? parseInt( buttonBorderWidth, 10 )
+									: undefined
+							}
+							onChange={ ( value ) =>
+								setAttributes( {
+									buttonBorderWidth:
+										value !== undefined
+											? String( value ) + 'px'
+											: '',
+								} )
+							}
+							min={ 0 }
+							max={ 10 }
+							allowReset
+						/>
+						<SelectControl
+							label={ __( 'Border Style', 'big-orange-pardot' ) }
+							value={ buttonBorderStyle }
+							options={ [
+								{
+									label: __( '\u2014', 'big-orange-pardot' ),
+									value: '',
+								},
+								{
+									label: __( 'Solid', 'big-orange-pardot' ),
+									value: 'solid',
+								},
+								{
+									label: __( 'Dashed', 'big-orange-pardot' ),
+									value: 'dashed',
+								},
+								{
+									label: __( 'Dotted', 'big-orange-pardot' ),
+									value: 'dotted',
+								},
+								{
+									label: __( 'Double', 'big-orange-pardot' ),
+									value: 'double',
+								},
+							] }
+							onChange={ ( value ) =>
+								setAttributes( { buttonBorderStyle: value } )
+							}
+						/>
+					</PanelColorSettings>
+					<TextControl
+						label={ __( 'Box Shadow', 'big-orange-pardot' ) }
+						value={ buttonShadow }
+						onChange={ ( value ) =>
+							setAttributes( { buttonShadow: value } )
+						}
+						help={ __(
+							'Any valid CSS box-shadow value.',
+							'big-orange-pardot'
+						) }
+						placeholder="0 2px 8px rgba(0,0,0,0.15)"
+					/>
+				</PanelBody>
+			</InspectorControls>
+
+			<div { ...blockProps }>
+				<div { ...innerBlocksProps } />
+				<div
+					className="bol-pardot-submit"
+					style={
+						buttonAlignment && 'left' !== buttonAlignment
+							? { textAlign: buttonAlignment }
+							: undefined
+					}
+				>
+					<RichText
+						tagName="div"
+						className="kb-button wp-block-button__link"
+						allowedFormats={ [] }
+						value={ submitLabel }
+						onChange={ ( value ) =>
+							setAttributes( { submitLabel: value } )
+						}
+						placeholder={ __( 'Submit', 'big-orange-pardot' ) }
+						style={ buttonStyle }
+					/>
+				</div>
+			</div>
 		</>
 	);
 }

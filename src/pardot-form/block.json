@@ -1,9 +1,9 @@
 {
 	"$schema": "https://schemas.wp.org/trunk/block.json",
 	"apiVersion": 3,
-	"name": "bigorangelab/big-orange-pardot",
+	"name": "bigorangelab/pardot-form",
 	"version": "0.1.0",
-	"title": "Big Orange Pardot",
+	"title": "Pardot Form",
 	"category": "widgets",
 	"icon": "feedback",
 	"description": "A WordPress Form block for WordPress to integrate with Pardot.",
@@ -53,14 +53,61 @@
 		"fieldBorderRadius": {
 			"type": "string",
 			"default": ""
+		},
+		"submitLabel": {
+			"type": "string",
+			"default": ""
+		},
+		"buttonTextColor": {
+			"type": "string",
+			"default": ""
+		},
+		"buttonBgColor": {
+			"type": "string",
+			"default": ""
+		},
+		"buttonBgGradient": {
+			"type": "string",
+			"default": ""
+		},
+		"buttonHoverBgColor": {
+			"type": "string",
+			"default": ""
+		},
+		"buttonBorderColor": {
+			"type": "string",
+			"default": ""
+		},
+		"buttonBorderWidth": {
+			"type": "string",
+			"default": ""
+		},
+		"buttonBorderStyle": {
+			"type": "string",
+			"default": ""
+		},
+		"buttonBorderRadius": {
+			"type": "string",
+			"default": ""
+		},
+		"buttonPadding": {
+			"type": "object",
+			"default": {}
+		},
+		"buttonShadow": {
+			"type": "string",
+			"default": ""
+		},
+		"buttonAlignment": {
+			"type": "string",
+			"default": "left"
 		}
 	},
 	"providesContext": {
 		"big-orange-pardot/formUrl": "pardotFormUrl"
 	},
 	"allowedBlocks": [
-		"bigorangelab/pardot-field",
-		"bigorangelab/pardot-submit"
+		"bigorangelab/pardot-field"
 	],
 	"textdomain": "big-orange-pardot",
 	"editorScript": "file:./index.js",

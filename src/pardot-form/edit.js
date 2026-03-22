@@ -20,9 +20,9 @@ import {
 	Spinner,
 	TextControl,
 } from '@wordpress/components';
-import { useDispatch } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { useEffect, useState } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import './editor.scss';
 
 /* global bolPardot */
@@ -30,7 +30,70 @@ import './editor.scss';
 /** Map Pardot dataFormat values to our fieldType attribute values. */
 const PARDOT_TYPE_MAP = { Email: 'email', Phone: 'tel', TextArea: 'textarea' };
 
-/** Default 7-field + submit template applied when the block is first inserted. */
+/**
+ * Standard Pardot fields available on most form handlers.
+ * Used in unconnected mode to let users quickly add common fields.
+ */
+const COMMON_PARDOT_FIELDS = [
+	{
+		name: 'first_name',
+		label: 'First Name',
+		fieldType: 'text',
+		isRequired: false,
+		width: 'half',
+	},
+	{
+		name: 'last_name',
+		label: 'Last Name',
+		fieldType: 'text',
+		isRequired: false,
+		width: 'half',
+	},
+	{
+		name: 'email',
+		label: 'Email',
+		fieldType: 'email',
+		isRequired: true,
+		width: 'full',
+	},
+	{
+		name: 'phone',
+		label: 'Phone',
+		fieldType: 'tel',
+		isRequired: false,
+		width: 'full',
+	},
+	{
+		name: 'company',
+		label: 'Company',
+		fieldType: 'text',
+		isRequired: false,
+		width: 'full',
+	},
+	{
+		name: 'job_title',
+		label: 'Job Title',
+		fieldType: 'text',
+		isRequired: false,
+		width: 'full',
+	},
+	{
+		name: 'website',
+		label: 'Website',
+		fieldType: 'text',
+		isRequired: false,
+		width: 'full',
+	},
+	{
+		name: 'comments',
+		label: 'Comments',
+		fieldType: 'textarea',
+		isRequired: false,
+		width: 'full',
+	},
+];
+
+/** Default 7-field template applied when the block is first inserted. */
 const DEFAULT_TEMPLATE = [
 	[
 		'bigorangelab/pardot-field',
@@ -199,15 +262,40 @@ export default function Edit( { attributes, setAttributes, clientId } ) {
 		}
 	);
 
-	const { replaceInnerBlocks } = useDispatch( blockEditorStore );
+	const { replaceInnerBlocks, insertBlocks } =
+		useDispatch( blockEditorStore );
+
+	// Live list of fieldName values from the current inner field blocks.
+	const existingFieldNames = useSelect(
+		( select ) =>
+			select( blockEditorStore )
+				.getBlocks( clientId )
+				.map( ( b ) => b.attributes.fieldName )
+				.filter( Boolean ),
+		[ clientId ]
+	);
 
 	const [ formHandlers, setFormHandlers ] = useState( null ); // null = not yet loaded
 	const [ isLoading, setIsLoading ] = useState( false );
 	const [ apiError, setApiError ] = useState( null );
 	const [ isImporting, setIsImporting ] = useState( false );
 
+	// handlerFields: expected Pardot fields for the selected handler (display + sync status).
+	const [ handlerFields, setHandlerFields ] = useState( null ); // null = not fetched
+	const [ isLoadingHandlerFields, setIsLoadingHandlerFields ] =
+		useState( false );
+
+	// Settings page URL and connection status injected by wp_localize_script.
+	const settingsUrl =
+		typeof bolPardot !== 'undefined' ? bolPardot.settingsUrl : '';
+	const isConnected =
+		typeof bolPardot !== 'undefined' ? bolPardot.isConnected : false;
+
 	// Fetch form handlers from the REST endpoint on mount.
 	useEffect( () => {
+		if ( ! isConnected ) {
+			return;
+		}
 		setIsLoading( true );
 		apiFetch( { path: '/big-orange-pardot/v1/form-handlers' } )
 			.then( ( data ) => {
@@ -219,28 +307,126 @@ export default function Edit( { attributes, setAttributes, clientId } ) {
 				setApiError( 'fetch_failed' );
 				setIsLoading( false );
 			} );
-	}, [] );
+	}, [ isConnected ] );
+
+	// Fetch handler fields whenever the selected handler changes (for sync status display).
+	useEffect( () => {
+		if ( ! isConnected || pardotFormHandlerId <= 0 ) {
+			setHandlerFields( null );
+			return;
+		}
+		setIsLoadingHandlerFields( true );
+		apiFetch( {
+			path:
+				'/big-orange-pardot/v1/form-handler-fields?handler_id=' +
+				pardotFormHandlerId,
+		} )
+			.then( ( fields ) => {
+				setHandlerFields( fields );
+				setIsLoadingHandlerFields( false );
+			} )
+			.catch( () => {
+				setHandlerFields( [] );
+				setIsLoadingHandlerFields( false );
+			} );
+	}, [ pardotFormHandlerId, isConnected ] );
 
 	/**
 	 * Called when the user picks a form handler from the dropdown.
-	 * Stores both the handler ID and the action URL derived from the API.
+	 * Stores the handler ID and action URL, then auto-inserts any fields
+	 * the handler expects that are not already present in the form.
 	 *
 	 * @param {string} value Selected handler ID as a string.
 	 */
-	function onSelectHandler( value ) {
+	async function onSelectHandler( value ) {
 		const id = parseInt( value, 10 );
 		const handler = ( formHandlers || [] ).find( ( h ) => h.id === id );
 		setAttributes( {
 			pardotFormHandlerId: id,
 			pardotFormUrl: handler ? handler.url : '',
 		} );
+
+		if ( id <= 0 ) {
+			setHandlerFields( null );
+			return;
+		}
+
+		setIsLoadingHandlerFields( true );
+		try {
+			const fields = await apiFetch( {
+				path:
+					'/big-orange-pardot/v1/form-handler-fields?handler_id=' +
+					id,
+			} );
+			setHandlerFields( fields );
+
+			// Auto-insert fields the handler expects that aren't in the form yet.
+			const missing = fields.filter(
+				( f ) => ! existingFieldNames.includes( f.name )
+			);
+			if ( missing.length > 0 ) {
+				insertBlocks(
+					missing.map( ( f ) => {
+						const newFieldType =
+							PARDOT_TYPE_MAP[ f.dataFormat ] || 'text';
+						const newLabel = f.name
+							.replace( /_/g, ' ' )
+							.replace( /\b\w/g, ( c ) => c.toUpperCase() );
+						return createBlock( 'bigorangelab/pardot-field', {
+							fieldName: f.name,
+							label: newLabel,
+							fieldType: newFieldType,
+							isRequired: !! f.isRequired,
+							width: 'full',
+						} );
+					} ),
+					undefined,
+					clientId
+				);
+			}
+		} catch ( e ) {
+			setHandlerFields( [] );
+		} finally {
+			setIsLoadingHandlerFields( false );
+		}
 	}
 
 	/**
-	 * Fetches fields for the selected handler from Pardot and replaces
-	 * all inner blocks with the returned field layout.
+	 * Inserts any handler fields not yet present in the form (additive only).
 	 */
-	function importFieldsFromPardot() {
+	function addMissingFields() {
+		if ( isImporting || ! handlerFields ) {
+			return;
+		}
+		const missing = handlerFields.filter(
+			( f ) => ! existingFieldNames.includes( f.name )
+		);
+		if ( missing.length === 0 ) {
+			return;
+		}
+		insertBlocks(
+			missing.map( ( f ) => {
+				const newFieldType = PARDOT_TYPE_MAP[ f.dataFormat ] || 'text';
+				const newLabel = f.name
+					.replace( /_/g, ' ' )
+					.replace( /\b\w/g, ( c ) => c.toUpperCase() );
+				return createBlock( 'bigorangelab/pardot-field', {
+					fieldName: f.name,
+					label: newLabel,
+					fieldType: newFieldType,
+					isRequired: !! f.isRequired,
+					width: 'full',
+				} );
+			} ),
+			undefined,
+			clientId
+		);
+	}
+
+	/**
+	 * Fetches all fields for the selected handler and replaces all inner blocks.
+	 */
+	function replaceAllWithPardotFields() {
 		setIsImporting( true );
 		apiFetch( {
 			path:
@@ -249,25 +435,45 @@ export default function Edit( { attributes, setAttributes, clientId } ) {
 		} )
 			.then( ( fields ) => {
 				const fieldBlocks = fields.map( ( field ) => {
-					const fieldType =
+					const newFieldType =
 						PARDOT_TYPE_MAP[ field.dataFormat ] || 'text';
-					const label = field.name
+					const newLabel = field.name
 						.replace( /_/g, ' ' )
 						.replace( /\b\w/g, ( c ) => c.toUpperCase() );
 					return createBlock( 'bigorangelab/pardot-field', {
 						fieldName: field.name,
-						label,
-						fieldType,
+						label: newLabel,
+						fieldType: newFieldType,
 						isRequired: !! field.isRequired,
 						width: 'full',
 					} );
 				} );
 				replaceInnerBlocks( clientId, fieldBlocks );
+				setHandlerFields( fields );
 				setIsImporting( false );
 			} )
 			.catch( () => {
 				setIsImporting( false );
 			} );
+	}
+
+	/**
+	 * Appends a single common Pardot field to the form.
+	 *
+	 * @param {{ name: string, label: string, fieldType: string, isRequired: boolean, width: string }} field
+	 */
+	function addCommonField( field ) {
+		insertBlocks(
+			createBlock( 'bigorangelab/pardot-field', {
+				fieldName: field.name,
+				label: field.label,
+				fieldType: field.fieldType,
+				isRequired: field.isRequired,
+				width: field.width,
+			} ),
+			undefined,
+			clientId
+		);
 	}
 
 	// Build SelectControl options.
@@ -282,123 +488,247 @@ export default function Edit( { attributes, setAttributes, clientId } ) {
 		} ) ),
 	];
 
-	// Settings page URL injected by wp_localize_script.
-	const settingsUrl =
-		typeof bolPardot !== 'undefined' ? bolPardot.settingsUrl : '';
-	const isConnected =
-		typeof bolPardot !== 'undefined' ? bolPardot.isConnected : false;
+	// Field sync status computed values (connected mode).
+	const matchedCount = handlerFields
+		? handlerFields.filter( ( f ) => existingFieldNames.includes( f.name ) )
+				.length
+		: 0;
+	const missingHandlerFields = handlerFields
+		? handlerFields.filter(
+				( f ) => ! existingFieldNames.includes( f.name )
+		  )
+		: [];
 
 	return (
 		<>
+			{ /* ---- Pardot Settings panel ---- */ }
 			<InspectorControls>
 				<PanelBody
 					title={ __( 'Pardot Settings', 'big-orange-pardot' ) }
 				>
-					{ /* Not connected notice */ }
-					{ ! isConnected && (
-						<Notice
-							status="warning"
-							isDismissible={ false }
-							className="bol-inspector-notice"
-						>
-							{ __(
-								'Pardot is not connected.',
-								'big-orange-pardot'
+					{ isConnected ? (
+						<>
+							{ /* Loading state */ }
+							{ isLoading && (
+								<div className="bol-inspector-loading">
+									<Spinner />
+									<span>
+										{ __(
+											'Loading form handlers…',
+											'big-orange-pardot'
+										) }
+									</span>
+								</div>
 							) }
-							{ settingsUrl && (
-								<a href={ settingsUrl }>
+
+							{ /* API fetch error */ }
+							{ ! isLoading && apiError && (
+								<Notice status="error" isDismissible={ false }>
 									{ __(
-										'Configure credentials →',
+										'Could not load form handlers from Pardot. Check your connection on the',
+										'big-orange-pardot'
+									) }{ ' ' }
+									{ settingsUrl && (
+										<a href={ settingsUrl }>
+											{ __(
+												'Settings page',
+												'big-orange-pardot'
+											) }
+										</a>
+									) }
+									{ '.' }
+								</Notice>
+							) }
+
+							{ /* Form handler dropdown */ }
+							{ ! isLoading && ! apiError && (
+								<SelectControl
+									label={ __(
+										'Form Handler',
 										'big-orange-pardot'
 									) }
-								</a>
+									value={ String( pardotFormHandlerId ) }
+									options={ handlerOptions }
+									onChange={ onSelectHandler }
+									help={ __(
+										"The form will POST to this handler's URL.",
+										'big-orange-pardot'
+									) }
+								/>
 							) }
-						</Notice>
-					) }
 
-					{ /* Loading state */ }
-					{ isConnected && isLoading && (
-						<div className="bol-inspector-loading">
-							<Spinner />
-							<span>
-								{ __(
-									'Loading form handlers…',
-									'big-orange-pardot'
+							{ /* Field sync status */ }
+							{ ! isLoading &&
+								! apiError &&
+								pardotFormHandlerId > 0 &&
+								handlerFields !== null &&
+								handlerFields.length > 0 && (
+									<>
+										{ isLoadingHandlerFields ? (
+											<div className="bol-inspector-loading">
+												<Spinner />
+												<span>
+													{ __(
+														'Checking fields…',
+														'big-orange-pardot'
+													) }
+												</span>
+											</div>
+										) : (
+											<>
+												<p className="description">
+													{ sprintf(
+														/* translators: 1: matched field count, 2: total handler field count */
+														__(
+															'%1$d of %2$d Pardot fields present in form.',
+															'big-orange-pardot'
+														),
+														matchedCount,
+														handlerFields.length
+													) }
+												</p>
+												{ missingHandlerFields.length >
+													0 && (
+													<Button
+														variant="secondary"
+														onClick={
+															addMissingFields
+														}
+														disabled={ isImporting }
+													>
+														{ sprintf(
+															/* translators: %d: number of missing fields */
+															__(
+																'Add %d missing field(s)',
+																'big-orange-pardot'
+															),
+															missingHandlerFields.length
+														) }
+													</Button>
+												) }
+											</>
+										) }
+									</>
 								) }
-							</span>
-						</div>
-					) }
 
-					{ /* API fetch error */ }
-					{ isConnected && ! isLoading && apiError && (
-						<Notice status="error" isDismissible={ false }>
-							{ __(
-								'Could not load form handlers from Pardot. Check your connection on the',
-								'big-orange-pardot'
-							) }{ ' ' }
-							{ settingsUrl && (
-								<a href={ settingsUrl }>
-									{ __(
-										'Settings page',
-										'big-orange-pardot'
-									) }
-								</a>
-							) }
-							{ '.' }
-						</Notice>
-					) }
-
-					{ /* Form handler dropdown */ }
-					{ isConnected && ! isLoading && ! apiError && (
-						<SelectControl
-							label={ __( 'Form Handler', 'big-orange-pardot' ) }
-							value={ String( pardotFormHandlerId ) }
-							options={ handlerOptions }
-							onChange={ onSelectHandler }
-							help={ __(
-								"The form will POST to this handler's URL.",
-								'big-orange-pardot'
-							) }
-						/>
-					) }
-
-					{ /* Import fields button */ }
-					{ isConnected &&
-						! isLoading &&
-						! apiError &&
-						pardotFormHandlerId > 0 && (
-							<Button
-								variant="secondary"
-								onClick={ importFieldsFromPardot }
-								isBusy={ isImporting }
-								disabled={ isImporting }
+							{ /* Replace all button */ }
+							{ ! isLoading &&
+								! apiError &&
+								pardotFormHandlerId > 0 && (
+									<Button
+										variant="secondary"
+										onClick={ replaceAllWithPardotFields }
+										isBusy={ isImporting }
+										disabled={
+											isImporting ||
+											isLoadingHandlerFields ||
+											( handlerFields !== null &&
+												handlerFields.length === 0 )
+										}
+									>
+										{ __(
+											'Replace all with Pardot fields',
+											'big-orange-pardot'
+										) }
+									</Button>
+								) }
+						</>
+					) : (
+						<>
+							{ /* Not-connected notice */ }
+							<Notice
+								status="warning"
+								isDismissible={ false }
+								className="bol-inspector-notice"
 							>
 								{ __(
-									'Import fields from Pardot',
+									'Pardot is not connected.',
 									'big-orange-pardot'
 								) }
-							</Button>
-						) }
+								{ settingsUrl && (
+									<a href={ settingsUrl }>
+										{ __(
+											'Configure credentials →',
+											'big-orange-pardot'
+										) }
+									</a>
+								) }
+							</Notice>
 
-					{ /* Manual URL override */ }
-					<TextControl
-						label={ __(
-							'Form Handler URL (manual override)',
-							'big-orange-pardot'
-						) }
-						help={ __(
-							'Auto-populated when you select a handler above. Edit only if needed.',
-							'big-orange-pardot'
-						) }
-						value={ pardotFormUrl }
-						onChange={ ( value ) =>
-							setAttributes( { pardotFormUrl: value } )
-						}
-						type="url"
-						placeholder="https://go.pardot.com/l/..."
-					/>
+							{ /* URL input — primary control when unconnected */ }
+							<TextControl
+								label={ __(
+									'Form Handler URL',
+									'big-orange-pardot'
+								) }
+								help={ __(
+									"The URL your form will POST to. Found in your Pardot form handler's embed code.",
+									'big-orange-pardot'
+								) }
+								value={ pardotFormUrl }
+								onChange={ ( value ) =>
+									setAttributes( { pardotFormUrl: value } )
+								}
+								type="url"
+								placeholder="https://go.pardot.com/l/..."
+							/>
+						</>
+					) }
 				</PanelBody>
 			</InspectorControls>
+
+			{ /* ---- Common Pardot Fields panel (unconnected mode only) ---- */ }
+			{ ! isConnected && (
+				<InspectorControls>
+					<PanelBody
+						title={ __(
+							'Common Pardot Fields',
+							'big-orange-pardot'
+						) }
+						initialOpen={ false }
+					>
+						<p className="description">
+							{ __(
+								'Quick-add standard Pardot fields to your form:',
+								'big-orange-pardot'
+							) }
+						</p>
+						{ COMMON_PARDOT_FIELDS.map( ( field ) => {
+							const isPresent = existingFieldNames.includes(
+								field.name
+							);
+							return (
+								<div
+									key={ field.name }
+									className="bol-common-field-row"
+								>
+									<span className="bol-common-field-label">
+										{ field.label }{ ' ' }
+										<code>{ field.name }</code>
+									</span>
+									{ isPresent ? (
+										<span className="bol-common-field-added">
+											{ __(
+												'\u2713',
+												'big-orange-pardot'
+											) }
+										</span>
+									) : (
+										<Button
+											variant="link"
+											onClick={ () =>
+												addCommonField( field )
+											}
+										>
+											{ __( 'Add', 'big-orange-pardot' ) }
+										</Button>
+									) }
+								</div>
+							);
+						} ) }
+					</PanelBody>
+				</InspectorControls>
+			) }
 
 			<BlockControls>
 				<AlignmentControl

@@ -420,9 +420,21 @@ class BOL_Admin_Page {
 			<ol>
 				<li><?php esc_html_e( 'In the block editor, insert the Big Orange Pardot block from the Widgets category (or search for "Pardot").', 'big-orange-pardot' ); ?></li>
 				<li><?php esc_html_e( 'The block inserts with a default set of seven fields (First Name, Last Name, Email, Phone, Company, Job Title, Comments) plus a Submit button. Each field is its own block — you can reorder, delete, or add fields freely using the block editor.', 'big-orange-pardot' ); ?></li>
-				<li><?php esc_html_e( 'Open the block settings panel (sidebar). If the plugin is connected, a dropdown lists all form handlers from your Pardot account. Select the form handler this block should submit to — the Form Handler URL is populated automatically from the handler\'s embed code.', 'big-orange-pardot' ); ?></li>
-				<li><?php esc_html_e( 'Once a form handler is selected, click Import fields from Pardot to replace the inner blocks with the actual fields configured on that handler. Field types and required status are imported automatically.', 'big-orange-pardot' ); ?></li>
-				<li><?php esc_html_e( 'You can also paste a URL directly into the Form Handler URL field if you need to override or bypass the dropdown.', 'big-orange-pardot' ); ?></li>
+			</ol>
+
+			<h3><?php esc_html_e( 'If connected to Pardot', 'big-orange-pardot' ); ?></h3>
+			<ol>
+				<li><?php esc_html_e( 'Open the block settings panel. A dropdown lists all form handlers from your Pardot account. Select the handler this form should submit to — the submission URL is set automatically.', 'big-orange-pardot' ); ?></li>
+				<li><?php esc_html_e( 'Any fields the handler expects that are not already in your form are added automatically when you select a handler. Review the added fields and adjust labels, types, or widths as needed.', 'big-orange-pardot' ); ?></li>
+				<li><?php esc_html_e( 'The settings panel shows how many Pardot fields are present in your form. Use the "Add missing field(s)" button to insert any remaining expected fields.', 'big-orange-pardot' ); ?></li>
+				<li><?php esc_html_e( 'To start fresh from Pardot\'s field list, click "Replace all with Pardot fields". This removes all current fields and rebuilds them from the handler\'s configuration.', 'big-orange-pardot' ); ?></li>
+			</ol>
+
+			<h3><?php esc_html_e( 'If not connected to Pardot', 'big-orange-pardot' ); ?></h3>
+			<ol>
+				<li><?php esc_html_e( 'Open the block settings panel. Enter the Form Handler URL — found in your Pardot form handler\'s embed code — into the Form Handler URL field.', 'big-orange-pardot' ); ?></li>
+				<li><?php esc_html_e( 'Open the "Common Pardot Fields" panel to quickly add standard Pardot field names to your form. Fields already present show a check mark; click "Add" for any you want to include.', 'big-orange-pardot' ); ?></li>
+				<li><?php esc_html_e( 'You can also add fields manually via the block editor and type any Pardot field name directly into the Field Name setting on each field block.', 'big-orange-pardot' ); ?></li>
 			</ol>
 			<h3><?php esc_html_e( 'Customising fields', 'big-orange-pardot' ); ?></h3>
 			<p><?php esc_html_e( 'Select any Pardot Field block inside the form to edit it via the block settings panel. Available settings:', 'big-orange-pardot' ); ?></p>

@@ -18,13 +18,13 @@ The plugin provides three block types:
 
 | File | Purpose |
 |------|---------|
-| `src/big-orange-pardot/block.json` | Block metadata, attributes (`pardotFormUrl`, `pardotFormHandlerId`), `providesContext`, `allowedBlocks` |
+| `src/big-orange-pardot/block.json` | Block metadata, attributes (`pardotFormUrl`, `pardotFormHandlerId`, field style attrs), `providesContext`, `allowedBlocks`, native `color`/`spacing`/`border` supports |
 | `src/big-orange-pardot/index.js` | Block registration |
-| `src/big-orange-pardot/edit.js` | Editor component — handler dropdown, "Import fields from Pardot" button, `useInnerBlocksProps` with default 7-field template |
-| `src/big-orange-pardot/render.php` | PHP template — wraps `$content` (rendered inner blocks) in `<form action="...">` + hidden attribution inputs |
-| `src/big-orange-pardot/save.js` | Returns `null` (dynamic block) |
-| `src/big-orange-pardot/editor.scss` | Editor-only styles (inspector notice, loading spinner) |
-| `src/big-orange-pardot/style.scss` | Frontend (and editor) styles — CSS grid two-column layout on `form` |
+| `src/big-orange-pardot/edit.js` | Editor component — handler dropdown, "Import fields from Pardot" button, `useInnerBlocksProps` with default 7-field template; emits field CSS custom props via `useBlockProps` |
+| `src/big-orange-pardot/render.php` | PHP template — wraps `$content` (rendered inner blocks) in `<form action="...">` + hidden attribution inputs; emits field CSS custom props via `get_block_wrapper_attributes()` |
+| `src/big-orange-pardot/save.js` | Returns `<InnerBlocks.Content />` (serializes inner blocks to post_content) |
+| `src/big-orange-pardot/editor.scss` | Editor-only styles — CSS grid mirroring via `:has()` on `.block-editor-block-list__layout` so half-width fields sit side-by-side in the editor |
+| `src/big-orange-pardot/style.scss` | Frontend (and editor) styles — CSS grid two-column layout on `form`; all field colours driven by `--bol-*` CSS custom properties |
 | `assets/attribution.js` | Global cookie capture + hidden field population (enqueued on every page, no build step) |
 
 **`bigorangelab/pardot-field`** — individual form field (`src/pardot-field/`)
@@ -32,17 +32,19 @@ The plugin provides three block types:
 | File | Purpose |
 |------|---------|
 | `src/pardot-field/block.json` | Metadata — `parent: ["bigorangelab/big-orange-pardot"]`; attributes: `fieldName`, `label`, `fieldType` (text/email/tel/textarea), `isRequired`, `placeholder`, `width` (full/half) |
-| `src/pardot-field/edit.js` | InspectorControls (5 field settings), visual preview with label wrapping input |
+| `src/pardot-field/edit.js` | InspectorControls (field settings + linked Field Styling panel that reads/writes the *parent* block's style attributes via `getBlockRootClientId`+`updateBlockAttributes`) |
 | `src/pardot-field/render.php` | Outputs `<div class="bol-pardot-field bol-pardot-field--{width}">…</div>` — no `get_block_wrapper_attributes()` so CSS grid works cleanly |
 | `src/pardot-field/save.js` | Returns `null` (dynamic block) |
+
+**Field styling pattern:** style attributes (`fieldLabelColor`, `fieldInputBg`, `fieldBorderColor`, `fieldFocusColor`, `fieldBorderRadius`) are stored on the **parent** block, not on each field. The UI appears when any field is selected, keeping all fields visually consistent. The parent emits `--bol-label-color`, `--bol-input-bg`, `--bol-border-color`, `--bol-focus-color`, `--bol-field-radius` CSS custom properties on its wrapper element; `style.scss` consumes them via `var()` with fallback chains.
 
 **`bigorangelab/pardot-submit`** — submit button (`src/pardot-submit/`)
 
 | File | Purpose |
 |------|---------|
-| `src/pardot-submit/block.json` | Metadata — `parent: ["bigorangelab/big-orange-pardot"]`; attribute: `label` |
-| `src/pardot-submit/edit.js` | InspectorControls (button label), disabled preview button |
-| `src/pardot-submit/render.php` | Outputs `<div class="bol-pardot-submit"><button type="submit">…</button></div>` |
+| `src/pardot-submit/block.json` | Metadata — `parent: ["bigorangelab/big-orange-pardot"]`; attributes: `label`, plus full button styling attrs (`buttonTextColor`, `buttonBgColor`, `buttonBgGradient`, `buttonHoverBgColor`, `buttonBorderColor/Width/Style/Radius`, `buttonPadding`, `buttonShadow`, `buttonAlignment`); native `spacing.margin` support |
+| `src/pardot-submit/edit.js` | `BlockControls` alignment toolbar + `InspectorControls` with color/gradient pickers, padding `BoxControl`, border controls, shadow `TextControl`; builds inline `buttonStyle` applied to the preview `<button>` |
+| `src/pardot-submit/render.php` | Wrapper div via `get_block_wrapper_attributes()`; button style attributes applied as inline `style` on `<button>`; hover color emitted as `--bol-btn-hover-bg` CSS custom property |
 | `src/pardot-submit/save.js` | Returns `null` (dynamic block) |
 
 ### PHP includes
@@ -60,7 +62,7 @@ The plugin provides three block types:
 - **REST endpoints:**
   - `GET /wp-json/big-orange-pardot/v1/form-handlers` — requires `manage_options`. Powers the block editor handler dropdown.
   - `GET /wp-json/big-orange-pardot/v1/form-handler-fields?handler_id={id}` — requires `manage_options`. Powers the "Import fields from Pardot" button in the editor.
-- **Help tab:** `BOL_Admin_Page::render_help_tab()` contains user-facing setup documentation. **Update it whenever the plugin's behaviour, setup steps, form fields, or attribution tracking changes.**
+- **Help tab:** `BOL_Admin_Page::render_help_tab()` contains user-facing setup documentation. **Update it whenever the plugin's behaviour, setup steps, form fields, or attribution tracking changes.** This includes any significant new features — e.g. new block controls, new field options, changes to how the form or submit button work.
 - **Attribution fields:** 8 hidden fields populated by `assets/attribution.js` cookies: `utm_source`, `utm_medium`, `utm_campaign`, `utm_term`, `utm_content`, `referrer_url`, `landing_page_url`, `gclid`.
 
 ## Build System
@@ -117,12 +119,15 @@ This project follows **WordPress Core coding standards** throughout, enforced by
 
 ## Before marking any task as done
 
-Run **both** linters and fix any reported issues:
+1. Run **both** linters and fix any reported issues:
 
 ```bash
 npm run lint:js && npm run lint:css
 composer lint:php
 ```
+
+2. If the task adds or changes user-visible behaviour, update the **Help tab** in `includes/class-bol-admin-page.php` (`render_help_tab()`).
+3. Update **`CLAUDE.md`** and **`.github/copilot-instructions.md`** with any architectural changes.
 
 ## Requirements
 

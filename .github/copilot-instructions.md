@@ -8,9 +8,9 @@ This plugin provides Gutenberg blocks for embedding and configuring Pardot (Acco
 
 - `big-orange-pardot.php`: Main plugin bootstrap. Registers blocks, REST routes, admin page, and scripts.
 - `src/`: Source of truth for block code (JSX/SCSS/PHP render templates).
-  - `src/big-orange-pardot/`: Parent form block — handler dropdown, "Import fields from Pardot" button, `useInnerBlocksProps` with default 7-field template.
-  - `src/pardot-field/`: Child field block — attributes: `fieldName`, `label`, `fieldType` (text/email/tel/textarea), `isRequired`, `placeholder`, `width` (full/half). `render.php` does NOT call `get_block_wrapper_attributes()` so the CSS grid on the parent `<form>` applies cleanly.
-  - `src/pardot-submit/`: Child submit block — single `label` attribute.
+  - `src/big-orange-pardot/`: Parent form block — handler dropdown, "Import fields from Pardot" button, `useInnerBlocksProps` with default 7-field template. Stores shared field style attributes (`fieldLabelColor`, `fieldInputBg`, `fieldBorderColor`, `fieldFocusColor`, `fieldBorderRadius`) and emits them as `--bol-*` CSS custom properties on the wrapper. Native `color`/`spacing`/`border` supports for form-level appearance. `save.js` returns `<InnerBlocks.Content />` (not `null`) to serialize inner blocks.
+  - `src/pardot-field/`: Child field block — attributes: `fieldName`, `label`, `fieldType` (text/email/tel/textarea), `isRequired`, `placeholder`, `width` (full/half). The "Field Styling" panel in `edit.js` reads and writes style attributes on the **parent** block (via `getBlockRootClientId`/`updateBlockAttributes`), keeping styling consistent across all fields. `render.php` does NOT call `get_block_wrapper_attributes()` so the CSS grid on the parent `<form>` applies cleanly.
+  - `src/pardot-submit/`: Child submit block — `label` + full button style attributes (`buttonTextColor`, `buttonBgColor`, `buttonBgGradient`, `buttonHoverBgColor`, border/padding/shadow/alignment attrs). Button styles are applied inline on `<button>` (not the wrapper) in both `edit.js` and `render.php`. Hover color uses `--bol-btn-hover-bg` CSS custom property.
 - `includes/`: PHP classes for Pardot API integration and plugin admin/settings UI.
   - `includes/class-bol-pardot-api.php`: Static API client — OAuth token management, form handler cache, form handler fields.
   - `includes/class-bol-admin-page.php`: Two-tab settings page (Settings + Help). **Keep `render_help_tab()` current whenever plugin behaviour changes.**
@@ -27,6 +27,18 @@ The parent `<form>` uses a two-column CSS grid. Child block wrapper divs are dir
 - `.bol-pardot-field--full` → `grid-column: span 2`
 - `.bol-pardot-field--half` → `grid-column: span 1`
 - `.bol-pardot-submit` → `grid-column: span 2`
+
+In the block editor, Gutenberg wraps each inner block in a `.wp-block` div, which breaks the grid. `editor.scss` targets `.block-editor-block-list__layout` as the grid container and uses `:has()` to apply `grid-column` to the `.wp-block` wrappers based on their child classes.
+
+## Field styling CSS custom properties
+
+The parent block wrapper emits these custom properties, consumed by `style.scss`:
+- `--bol-label-color` — label text colour
+- `--bol-input-bg` — input/textarea background
+- `--bol-border-color` — input/textarea border colour
+- `--bol-focus-color` — focus outline/border accent
+- `--bol-field-radius` — input/textarea border radius
+- `--bol-btn-hover-bg` — submit button hover background (set on the `<button>` element)
 
 ## REST endpoints
 

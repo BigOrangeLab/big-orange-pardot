@@ -1,19 +1,60 @@
-import { InspectorControls, useBlockProps } from '@wordpress/block-editor';
+import {
+	InspectorControls,
+	PanelColorSettings,
+	store as blockEditorStore,
+	useBlockProps,
+} from '@wordpress/block-editor';
 import {
 	PanelBody,
+	RangeControl,
 	SelectControl,
 	TextControl,
 	ToggleControl,
 } from '@wordpress/components';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 
-export default function Edit( { attributes, setAttributes } ) {
+export default function Edit( { attributes, setAttributes, clientId } ) {
 	const { fieldName, label, fieldType, isRequired, placeholder, width } =
 		attributes;
 
 	const blockProps = useBlockProps( {
 		className: `bol-pardot-field bol-pardot-field--${ width }`,
 	} );
+
+	// Read shared field style attributes from the parent block so all fields
+	// show the same values — changing one field's styling updates them all.
+	const {
+		parentClientId,
+		fieldLabelColor,
+		fieldInputBg,
+		fieldBorderColor,
+		fieldFocusColor,
+		fieldBorderRadius,
+	} = useSelect(
+		( select ) => {
+			const { getBlockRootClientId, getBlockAttributes } =
+				select( blockEditorStore );
+			const parentId = getBlockRootClientId( clientId );
+			const parentAttrs = getBlockAttributes( parentId ) || {};
+			return {
+				parentClientId: parentId,
+				fieldLabelColor: parentAttrs.fieldLabelColor || '',
+				fieldInputBg: parentAttrs.fieldInputBg || '',
+				fieldBorderColor: parentAttrs.fieldBorderColor || '',
+				fieldFocusColor: parentAttrs.fieldFocusColor || '',
+				fieldBorderRadius: parentAttrs.fieldBorderRadius || '',
+			};
+		},
+		[ clientId ]
+	);
+
+	// Write field style changes back to the parent so all fields share them.
+	const { updateBlockAttributes } = useDispatch( blockEditorStore );
+	function setFieldStyle( attr ) {
+		return ( value ) =>
+			updateBlockAttributes( parentClientId, { [ attr ]: value || '' } );
+	}
 
 	return (
 		<>
@@ -96,6 +137,74 @@ export default function Edit( { attributes, setAttributes } ) {
 						) }
 					/>
 				</PanelBody>
+			</InspectorControls>
+
+			{ /* Field styling is stored on the parent and shared across all fields. */ }
+			<InspectorControls>
+				<PanelColorSettings
+					title={ __( 'Field Styling', 'big-orange-pardot' ) }
+					initialOpen={ false }
+					colorSettings={ [
+						{
+							value: fieldLabelColor,
+							onChange: setFieldStyle( 'fieldLabelColor' ),
+							label: __( 'Label Color', 'big-orange-pardot' ),
+						},
+						{
+							value: fieldInputBg,
+							onChange: setFieldStyle( 'fieldInputBg' ),
+							label: __(
+								'Input Background',
+								'big-orange-pardot'
+							),
+						},
+						{
+							value: fieldBorderColor,
+							onChange: setFieldStyle( 'fieldBorderColor' ),
+							label: __(
+								'Input Border Color',
+								'big-orange-pardot'
+							),
+						},
+						{
+							value: fieldFocusColor,
+							onChange: setFieldStyle( 'fieldFocusColor' ),
+							label: __(
+								'Focus / Accent Color',
+								'big-orange-pardot'
+							),
+						},
+					] }
+				>
+					<RangeControl
+						label={ __(
+							'Input Border Radius (px)',
+							'big-orange-pardot'
+						) }
+						value={
+							fieldBorderRadius
+								? parseInt( fieldBorderRadius, 10 )
+								: undefined
+						}
+						onChange={ ( value ) =>
+							updateBlockAttributes( parentClientId, {
+								fieldBorderRadius:
+									value !== undefined
+										? String( value ) + 'px'
+										: '',
+							} )
+						}
+						min={ 0 }
+						max={ 24 }
+						allowReset
+					/>
+					<p className="components-base-control__help">
+						{ __(
+							'These settings apply to all fields in this form.',
+							'big-orange-pardot'
+						) }
+					</p>
+				</PanelColorSettings>
 			</InspectorControls>
 
 			<div { ...blockProps }>

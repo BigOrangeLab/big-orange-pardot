@@ -14,7 +14,21 @@ return array(
 			
 		),
 		'supports' => array(
-			'html' => false
+			'html' => false,
+			'color' => array(
+				'background' => true,
+				'text' => false
+			),
+			'spacing' => array(
+				'padding' => true,
+				'margin' => true
+			),
+			'border' => array(
+				'color' => true,
+				'radius' => true,
+				'style' => true,
+				'width' => true
+			)
 		),
 		'attributes' => array(
 			'pardotFormUrl' => array(
@@ -24,6 +38,26 @@ return array(
 			'pardotFormHandlerId' => array(
 				'type' => 'integer',
 				'default' => 0
+			),
+			'fieldLabelColor' => array(
+				'type' => 'string',
+				'default' => ''
+			),
+			'fieldInputBg' => array(
+				'type' => 'string',
+				'default' => ''
+			),
+			'fieldBorderColor' => array(
+				'type' => 'string',
+				'default' => ''
+			),
+			'fieldFocusColor' => array(
+				'type' => 'string',
+				'default' => ''
+			),
+			'fieldBorderRadius' => array(
+				'type' => 'string',
+				'default' => ''
 			)
 		),
 		'providesContext' => array(
@@ -112,12 +146,61 @@ return array(
 		),
 		'supports' => array(
 			'html' => false,
-			'reusable' => false
+			'reusable' => false,
+			'spacing' => array(
+				'margin' => true
+			)
 		),
 		'attributes' => array(
 			'label' => array(
 				'type' => 'string',
 				'default' => 'Submit'
+			),
+			'buttonTextColor' => array(
+				'type' => 'string',
+				'default' => ''
+			),
+			'buttonBgColor' => array(
+				'type' => 'string',
+				'default' => ''
+			),
+			'buttonBgGradient' => array(
+				'type' => 'string',
+				'default' => ''
+			),
+			'buttonHoverBgColor' => array(
+				'type' => 'string',
+				'default' => ''
+			),
+			'buttonBorderColor' => array(
+				'type' => 'string',
+				'default' => ''
+			),
+			'buttonBorderWidth' => array(
+				'type' => 'string',
+				'default' => ''
+			),
+			'buttonBorderStyle' => array(
+				'type' => 'string',
+				'default' => ''
+			),
+			'buttonBorderRadius' => array(
+				'type' => 'string',
+				'default' => ''
+			),
+			'buttonPadding' => array(
+				'type' => 'object',
+				'default' => array(
+					
+				)
+			),
+			'buttonShadow' => array(
+				'type' => 'string',
+				'default' => ''
+			),
+			'buttonAlignment' => array(
+				'type' => 'string',
+				'default' => 'left'
 			)
 		),
 		'textdomain' => 'big-orange-pardot',

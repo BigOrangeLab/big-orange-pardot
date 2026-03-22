@@ -10,12 +10,59 @@
 	"parent": [ "bigorangelab/big-orange-pardot" ],
 	"supports": {
 		"html": false,
-		"reusable": false
+		"reusable": false,
+		"spacing": {
+			"margin": true
+		}
 	},
 	"attributes": {
 		"label": {
 			"type": "string",
 			"default": "Submit"
+		},
+		"buttonTextColor": {
+			"type": "string",
+			"default": ""
+		},
+		"buttonBgColor": {
+			"type": "string",
+			"default": ""
+		},
+		"buttonBgGradient": {
+			"type": "string",
+			"default": ""
+		},
+		"buttonHoverBgColor": {
+			"type": "string",
+			"default": ""
+		},
+		"buttonBorderColor": {
+			"type": "string",
+			"default": ""
+		},
+		"buttonBorderWidth": {
+			"type": "string",
+			"default": ""
+		},
+		"buttonBorderStyle": {
+			"type": "string",
+			"default": ""
+		},
+		"buttonBorderRadius": {
+			"type": "string",
+			"default": ""
+		},
+		"buttonPadding": {
+			"type": "object",
+			"default": {}
+		},
+		"buttonShadow": {
+			"type": "string",
+			"default": ""
+		},
+		"buttonAlignment": {
+			"type": "string",
+			"default": "left"
 		}
 	},
 	"textdomain": "big-orange-pardot",

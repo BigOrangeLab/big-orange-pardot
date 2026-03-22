@@ -1,9 +1,17 @@
 /**
  * Big Orange Pardot — frontend & editor shared styles.
  *
- * Uses WordPress global style CSS variables (--wp--preset--*) and Kadence
- * palette variables (--global-palette*) with sensible fallbacks so the form
- * inherits whatever theme is active without hardcoded colors or fonts.
+ * Field colours, border, and border-radius are driven by CSS custom properties
+ * emitted by the parent block so changing them in one place updates all fields.
+ *
+ * Custom properties (all optional — fallback chain: block setting → Kadence
+ * palette → WP preset → hard-coded default):
+ *   --bol-label-color   Label text colour
+ *   --bol-input-bg      Input / textarea background colour
+ *   --bol-border-color  Input / textarea border colour
+ *   --bol-focus-color   Focus outline / border accent colour
+ *   --bol-field-radius  Input / textarea border-radius
+ *   --bol-btn-hover-bg  Submit button hover background
  */
 
 .wp-block-bigorangelab-big-orange-pardot {
@@ -39,7 +47,7 @@
 		label {
 			font-size: var(--wp--preset--font-size--small, 0.875rem);
 			font-weight: 600;
-			color: var(--global-palette3, var(--wp--preset--color--contrast, inherit));
+			color: var(--bol-label-color, var(--global-palette3, var(--wp--preset--color--contrast, inherit)));
 		}
 
 		input {
@@ -48,9 +56,9 @@
 			font-size: var(--wp--preset--font-size--medium, 1rem);
 			font-family: inherit;
 			color: var(--global-palette3, var(--wp--preset--color--contrast, inherit));
-			background-color: var(--global-palette9, var(--wp--preset--color--base, #fff));
-			border: 1px solid var(--global-palette7, var(--wp--preset--color--accent-4, #ccc));
-			border-radius: 0.25rem;
+			background-color: var(--bol-input-bg, var(--global-palette9, var(--wp--preset--color--base, #fff)));
+			border: 1px solid var(--bol-border-color, var(--global-palette7, var(--wp--preset--color--accent-4, #ccc)));
+			border-radius: var(--bol-field-radius, 0.25rem);
 			box-sizing: border-box;
 			transition: border-color 0.15s ease;
 
@@ -60,13 +68,13 @@
 			}
 
 			&:focus {
-				outline: 2px solid var(--global-palette1, var(--wp--preset--color--accent-3, #000));
+				outline: 2px solid var(--bol-focus-color, var(--global-palette1, var(--wp--preset--color--accent-3, #000)));
 				outline-offset: 1px;
-				border-color: var(--global-palette1, var(--wp--preset--color--accent-3, #000));
+				border-color: var(--bol-focus-color, var(--global-palette1, var(--wp--preset--color--accent-3, #000)));
 			}
 
 			&:hover:not(:disabled) {
-				border-color: var(--global-palette5, var(--wp--preset--color--accent-4, #999));
+				border-color: var(--bol-focus-color, var(--global-palette5, var(--wp--preset--color--accent-4, #999)));
 			}
 		}
 
@@ -76,9 +84,9 @@
 			font-size: var(--wp--preset--font-size--medium, 1rem);
 			font-family: inherit;
 			color: var(--global-palette3, var(--wp--preset--color--contrast, inherit));
-			background-color: var(--global-palette9, var(--wp--preset--color--base, #fff));
-			border: 1px solid var(--global-palette7, var(--wp--preset--color--accent-4, #ccc));
-			border-radius: 0.25rem;
+			background-color: var(--bol-input-bg, var(--global-palette9, var(--wp--preset--color--base, #fff)));
+			border: 1px solid var(--bol-border-color, var(--global-palette7, var(--wp--preset--color--accent-4, #ccc)));
+			border-radius: var(--bol-field-radius, 0.25rem);
 			box-sizing: border-box;
 			transition: border-color 0.15s ease;
 			resize: vertical;
@@ -90,13 +98,13 @@
 			}
 
 			&:focus {
-				outline: 2px solid var(--global-palette1, var(--wp--preset--color--accent-3, #000));
+				outline: 2px solid var(--bol-focus-color, var(--global-palette1, var(--wp--preset--color--accent-3, #000)));
 				outline-offset: 1px;
-				border-color: var(--global-palette1, var(--wp--preset--color--accent-3, #000));
+				border-color: var(--bol-focus-color, var(--global-palette1, var(--wp--preset--color--accent-3, #000)));
 			}
 
 			&:hover:not(:disabled) {
-				border-color: var(--global-palette5, var(--wp--preset--color--accent-4, #999));
+				border-color: var(--bol-focus-color, var(--global-palette5, var(--wp--preset--color--accent-4, #999)));
 			}
 		}
 	}
@@ -140,7 +148,7 @@
 			}
 
 			&:hover:not(:disabled) {
-				background-color: var(--global-palette2, var(--wp--preset--color--contrast, #000));
+				background-color: var(--bol-btn-hover-bg, var(--global-palette2, var(--wp--preset--color--contrast, #000)));
 			}
 		}
 	}

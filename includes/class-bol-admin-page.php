@@ -433,8 +433,40 @@ class BOL_Admin_Page {
 				<li><strong><?php esc_html_e( 'Placeholder', 'big-orange-pardot' ); ?></strong> — <?php esc_html_e( 'Placeholder text shown inside the input.', 'big-orange-pardot' ); ?></li>
 				<li><strong><?php esc_html_e( 'Width', 'big-orange-pardot' ); ?></strong> — <?php esc_html_e( 'Full width (spans both grid columns) or Half width (spans one column). Two adjacent half-width fields sit side by side on the frontend.', 'big-orange-pardot' ); ?></li>
 			</ul>
-			<p><?php esc_html_e( 'The form is styled to inherit the active theme\'s colors and typography via CSS custom properties.', 'big-orange-pardot' ); ?></p>
-			<p><?php esc_html_e( 'Kadence Blocks is required — the submit button uses Kadence\'s button classes so it inherits the global button style you have configured in Kadence.', 'big-orange-pardot' ); ?></p>
+
+			<h3><?php esc_html_e( 'Field styling', 'big-orange-pardot' ); ?></h3>
+			<p><?php esc_html_e( 'When any Pardot Field block is selected, the block settings panel shows a Field Styling section. Changes made here apply to every field in the form — the settings are stored once on the parent form block and cascade to all fields automatically.', 'big-orange-pardot' ); ?></p>
+			<ul style="list-style: disc; margin-left: 2em;">
+				<li><strong><?php esc_html_e( 'Label Color', 'big-orange-pardot' ); ?></strong> — <?php esc_html_e( 'Text colour for all field labels.', 'big-orange-pardot' ); ?></li>
+				<li><strong><?php esc_html_e( 'Input Background', 'big-orange-pardot' ); ?></strong> — <?php esc_html_e( 'Background colour for text inputs and textareas.', 'big-orange-pardot' ); ?></li>
+				<li><strong><?php esc_html_e( 'Input Border Color', 'big-orange-pardot' ); ?></strong> — <?php esc_html_e( 'Border colour for text inputs and textareas.', 'big-orange-pardot' ); ?></li>
+				<li><strong><?php esc_html_e( 'Focus / Accent Color', 'big-orange-pardot' ); ?></strong> — <?php esc_html_e( 'Outline and border colour when a field is focused; also used for the hover border on inputs.', 'big-orange-pardot' ); ?></li>
+				<li><strong><?php esc_html_e( 'Input Border Radius (px)', 'big-orange-pardot' ); ?></strong> — <?php esc_html_e( 'Corner rounding applied to all inputs and textareas.', 'big-orange-pardot' ); ?></li>
+			</ul>
+			<p class="description"><?php esc_html_e( 'When no custom colours are set, the form falls back to your active theme\'s color palette (Kadence global palette variables, then WordPress preset colors, then sensible hard-coded defaults).', 'big-orange-pardot' ); ?></p>
+
+			<h3><?php esc_html_e( 'Form-level styling', 'big-orange-pardot' ); ?></h3>
+			<p><?php esc_html_e( 'Select the outer Big Orange Pardot block itself (not a field inside it) to access additional styling controls in the block settings panel and the block toolbar:', 'big-orange-pardot' ); ?></p>
+			<ul style="list-style: disc; margin-left: 2em;">
+				<li><strong><?php esc_html_e( 'Color → Background', 'big-orange-pardot' ); ?></strong> — <?php esc_html_e( 'Background colour of the entire form wrapper.', 'big-orange-pardot' ); ?></li>
+				<li><strong><?php esc_html_e( 'Dimensions → Padding / Margin', 'big-orange-pardot' ); ?></strong> — <?php esc_html_e( 'Spacing inside and outside the form wrapper.', 'big-orange-pardot' ); ?></li>
+				<li><strong><?php esc_html_e( 'Border', 'big-orange-pardot' ); ?></strong> — <?php esc_html_e( 'Border color, width, style, and radius for the form wrapper.', 'big-orange-pardot' ); ?></li>
+			</ul>
+
+			<h3><?php esc_html_e( 'Submit button styling', 'big-orange-pardot' ); ?></h3>
+			<p><?php esc_html_e( 'Select the Pardot Submit Button block to access its settings. The button inherits Kadence\'s global button classes by default; the options below let you override individual properties:', 'big-orange-pardot' ); ?></p>
+			<ul style="list-style: disc; margin-left: 2em;">
+				<li><strong><?php esc_html_e( 'Alignment', 'big-orange-pardot' ); ?></strong> — <?php esc_html_e( 'Left, center, or right — available in the block toolbar.', 'big-orange-pardot' ); ?></li>
+				<li><strong><?php esc_html_e( 'Button Label', 'big-orange-pardot' ); ?></strong> — <?php esc_html_e( 'The button text (defaults to "Submit").', 'big-orange-pardot' ); ?></li>
+				<li><strong><?php esc_html_e( 'Button Colors → Text Color', 'big-orange-pardot' ); ?></strong> — <?php esc_html_e( 'Button label colour.', 'big-orange-pardot' ); ?></li>
+				<li><strong><?php esc_html_e( 'Button Colors → Background', 'big-orange-pardot' ); ?></strong> — <?php esc_html_e( 'Solid background colour or gradient for the button.', 'big-orange-pardot' ); ?></li>
+				<li><strong><?php esc_html_e( 'Button Colors → Hover Background', 'big-orange-pardot' ); ?></strong> — <?php esc_html_e( 'Background colour shown when the button is hovered.', 'big-orange-pardot' ); ?></li>
+				<li><strong><?php esc_html_e( 'Button Appearance → Padding', 'big-orange-pardot' ); ?></strong> — <?php esc_html_e( 'Inner spacing on each side of the button label.', 'big-orange-pardot' ); ?></li>
+				<li><strong><?php esc_html_e( 'Button Appearance → Border Radius (px)', 'big-orange-pardot' ); ?></strong> — <?php esc_html_e( 'Corner rounding for the button.', 'big-orange-pardot' ); ?></li>
+				<li><strong><?php esc_html_e( 'Button Appearance → Border', 'big-orange-pardot' ); ?></strong> — <?php esc_html_e( 'Border color, width, and style.', 'big-orange-pardot' ); ?></li>
+				<li><strong><?php esc_html_e( 'Button Appearance → Box Shadow', 'big-orange-pardot' ); ?></strong> — <?php esc_html_e( 'Any valid CSS box-shadow value (e.g. "0 2px 8px rgba(0,0,0,0.15)").', 'big-orange-pardot' ); ?></li>
+				<li><strong><?php esc_html_e( 'Dimensions → Margin', 'big-orange-pardot' ); ?></strong> — <?php esc_html_e( 'Outer spacing around the button wrapper.', 'big-orange-pardot' ); ?></li>
+			</ul>
 
 			<hr />
 

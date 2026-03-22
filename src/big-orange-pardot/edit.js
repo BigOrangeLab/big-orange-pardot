@@ -100,8 +100,36 @@ const DEFAULT_TEMPLATE = [
 ];
 
 export default function Edit( { attributes, setAttributes, clientId } ) {
-	const { pardotFormUrl, pardotFormHandlerId } = attributes;
-	const blockProps = useBlockProps();
+	const {
+		pardotFormUrl,
+		pardotFormHandlerId,
+		fieldLabelColor,
+		fieldInputBg,
+		fieldBorderColor,
+		fieldFocusColor,
+		fieldBorderRadius,
+	} = attributes;
+
+	// Emit field style attributes as CSS custom properties so child field
+	// blocks inherit them via the cascade — no context passing required.
+	const fieldCustomProps = {};
+	if ( fieldLabelColor ) {
+		fieldCustomProps[ '--bol-label-color' ] = fieldLabelColor;
+	}
+	if ( fieldInputBg ) {
+		fieldCustomProps[ '--bol-input-bg' ] = fieldInputBg;
+	}
+	if ( fieldBorderColor ) {
+		fieldCustomProps[ '--bol-border-color' ] = fieldBorderColor;
+	}
+	if ( fieldFocusColor ) {
+		fieldCustomProps[ '--bol-focus-color' ] = fieldFocusColor;
+	}
+	if ( fieldBorderRadius ) {
+		fieldCustomProps[ '--bol-field-radius' ] = fieldBorderRadius;
+	}
+
+	const blockProps = useBlockProps( { style: fieldCustomProps } );
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		template: DEFAULT_TEMPLATE,
 		templateLock: false,

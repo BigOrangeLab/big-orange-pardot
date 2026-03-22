@@ -8,47 +8,40 @@ A WordPress Gutenberg block plugin integrating Pardot (Account Engagement) form 
 ## Architecture
 
 - **Main entry:** `big-orange-pardot.php` — registers block types, REST routes, admin page, and scripts
-- **Source:** `src/` — JSX/SCSS source files for all three block types
+- **Source:** `src/` — JSX/SCSS source files for all two block types
 - **Build output:** `build/` — compiled assets per block (do not edit directly)
 - **Block manifest:** `build/blocks-manifest.php` — auto-generated, do not edit
 - **PHP includes:** `includes/` — server-side API client and admin page classes
 
 ### Block architecture
 
-The plugin provides three block types:
+The plugin provides two block types:
 
-**`bigorangelab/big-orange-pardot`** — parent form block (`src/big-orange-pardot/`)
+**`bigorangelab/pardot-form`** — parent form block (`src/pardot-form/`)
 
 | File | Purpose |
 |------|---------|
-| `src/big-orange-pardot/block.json` | Block metadata, attributes (`pardotFormUrl`, `pardotFormHandlerId`, field style attrs), `providesContext`, `allowedBlocks`, native `color`/`spacing`/`border` supports |
-| `src/big-orange-pardot/index.js` | Block registration |
-| `src/big-orange-pardot/edit.js` | Editor component — handler dropdown, "Import fields from Pardot" button, `useInnerBlocksProps` with default 7-field template; emits field CSS custom props via `useBlockProps` |
-| `src/big-orange-pardot/render.php` | PHP template — wraps `$content` (rendered inner blocks) in `<form action="...">` + hidden attribution inputs; emits field CSS custom props via `get_block_wrapper_attributes()` |
-| `src/big-orange-pardot/save.js` | Returns `<InnerBlocks.Content />` (serializes inner blocks to post_content) |
-| `src/big-orange-pardot/editor.scss` | Editor-only styles — CSS grid mirroring via `:has()` on `.block-editor-block-list__layout` so half-width fields sit side-by-side in the editor |
-| `src/big-orange-pardot/style.scss` | Frontend (and editor) styles — CSS grid two-column layout on `form`; all field colours driven by `--bol-*` CSS custom properties |
+| `src/pardot-form/block.json` | Block metadata, attributes (`pardotFormUrl`, `pardotFormHandlerId`, field style attrs, button style attrs), `providesContext`, `allowedBlocks`, native `color`/`spacing`/`border` supports |
+| `src/pardot-form/index.js` | Block registration |
+| `src/pardot-form/edit.js` | Editor component — handler dropdown, "Import fields from Pardot" button, `useInnerBlocksProps` with default 7-field template; `BlockControls` alignment toolbar; `InspectorControls` for button colors/appearance; inline `RichText` submit button preview; emits field CSS custom props via `useBlockProps` |
+| `src/pardot-form/render.php` | PHP template — wraps `$content` (rendered inner blocks) in `<form action="...">` + inline submit button + hidden attribution inputs; emits field and button CSS custom props via `get_block_wrapper_attributes()` |
+| `src/pardot-form/save.js` | Returns `<InnerBlocks.Content />` (serializes inner blocks to post_content) |
+| `src/pardot-form/editor.scss` | Editor-only styles — CSS grid mirroring via `:has()` on `.block-editor-block-list__layout` so half-width fields sit side-by-side in the editor |
+| `src/pardot-form/style.scss` | Frontend (and editor) styles — CSS grid two-column layout on `form`; all field colours driven by `--bol-*` CSS custom properties |
 | `assets/attribution.js` | Global cookie capture + hidden field population (enqueued on every page, no build step) |
+
+**Submit button pattern:** The submit button is part of the parent `pardot-form` block, not a separate child block. Button style attributes (`submitLabel`, `buttonTextColor`, `buttonBgColor`, `buttonBgGradient`, `buttonHoverBgColor`, `buttonBorderColor`, `buttonBorderWidth`, `buttonBorderStyle`, `buttonBorderRadius`, `buttonPadding`, `buttonShadow`, `buttonAlignment`) are all stored on the parent block. The editor renders the button as an inline `RichText` element; `render.php` outputs it as a `<button type="submit">` with inline styles. Hover color is emitted as `--bol-btn-hover-bg` CSS custom property.
 
 **`bigorangelab/pardot-field`** — individual form field (`src/pardot-field/`)
 
 | File | Purpose |
 |------|---------|
-| `src/pardot-field/block.json` | Metadata — `parent: ["bigorangelab/big-orange-pardot"]`; attributes: `fieldName`, `label`, `fieldType` (text/email/tel/textarea), `isRequired`, `placeholder`, `width` (full/half) |
+| `src/pardot-field/block.json` | Metadata — `parent: ["bigorangelab/pardot-form"]`; attributes: `fieldName`, `label`, `fieldType` (text/email/tel/textarea), `isRequired`, `placeholder`, `width` (full/half) |
 | `src/pardot-field/edit.js` | InspectorControls (field settings + linked Field Styling panel that reads/writes the *parent* block's style attributes via `getBlockRootClientId`+`updateBlockAttributes`) |
 | `src/pardot-field/render.php` | Outputs `<div class="bol-pardot-field bol-pardot-field--{width}">…</div>` — no `get_block_wrapper_attributes()` so CSS grid works cleanly |
 | `src/pardot-field/save.js` | Returns `null` (dynamic block) |
 
 **Field styling pattern:** style attributes (`fieldLabelColor`, `fieldInputBg`, `fieldBorderColor`, `fieldFocusColor`, `fieldBorderRadius`) are stored on the **parent** block, not on each field. The UI appears when any field is selected, keeping all fields visually consistent. The parent emits `--bol-label-color`, `--bol-input-bg`, `--bol-border-color`, `--bol-focus-color`, `--bol-field-radius` CSS custom properties on its wrapper element; `style.scss` consumes them via `var()` with fallback chains.
-
-**`bigorangelab/pardot-submit`** — submit button (`src/pardot-submit/`)
-
-| File | Purpose |
-|------|---------|
-| `src/pardot-submit/block.json` | Metadata — `parent: ["bigorangelab/big-orange-pardot"]`; attributes: `label`, plus full button styling attrs (`buttonTextColor`, `buttonBgColor`, `buttonBgGradient`, `buttonHoverBgColor`, `buttonBorderColor/Width/Style/Radius`, `buttonPadding`, `buttonShadow`, `buttonAlignment`); native `spacing.margin` support |
-| `src/pardot-submit/edit.js` | `BlockControls` alignment toolbar + `InspectorControls` with color/gradient pickers, padding `BoxControl`, border controls, shadow `TextControl`; builds inline `buttonStyle` applied to the preview `<button>` |
-| `src/pardot-submit/render.php` | Wrapper div via `get_block_wrapper_attributes()`; button style attributes applied as inline `style` on `<button>`; hover color emitted as `--bol-btn-hover-bg` CSS custom property |
-| `src/pardot-submit/save.js` | Returns `null` (dynamic block) |
 
 ### PHP includes
 

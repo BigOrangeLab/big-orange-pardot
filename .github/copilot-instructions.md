@@ -35,6 +35,11 @@ The parent `<form>` uses a two-column CSS grid. Child block wrapper divs are dir
 
 Both require `manage_options`.
 
+## Debugging approach
+
+- **Check actual output before speculating.** When diagnosing a frontend issue, make an HTTP request to `https://pardot.wp.local/` and inspect the rendered HTML or loaded CSS first rather than reasoning about what the output might be.
+- **Ask the user questions early.** If a problem has multiple possible causes, ask a targeted question rather than running through all hypotheses.
+
 ## Working guidance
 
 - Prefer editing source files in `src/`, `includes/`, `assets/`, and `big-orange-pardot.php`.

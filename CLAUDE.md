@@ -110,6 +110,11 @@ This project follows **WordPress Core coding standards** throughout, enforced by
 - Avoid `input, textarea` combined rules when textarea needs additional properties — use separate blocks to satisfy `no-descending-specificity`.
 - Use CSS custom properties (`--wp--preset--*`, `--global-palette*`) with hardcoded fallbacks for theme compatibility.
 
+## Debugging approach
+
+- **Check actual output before speculating.** When diagnosing a frontend issue, make an HTTP request to the local site (`https://pardot.wp.local/`) and inspect the rendered HTML or loaded CSS first. This is faster and more reliable than reasoning about what the output might be.
+- **Ask the user questions early.** If a problem has multiple possible causes, ask a targeted question rather than running through all hypotheses. The user can often point you straight to the answer.
+
 ## Before marking any task as done
 
 Run **both** linters and fix any reported issues:

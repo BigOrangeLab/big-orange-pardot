@@ -10,6 +10,24 @@
 	outline: 1px dashed rgba(0, 0, 0, 0.15);
 	padding: 1rem;
 
+	// Mirror the frontend CSS grid on Gutenberg's inner block container.
+	// Each inner block is wrapped in a .wp-block div, so we use :has() to
+	// assign the correct grid-column span to that wrapper based on what's inside.
+	.block-editor-block-list__layout {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		gap: var(--wp--preset--spacing--30, 1rem);
+	}
+
+	.block-editor-block-list__layout > .wp-block:has(.bol-pardot-field--half) {
+		grid-column: span 1;
+	}
+
+	.block-editor-block-list__layout > .wp-block:has(.bol-pardot-field--full),
+	.block-editor-block-list__layout > .wp-block:has(.bol-pardot-submit) {
+		grid-column: span 2;
+	}
+
 	// Notice shown when no Form Handler URL is configured yet.
 	.bol-pardot-notice {
 		margin-bottom: 1rem;

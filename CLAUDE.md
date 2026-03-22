@@ -28,13 +28,14 @@ A WordPress Gutenberg block plugin integrating Pardot (Account Engagement) form 
 | File | Purpose |
 |------|---------|
 | `includes/class-bol-pardot-api.php` | Static API client — OAuth token management, Pardot v5 API requests, form handler cache |
-| `includes/class-bol-admin-page.php` | Settings page (Settings submenu) — credentials, OAuth connect/disconnect, form handler inspector |
+| `includes/class-bol-admin-page.php` | Settings page (Settings submenu) — two tabs: **Settings** (credentials, OAuth connect/disconnect, form handler inspector) and **Help** (user-facing setup documentation) |
 
 ### Pardot API integration
 
 - **OAuth flow:** Salesforce authorization code flow. Credentials (`client_id`, `client_secret`, `business_unit_id`) stored in `wp_options` (autoload off). Tokens refreshed automatically by `BOL_Pardot_API::get_access_token()` when within 60 seconds of expiry.
 - **Form handlers:** `BOL_Pardot_API::get_form_handlers()` fetches from `https://pi.pardot.com/api/v5/objects/form-handlers`, caches in transient `big_orange_pardot_form_handlers` (15 min). Returns `[{id, name, url}]` — the `url` is parsed from the handler's `embedCode` HTML via regex.
 - **REST endpoint:** `GET /wp-json/big-orange-pardot/v1/form-handlers` — requires `manage_options`. Powers the block editor dropdown.
+- **Help tab:** `BOL_Admin_Page::render_help_tab()` contains user-facing setup documentation. **Update it whenever the plugin's behaviour, setup steps, form fields, or attribution tracking changes.**
 - **Attribution fields:** 8 hidden fields populated by `assets/attribution.js` cookies: `utm_source`, `utm_medium`, `utm_campaign`, `utm_term`, `utm_content`, `referrer_url`, `landing_page_url`, `gclid`.
 
 ## Build System

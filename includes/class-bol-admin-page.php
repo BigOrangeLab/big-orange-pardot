@@ -11,6 +11,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 /**
  * Registers the Settings → Big Orange Pardot admin page and handles the OAuth flow.
+ *
+ * The page has two tabs: Settings (credentials, connection, inspector) and Help
+ * (user-facing documentation). Keep render_help_tab() up to date whenever the
+ * plugin's behaviour or setup process changes.
  */
 class BOL_Admin_Page {
 
@@ -204,6 +208,33 @@ class BOL_Admin_Page {
 	// -------------------------------------------------------------------------
 
 	/**
+	 * Returns the active tab slug, defaulting to 'settings'.
+	 *
+	 * @return string
+	 */
+	private function current_tab() {
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$tab = isset( $_GET['tab'] ) ? sanitize_key( $_GET['tab'] ) : 'settings';
+		return in_array( $tab, array( 'settings', 'help' ), true ) ? $tab : 'settings';
+	}
+
+	/**
+	 * Returns the URL to a specific tab on the settings page.
+	 *
+	 * @param string $tab Tab slug.
+	 * @return string
+	 */
+	private function tab_url( $tab ) {
+		return add_query_arg(
+			array(
+				'page' => self::SLUG,
+				'tab'  => $tab,
+			),
+			admin_url( 'options-general.php' )
+		);
+	}
+
+	/**
 	 * Renders the full settings page.
 	 *
 	 * @return void
@@ -212,76 +243,223 @@ class BOL_Admin_Page {
 		if ( ! current_user_can( 'manage_options' ) ) {
 			return;
 		}
+
+		$current_tab = $this->current_tab();
 		?>
 		<div class="wrap bol-pardot-admin">
 			<h1><?php esc_html_e( 'Big Orange Pardot', 'big-orange-pardot' ); ?></h1>
 
-			<?php $this->render_notices(); ?>
+			<nav class="nav-tab-wrapper">
+				<a href="<?php echo esc_url( $this->tab_url( 'settings' ) ); ?>"
+					class="nav-tab<?php echo 'settings' === $current_tab ? ' nav-tab-active' : ''; ?>">
+					<?php esc_html_e( 'Settings', 'big-orange-pardot' ); ?>
+				</a>
+				<a href="<?php echo esc_url( $this->tab_url( 'help' ) ); ?>"
+					class="nav-tab<?php echo 'help' === $current_tab ? ' nav-tab-active' : ''; ?>">
+					<?php esc_html_e( 'Help', 'big-orange-pardot' ); ?>
+				</a>
+			</nav>
 
-			<form method="post" action="">
-				<?php wp_nonce_field( self::NONCE_CREDENTIALS ); ?>
+			<?php if ( 'help' === $current_tab ) : ?>
+				<?php $this->render_help_tab(); ?>
+			<?php else : ?>
+				<?php $this->render_settings_tab(); ?>
+			<?php endif; ?>
+		</div>
+		<?php
+	}
 
-				<h2><?php esc_html_e( 'API Credentials', 'big-orange-pardot' ); ?></h2>
-				<p class="description">
+	/**
+	 * Renders the Settings tab content.
+	 *
+	 * @return void
+	 */
+	private function render_settings_tab() {
+		?>
+		<?php $this->render_notices(); ?>
+
+		<form method="post" action="">
+			<?php wp_nonce_field( self::NONCE_CREDENTIALS ); ?>
+
+			<h2><?php esc_html_e( 'API Credentials', 'big-orange-pardot' ); ?></h2>
+			<p class="description">
+				<?php
+				printf(
+					/* translators: %s: link to Salesforce Connected App documentation */
+					esc_html__( 'Enter the credentials from your Salesforce %s. The redirect URI to register is shown below.', 'big-orange-pardot' ),
+					'<a href="https://help.salesforce.com/s/articleView?id=sf.connected_app_create.htm&type=5" target="_blank" rel="noopener noreferrer">' . esc_html__( 'Connected App', 'big-orange-pardot' ) . '</a>'
+				);
+				?>
+			</p>
+			<p>
+				<strong><?php esc_html_e( 'Redirect URI to register:', 'big-orange-pardot' ); ?></strong>
+				<code><?php echo esc_html( $this->settings_url() ); ?></code>
+			</p>
+
+			<table class="form-table" role="presentation">
+				<tr>
+					<th scope="row">
+						<label for="bol_client_id"><?php esc_html_e( 'Consumer Key (Client ID)', 'big-orange-pardot' ); ?></label>
+					</th>
+					<td>
+						<input type="text" id="bol_client_id" name="bol_client_id" class="regular-text"
+							value="<?php echo esc_attr( BOL_Pardot_API::get_client_id() ); ?>" autocomplete="off" />
+					</td>
+				</tr>
+				<tr>
+					<th scope="row">
+						<label for="bol_client_secret"><?php esc_html_e( 'Consumer Secret (Client Secret)', 'big-orange-pardot' ); ?></label>
+					</th>
+					<td>
+						<input type="password" id="bol_client_secret" name="bol_client_secret" class="regular-text"
+							value="<?php echo esc_attr( BOL_Pardot_API::get_client_secret() ); ?>" autocomplete="off" />
+					</td>
+				</tr>
+				<tr>
+					<th scope="row">
+						<label for="bol_business_unit_id"><?php esc_html_e( 'Business Unit ID', 'big-orange-pardot' ); ?></label>
+					</th>
+					<td>
+						<input type="text" id="bol_business_unit_id" name="bol_business_unit_id" class="regular-text"
+							value="<?php echo esc_attr( BOL_Pardot_API::get_business_unit_id() ); ?>" autocomplete="off"
+							placeholder="0Uv..." />
+						<p class="description"><?php esc_html_e( '18-character ID starting with 0Uv. Found in Salesforce Setup under Account Engagement → Business Unit Setup.', 'big-orange-pardot' ); ?></p>
+					</td>
+				</tr>
+			</table>
+
+			<p class="submit">
+				<button type="submit" name="bol_save_credentials" class="button button-secondary">
+					<?php esc_html_e( 'Save Credentials', 'big-orange-pardot' ); ?>
+				</button>
+				<?php if ( BOL_Pardot_API::get_client_id() && ! BOL_Pardot_API::is_connected() ) : ?>
+					<button type="submit" name="bol_connect" class="button button-primary">
+						<?php esc_html_e( 'Connect to Pardot', 'big-orange-pardot' ); ?>
+					</button>
+				<?php endif; ?>
+			</p>
+		</form>
+
+		<?php $this->render_connection_section(); ?>
+		<?php $this->render_inspector_section(); ?>
+		<?php
+	}
+
+	/**
+	 * Renders the Help tab content.
+	 *
+	 * @return void
+	 */
+	private function render_help_tab() {
+		$redirect_uri = $this->settings_url();
+		?>
+		<div class="bol-help">
+
+			<h2><?php esc_html_e( 'Overview', 'big-orange-pardot' ); ?></h2>
+			<p><?php esc_html_e( 'Big Orange Pardot adds a Gutenberg block that embeds a Pardot (Account Engagement) form directly on any page or post. Rather than using an iframe, it renders a native HTML form that submits directly to your Pardot form handler, giving you full control over styling and layout.', 'big-orange-pardot' ); ?></p>
+			<p><?php esc_html_e( 'The plugin also automatically captures marketing attribution data (UTM parameters, Google Click ID, landing page URL, and referrer) into cookies on every page load, then injects those values as hidden fields on any Pardot form found on the page — even forms loaded dynamically after the page renders.', 'big-orange-pardot' ); ?></p>
+
+			<hr />
+
+			<h2><?php esc_html_e( 'Setup: Connecting to Salesforce', 'big-orange-pardot' ); ?></h2>
+			<p>
+				<?php
+				printf(
+					/* translators: %s: Salesforce OAuth documentation link */
+					esc_html__( 'The plugin connects to Pardot using the %s. This requires creating a Connected App in Salesforce once, then authorizing it here. There is no simpler authentication path — Salesforce requires a Connected App for all API access.', 'big-orange-pardot' ),
+					'<a href="https://help.salesforce.com/s/articleView?id=xcloud.remoteaccess_oauth_web_server_flow.htm&type=5" target="_blank" rel="noopener noreferrer">' . esc_html__( 'OAuth 2.0 Web Server Flow', 'big-orange-pardot' ) . '</a>'
+				);
+				?>
+			</p>
+
+			<h3><?php esc_html_e( 'Step 1 — Create a Salesforce Connected App', 'big-orange-pardot' ); ?></h3>
+			<ol>
+				<li><?php esc_html_e( 'In Salesforce, go to Setup → Apps → App Manager and click New Connected App.', 'big-orange-pardot' ); ?></li>
+				<li><?php esc_html_e( 'Give it a name (e.g. "WordPress Pardot Integration") and fill in a contact email.', 'big-orange-pardot' ); ?></li>
+				<li><?php esc_html_e( 'Under API (Enable OAuth Settings), check Enable OAuth Settings.', 'big-orange-pardot' ); ?></li>
+				<li>
+					<?php esc_html_e( 'Set the Callback URL (Redirect URI) to:', 'big-orange-pardot' ); ?>
+					<br /><code><?php echo esc_html( $redirect_uri ); ?></code>
+				</li>
+				<li>
+					<?php esc_html_e( 'Under Selected OAuth Scopes, add:', 'big-orange-pardot' ); ?>
+					<ul style="list-style: disc; margin-left: 2em;">
+						<li><strong>pardot_api</strong> — <?php esc_html_e( 'Access and manage your Pardot data', 'big-orange-pardot' ); ?></li>
+						<li><strong>refresh_token, offline_access</strong> — <?php esc_html_e( 'Perform requests at any time (allows token refresh without re-authorization)', 'big-orange-pardot' ); ?></li>
+					</ul>
+				</li>
+				<li><?php esc_html_e( 'Save the Connected App. Salesforce may take a few minutes to activate it.', 'big-orange-pardot' ); ?></li>
+				<li><?php esc_html_e( 'From the Connected App detail page, click Manage Consumer Details to view your Consumer Key and Consumer Secret.', 'big-orange-pardot' ); ?></li>
+			</ol>
+
+			<h3><?php esc_html_e( 'Step 2 — Find your Business Unit ID', 'big-orange-pardot' ); ?></h3>
+			<ol>
+				<li><?php esc_html_e( 'In Salesforce Setup, search for "Account Engagement" and go to Account Engagement → Business Unit Setup.', 'big-orange-pardot' ); ?></li>
+				<li><?php esc_html_e( 'Copy the Business Unit ID — it is an 18-character value beginning with 0Uv.', 'big-orange-pardot' ); ?></li>
+			</ol>
+
+			<h3><?php esc_html_e( 'Step 3 — Enter credentials and authorize', 'big-orange-pardot' ); ?></h3>
+			<ol>
+				<li>
 					<?php
 					printf(
-						/* translators: %s: link to Salesforce Connected App documentation */
-						esc_html__( 'Enter the credentials from your Salesforce %s. The redirect URI to register is shown below.', 'big-orange-pardot' ),
-						'<a href="https://help.salesforce.com/s/articleView?id=sf.connected_app_create.htm&type=5" target="_blank" rel="noopener noreferrer">' . esc_html__( 'Connected App', 'big-orange-pardot' ) . '</a>'
+						/* translators: %s: link to the Settings tab */
+						esc_html__( 'Go to the %s tab and enter your Consumer Key, Consumer Secret, and Business Unit ID, then click Save Credentials.', 'big-orange-pardot' ),
+						'<a href="' . esc_url( $this->tab_url( 'settings' ) ) . '">' . esc_html__( 'Settings', 'big-orange-pardot' ) . '</a>'
 					);
 					?>
-				</p>
-				<p>
-					<strong><?php esc_html_e( 'Redirect URI to register:', 'big-orange-pardot' ); ?></strong>
-					<code><?php echo esc_html( $this->settings_url() ); ?></code>
-				</p>
+				</li>
+				<li><?php esc_html_e( 'Click Connect to Pardot. You will be redirected to Salesforce to log in and approve access.', 'big-orange-pardot' ); ?></li>
+				<li><?php esc_html_e( 'After approving, Salesforce redirects back here automatically. The connection status will show Connected.', 'big-orange-pardot' ); ?></li>
+			</ol>
+			<p class="description"><?php esc_html_e( 'Access tokens are refreshed automatically in the background — you should only need to authorize once unless you explicitly disconnect or revoke access in Salesforce.', 'big-orange-pardot' ); ?></p>
 
-				<table class="form-table" role="presentation">
-					<tr>
-						<th scope="row">
-							<label for="bol_client_id"><?php esc_html_e( 'Consumer Key (Client ID)', 'big-orange-pardot' ); ?></label>
-						</th>
-						<td>
-							<input type="text" id="bol_client_id" name="bol_client_id" class="regular-text"
-								value="<?php echo esc_attr( BOL_Pardot_API::get_client_id() ); ?>" autocomplete="off" />
-						</td>
-					</tr>
-					<tr>
-						<th scope="row">
-							<label for="bol_client_secret"><?php esc_html_e( 'Consumer Secret (Client Secret)', 'big-orange-pardot' ); ?></label>
-						</th>
-						<td>
-							<input type="password" id="bol_client_secret" name="bol_client_secret" class="regular-text"
-								value="<?php echo esc_attr( BOL_Pardot_API::get_client_secret() ); ?>" autocomplete="off" />
-						</td>
-					</tr>
-					<tr>
-						<th scope="row">
-							<label for="bol_business_unit_id"><?php esc_html_e( 'Business Unit ID', 'big-orange-pardot' ); ?></label>
-						</th>
-						<td>
-							<input type="text" id="bol_business_unit_id" name="bol_business_unit_id" class="regular-text"
-								value="<?php echo esc_attr( BOL_Pardot_API::get_business_unit_id() ); ?>" autocomplete="off"
-								placeholder="0Uv..." />
-							<p class="description"><?php esc_html_e( '18-character ID starting with 0Uv. Found in Salesforce Setup under Account Engagement → Business Unit Setup.', 'big-orange-pardot' ); ?></p>
-						</td>
-					</tr>
-				</table>
+			<hr />
 
-				<p class="submit">
-					<button type="submit" name="bol_save_credentials" class="button button-secondary">
-						<?php esc_html_e( 'Save Credentials', 'big-orange-pardot' ); ?>
-					</button>
-					<?php if ( BOL_Pardot_API::get_client_id() && ! BOL_Pardot_API::is_connected() ) : ?>
-						<button type="submit" name="bol_connect" class="button button-primary">
-							<?php esc_html_e( 'Connect to Pardot', 'big-orange-pardot' ); ?>
-						</button>
-					<?php endif; ?>
-				</p>
-			</form>
+			<h2><?php esc_html_e( 'Using the Block', 'big-orange-pardot' ); ?></h2>
+			<ol>
+				<li><?php esc_html_e( 'In the block editor, insert the Big Orange Pardot block from the Widgets category (or search for "Pardot").', 'big-orange-pardot' ); ?></li>
+				<li><?php esc_html_e( 'Open the block settings panel (sidebar). If the plugin is connected, a dropdown lists all form handlers from your Pardot account.', 'big-orange-pardot' ); ?></li>
+				<li><?php esc_html_e( 'Select the form handler this block should submit to. The Form Handler URL field is populated automatically from the handler\'s embed code.', 'big-orange-pardot' ); ?></li>
+				<li><?php esc_html_e( 'You can also paste a URL directly into the Form Handler URL field if you need to override or bypass the dropdown.', 'big-orange-pardot' ); ?></li>
+			</ol>
+			<p><?php esc_html_e( 'The block renders a form with fields for First Name, Last Name, Email, Phone, Company, Job Title, and Comments. The form is styled to inherit the active theme\'s colors and typography via CSS custom properties.', 'big-orange-pardot' ); ?></p>
+			<p><?php esc_html_e( 'Kadence Blocks is required — the submit button uses Kadence\'s button classes so it inherits the global button style you have configured in Kadence.', 'big-orange-pardot' ); ?></p>
 
-			<?php $this->render_connection_section(); ?>
-			<?php $this->render_inspector_section(); ?>
+			<hr />
+
+			<h2><?php esc_html_e( 'Attribution Tracking', 'big-orange-pardot' ); ?></h2>
+			<p><?php esc_html_e( 'A small script runs on every page of your site (not just pages with the form). It captures marketing attribution data into cookies and injects that data as hidden fields on any Pardot form it finds on the page — including forms loaded dynamically after page load.', 'big-orange-pardot' ); ?></p>
+			<p><?php esc_html_e( 'The following hidden fields are submitted with every form and must be mapped in your Pardot form handler to be recorded:', 'big-orange-pardot' ); ?></p>
+			<table class="widefat striped" style="max-width: 600px;">
+				<thead>
+					<tr>
+						<th><?php esc_html_e( 'Field name', 'big-orange-pardot' ); ?></th>
+						<th><?php esc_html_e( 'What it captures', 'big-orange-pardot' ); ?></th>
+						<th><?php esc_html_e( 'Cookie lifetime', 'big-orange-pardot' ); ?></th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr><td><code>utm_source</code></td><td><?php esc_html_e( 'UTM source parameter', 'big-orange-pardot' ); ?></td><td><?php esc_html_e( '30 days, overwritten on each visit', 'big-orange-pardot' ); ?></td></tr>
+					<tr><td><code>utm_medium</code></td><td><?php esc_html_e( 'UTM medium parameter', 'big-orange-pardot' ); ?></td><td><?php esc_html_e( '30 days, overwritten on each visit', 'big-orange-pardot' ); ?></td></tr>
+					<tr><td><code>utm_campaign</code></td><td><?php esc_html_e( 'UTM campaign parameter', 'big-orange-pardot' ); ?></td><td><?php esc_html_e( '30 days, overwritten on each visit', 'big-orange-pardot' ); ?></td></tr>
+					<tr><td><code>utm_term</code></td><td><?php esc_html_e( 'UTM term parameter', 'big-orange-pardot' ); ?></td><td><?php esc_html_e( '30 days, overwritten on each visit', 'big-orange-pardot' ); ?></td></tr>
+					<tr><td><code>utm_content</code></td><td><?php esc_html_e( 'UTM content parameter', 'big-orange-pardot' ); ?></td><td><?php esc_html_e( '30 days, overwritten on each visit', 'big-orange-pardot' ); ?></td></tr>
+					<tr><td><code>gclid</code></td><td><?php esc_html_e( 'Google Click ID (from Google Ads)', 'big-orange-pardot' ); ?></td><td><?php esc_html_e( '90 days, overwritten on each visit', 'big-orange-pardot' ); ?></td></tr>
+					<tr><td><code>landing_page_url</code></td><td><?php esc_html_e( 'Full URL of the first page visited', 'big-orange-pardot' ); ?></td><td><?php esc_html_e( '30 days, set once and never overwritten', 'big-orange-pardot' ); ?></td></tr>
+					<tr><td><code>referrer_url</code></td><td><?php esc_html_e( 'Referring URL from outside this domain', 'big-orange-pardot' ); ?></td><td><?php esc_html_e( '30 days, set once and never overwritten', 'big-orange-pardot' ); ?></td></tr>
+				</tbody>
+			</table>
+			<p class="description">
+				<?php
+				printf(
+					/* translators: %s: link to Form Handler Inspector */
+					esc_html__( 'Unmapped fields are silently ignored by Pardot. Use the %s on the Settings tab to verify which of these fields are configured in each of your form handlers.', 'big-orange-pardot' ),
+					'<a href="' . esc_url( $this->tab_url( 'settings' ) ) . '">' . esc_html__( 'Form Handler Inspector', 'big-orange-pardot' ) . '</a>'
+				);
+				?>
+			</p>
+
 		</div>
 		<?php
 	}

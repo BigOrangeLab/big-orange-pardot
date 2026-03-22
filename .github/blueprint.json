@@ -4,7 +4,7 @@
 		"php": "8.2",
 		"wp": "latest"
 	},
-	"landingPage": "/wp-admin/post-new.php?post_type=page",
+	"landingPage": "/",
 	"steps": [
 		{
 			"step": "login",
@@ -30,6 +30,10 @@
 				"activate": true,
 				"targetFolderName": "big-orange-pardot"
 			}
+		},
+		{
+			"step": "runPHP",
+			"code": "<?php require '/wordpress/wp-load.php'; $content = '<!-- wp:bigorangelab/big-orange-pardot --><!-- wp:bigorangelab/pardot-field {\"fieldName\":\"first_name\",\"label\":\"First Name\",\"isRequired\":true,\"width\":\"half\"} /--><!-- wp:bigorangelab/pardot-field {\"fieldName\":\"last_name\",\"label\":\"Last Name\",\"isRequired\":true,\"width\":\"half\"} /--><!-- wp:bigorangelab/pardot-field {\"fieldName\":\"email\",\"label\":\"Email\",\"fieldType\":\"email\",\"isRequired\":true} /--><!-- wp:bigorangelab/pardot-field {\"fieldName\":\"phone\",\"label\":\"Phone\",\"fieldType\":\"tel\"} /--><!-- wp:bigorangelab/pardot-field {\"fieldName\":\"company\",\"label\":\"Company\"} /--><!-- wp:bigorangelab/pardot-field {\"fieldName\":\"job_title\",\"label\":\"Job Title\"} /--><!-- wp:bigorangelab/pardot-field {\"fieldName\":\"comments\",\"label\":\"Comments\",\"fieldType\":\"textarea\"} /--><!-- wp:bigorangelab/pardot-submit /--><!-- /wp:bigorangelab/big-orange-pardot -->'; $post_id = wp_insert_post( array( 'post_title' => 'Contact Us', 'post_status' => 'publish', 'post_type' => 'page', 'post_content' => $content ) ); update_option( 'show_on_front', 'page' ); update_option( 'page_on_front', $post_id );"
 		}
 	]
 }

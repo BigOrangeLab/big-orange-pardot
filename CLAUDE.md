@@ -2,6 +2,8 @@
 
 A WordPress Gutenberg block plugin integrating Pardot (Account Engagement) form handlers into WordPress pages.
 
+**GitHub:** https://github.com/BigOrangeLab/big-orange-pardot
+
 ## Architecture
 
 - **Main entry:** `big-orange-pardot.php` — registers block types, REST routes, admin page, and scripts

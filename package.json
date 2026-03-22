@@ -4,6 +4,10 @@
 	"description": "A WordPress Form block for WordPress to integrate with Pardot.",
 	"author": "George Stephanis / Big Orange Lab",
 	"license": "GPL-2.0-or-later",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/BigOrangeLab/big-orange-pardot"
+	},
 	"main": "build/index.js",
 	"scripts": {
 		"build": "wp-scripts build --blocks-manifest",

@@ -3,6 +3,10 @@
 	"description": "A WordPress Form block for integrating with Pardot.",
 	"type": "wordpress-plugin",
 	"license": "GPL-2.0-or-later",
+	"homepage": "https://github.com/BigOrangeLab/big-orange-pardot",
+	"support": {
+		"source": "https://github.com/BigOrangeLab/big-orange-pardot"
+	},
 	"require-dev": {
 		"wp-coding-standards/wpcs": "^3.1",
 		"phpcsstandards/phpcsutils": "^1.0",

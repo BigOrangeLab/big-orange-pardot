@@ -1,25 +1,122 @@
 import apiFetch from '@wordpress/api-fetch';
-import { InspectorControls, useBlockProps } from '@wordpress/block-editor';
 import {
+	InspectorControls,
+	useBlockProps,
+	useInnerBlocksProps,
+	store as blockEditorStore,
+} from '@wordpress/block-editor';
+import { createBlock } from '@wordpress/blocks';
+import {
+	Button,
 	Notice,
 	PanelBody,
 	SelectControl,
 	Spinner,
 	TextControl,
 } from '@wordpress/components';
+import { useDispatch } from '@wordpress/data';
 import { useEffect, useState } from '@wordpress/element';
-import { __, sprintf } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import './editor.scss';
 
 /* global bolPardot */
 
-export default function Edit( { attributes, setAttributes } ) {
+/** Map Pardot dataFormat values to our fieldType attribute values. */
+const PARDOT_TYPE_MAP = { Email: 'email', Phone: 'tel', TextArea: 'textarea' };
+
+/** Default 7-field + submit template applied when the block is first inserted. */
+const DEFAULT_TEMPLATE = [
+	[
+		'bigorangelab/pardot-field',
+		{
+			fieldName: 'first_name',
+			label: 'First Name',
+			fieldType: 'text',
+			isRequired: true,
+			width: 'half',
+		},
+	],
+	[
+		'bigorangelab/pardot-field',
+		{
+			fieldName: 'last_name',
+			label: 'Last Name',
+			fieldType: 'text',
+			isRequired: true,
+			width: 'half',
+		},
+	],
+	[
+		'bigorangelab/pardot-field',
+		{
+			fieldName: 'email',
+			label: 'Email',
+			fieldType: 'email',
+			isRequired: true,
+			width: 'full',
+		},
+	],
+	[
+		'bigorangelab/pardot-field',
+		{
+			fieldName: 'phone',
+			label: 'Phone',
+			fieldType: 'tel',
+			isRequired: false,
+			width: 'full',
+		},
+	],
+	[
+		'bigorangelab/pardot-field',
+		{
+			fieldName: 'company',
+			label: 'Company',
+			fieldType: 'text',
+			isRequired: false,
+			width: 'full',
+		},
+	],
+	[
+		'bigorangelab/pardot-field',
+		{
+			fieldName: 'job_title',
+			label: 'Job Title',
+			fieldType: 'text',
+			isRequired: false,
+			width: 'full',
+		},
+	],
+	[
+		'bigorangelab/pardot-field',
+		{
+			fieldName: 'comments',
+			label: 'Comments',
+			fieldType: 'textarea',
+			isRequired: false,
+			width: 'full',
+		},
+	],
+	[ 'bigorangelab/pardot-submit', { label: 'Submit' } ],
+];
+
+export default function Edit( { attributes, setAttributes, clientId } ) {
 	const { pardotFormUrl, pardotFormHandlerId } = attributes;
 	const blockProps = useBlockProps();
+	const innerBlocksProps = useInnerBlocksProps( blockProps, {
+		template: DEFAULT_TEMPLATE,
+		templateLock: false,
+		allowedBlocks: [
+			'bigorangelab/pardot-field',
+			'bigorangelab/pardot-submit',
+		],
+	} );
+
+	const { replaceInnerBlocks } = useDispatch( blockEditorStore );
 
 	const [ formHandlers, setFormHandlers ] = useState( null ); // null = not yet loaded
 	const [ isLoading, setIsLoading ] = useState( false );
 	const [ apiError, setApiError ] = useState( null );
+	const [ isImporting, setIsImporting ] = useState( false );
 
 	// Fetch form handlers from the REST endpoint on mount.
 	useEffect( () => {
@@ -51,6 +148,43 @@ export default function Edit( { attributes, setAttributes } ) {
 		} );
 	}
 
+	/**
+	 * Fetches fields for the selected handler from Pardot and replaces
+	 * all inner blocks with the returned field layout.
+	 */
+	function importFieldsFromPardot() {
+		setIsImporting( true );
+		apiFetch( {
+			path:
+				'/big-orange-pardot/v1/form-handler-fields?handler_id=' +
+				pardotFormHandlerId,
+		} )
+			.then( ( fields ) => {
+				const fieldBlocks = fields.map( ( field ) => {
+					const fieldType =
+						PARDOT_TYPE_MAP[ field.dataFormat ] || 'text';
+					const label = field.name
+						.replace( /_/g, ' ' )
+						.replace( /\b\w/g, ( c ) => c.toUpperCase() );
+					return createBlock( 'bigorangelab/pardot-field', {
+						fieldName: field.name,
+						label,
+						fieldType,
+						isRequired: !! field.isRequired,
+						width: 'full',
+					} );
+				} );
+				const submitBlock = createBlock( 'bigorangelab/pardot-submit', {
+					label: 'Submit',
+				} );
+				replaceInnerBlocks( clientId, [ ...fieldBlocks, submitBlock ] );
+				setIsImporting( false );
+			} )
+			.catch( () => {
+				setIsImporting( false );
+			} );
+	}
+
 	// Build SelectControl options.
 	const handlerOptions = [
 		{
@@ -68,12 +202,6 @@ export default function Edit( { attributes, setAttributes } ) {
 		typeof bolPardot !== 'undefined' ? bolPardot.settingsUrl : '';
 	const isConnected =
 		typeof bolPardot !== 'undefined' ? bolPardot.isConnected : false;
-
-	const selectedHandlerName =
-		pardotFormHandlerId > 0 && formHandlers
-			? formHandlers.find( ( h ) => h.id === pardotFormHandlerId )
-					?.name ?? ''
-			: '';
 
 	return (
 		<>
@@ -149,6 +277,24 @@ export default function Edit( { attributes, setAttributes } ) {
 						/>
 					) }
 
+					{ /* Import fields button */ }
+					{ isConnected &&
+						! isLoading &&
+						! apiError &&
+						pardotFormHandlerId > 0 && (
+							<Button
+								variant="secondary"
+								onClick={ importFieldsFromPardot }
+								isBusy={ isImporting }
+								disabled={ isImporting }
+							>
+								{ __(
+									'Import fields from Pardot',
+									'big-orange-pardot'
+								) }
+							</Button>
+						) }
+
 					{ /* Manual URL override */ }
 					<TextControl
 						label={ __(
@@ -169,144 +315,7 @@ export default function Edit( { attributes, setAttributes } ) {
 				</PanelBody>
 			</InspectorControls>
 
-			<div { ...blockProps }>
-				{ ! pardotFormUrl && (
-					<div className="bol-pardot-notice">
-						{ __(
-							'Select a Pardot Form Handler in the block settings panel →',
-							'big-orange-pardot'
-						) }
-					</div>
-				) }
-
-				{ selectedHandlerName && (
-					<p className="bol-pardot-handler-name">
-						{
-							/* translators: %s: Pardot form handler name */ sprintf(
-								__( 'Form handler: %s', 'big-orange-pardot' ),
-								selectedHandlerName
-							)
-						}
-					</p>
-				) }
-
-				{ /* aria-hidden: preview form is non-interactive, not meaningful to AT */ }
-				<form
-					className="bol-pardot-preview"
-					onSubmit={ ( e ) => e.preventDefault() }
-					aria-hidden="true"
-				>
-					<div className="bol-pardot-row bol-pardot-two-col">
-						<div className="bol-pardot-field">
-							<label htmlFor="bol-preview-first-name">
-								{ __( 'First Name', 'big-orange-pardot' ) }{ ' ' }
-								<span className="bol-required">*</span>
-							</label>
-							<input
-								id="bol-preview-first-name"
-								type="text"
-								disabled
-								placeholder={ __(
-									'First Name',
-									'big-orange-pardot'
-								) }
-							/>
-						</div>
-						<div className="bol-pardot-field">
-							<label htmlFor="bol-preview-last-name">
-								{ __( 'Last Name', 'big-orange-pardot' ) }{ ' ' }
-								<span className="bol-required">*</span>
-							</label>
-							<input
-								id="bol-preview-last-name"
-								type="text"
-								disabled
-								placeholder={ __(
-									'Last Name',
-									'big-orange-pardot'
-								) }
-							/>
-						</div>
-					</div>
-
-					<div className="bol-pardot-field">
-						<label htmlFor="bol-preview-email">
-							{ __( 'Email', 'big-orange-pardot' ) }{ ' ' }
-							<span className="bol-required">*</span>
-						</label>
-						<input
-							id="bol-preview-email"
-							type="email"
-							disabled
-							placeholder={ __( 'Email', 'big-orange-pardot' ) }
-						/>
-					</div>
-
-					<div className="bol-pardot-field">
-						<label htmlFor="bol-preview-phone">
-							{ __( 'Phone', 'big-orange-pardot' ) }
-						</label>
-						<input
-							id="bol-preview-phone"
-							type="tel"
-							disabled
-							placeholder={ __( 'Phone', 'big-orange-pardot' ) }
-						/>
-					</div>
-
-					<div className="bol-pardot-field">
-						<label htmlFor="bol-preview-company">
-							{ __( 'Company', 'big-orange-pardot' ) }
-						</label>
-						<input
-							id="bol-preview-company"
-							type="text"
-							disabled
-							placeholder={ __( 'Company', 'big-orange-pardot' ) }
-						/>
-					</div>
-
-					<div className="bol-pardot-field">
-						<label htmlFor="bol-preview-job-title">
-							{ __( 'Job Title', 'big-orange-pardot' ) }
-						</label>
-						<input
-							id="bol-preview-job-title"
-							type="text"
-							disabled
-							placeholder={ __(
-								'Job Title',
-								'big-orange-pardot'
-							) }
-						/>
-					</div>
-
-					<div className="bol-pardot-field">
-						<label htmlFor="bol-preview-comments">
-							{ __( 'Comments', 'big-orange-pardot' ) }
-						</label>
-						<textarea
-							id="bol-preview-comments"
-							disabled
-							rows={ 4 }
-							placeholder={ __(
-								'Comments',
-								'big-orange-pardot'
-							) }
-						/>
-					</div>
-
-					<div className="bol-pardot-submit">
-						<button
-							type="button"
-							className="kb-button wp-block-button__link"
-							disabled
-						>
-							{ __( 'Submit', 'big-orange-pardot' ) }
-						</button>
-					</div>
-				</form>
-			</div>
+			<div { ...innerBlocksProps } />
 		</>
 	);
 }

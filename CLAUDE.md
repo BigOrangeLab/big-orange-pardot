@@ -5,23 +5,45 @@ A WordPress Gutenberg block plugin integrating Pardot (Account Engagement) form 
 ## Architecture
 
 - **Main entry:** `big-orange-pardot.php` — registers block types, REST routes, admin page, and scripts
-- **Source:** `src/big-orange-pardot/` — JSX/SCSS source files
-- **Build output:** `build/big-orange-pardot/` — compiled assets (do not edit directly)
+- **Source:** `src/` — JSX/SCSS source files for all three block types
+- **Build output:** `build/` — compiled assets per block (do not edit directly)
 - **Block manifest:** `build/blocks-manifest.php` — auto-generated, do not edit
 - **PHP includes:** `includes/` — server-side API client and admin page classes
 
-### Block files
+### Block architecture
+
+The plugin provides three block types:
+
+**`bigorangelab/big-orange-pardot`** — parent form block (`src/big-orange-pardot/`)
 
 | File | Purpose |
 |------|---------|
-| `src/big-orange-pardot/block.json` | Block metadata, attributes (`pardotFormUrl`, `pardotFormHandlerId`), asset registration |
+| `src/big-orange-pardot/block.json` | Block metadata, attributes (`pardotFormUrl`, `pardotFormHandlerId`), `providesContext`, `allowedBlocks` |
 | `src/big-orange-pardot/index.js` | Block registration |
-| `src/big-orange-pardot/edit.js` | Block editor React component — dropdown to select Pardot form handler, fetched via REST |
-| `src/big-orange-pardot/render.php` | PHP template — dynamic block frontend output (form HTML, hidden attribution fields) |
-| `src/big-orange-pardot/save.js` | Returns `null` (dynamic block, PHP renders output) |
+| `src/big-orange-pardot/edit.js` | Editor component — handler dropdown, "Import fields from Pardot" button, `useInnerBlocksProps` with default 7-field template |
+| `src/big-orange-pardot/render.php` | PHP template — wraps `$content` (rendered inner blocks) in `<form action="...">` + hidden attribution inputs |
+| `src/big-orange-pardot/save.js` | Returns `null` (dynamic block) |
 | `src/big-orange-pardot/editor.scss` | Editor-only styles (inspector notice, loading spinner) |
-| `src/big-orange-pardot/style.scss` | Frontend (and editor) styles |
+| `src/big-orange-pardot/style.scss` | Frontend (and editor) styles — CSS grid two-column layout on `form` |
 | `assets/attribution.js` | Global cookie capture + hidden field population (enqueued on every page, no build step) |
+
+**`bigorangelab/pardot-field`** — individual form field (`src/pardot-field/`)
+
+| File | Purpose |
+|------|---------|
+| `src/pardot-field/block.json` | Metadata — `parent: ["bigorangelab/big-orange-pardot"]`; attributes: `fieldName`, `label`, `fieldType` (text/email/tel/textarea), `isRequired`, `placeholder`, `width` (full/half) |
+| `src/pardot-field/edit.js` | InspectorControls (5 field settings), visual preview with label wrapping input |
+| `src/pardot-field/render.php` | Outputs `<div class="bol-pardot-field bol-pardot-field--{width}">…</div>` — no `get_block_wrapper_attributes()` so CSS grid works cleanly |
+| `src/pardot-field/save.js` | Returns `null` (dynamic block) |
+
+**`bigorangelab/pardot-submit`** — submit button (`src/pardot-submit/`)
+
+| File | Purpose |
+|------|---------|
+| `src/pardot-submit/block.json` | Metadata — `parent: ["bigorangelab/big-orange-pardot"]`; attribute: `label` |
+| `src/pardot-submit/edit.js` | InspectorControls (button label), disabled preview button |
+| `src/pardot-submit/render.php` | Outputs `<div class="bol-pardot-submit"><button type="submit">…</button></div>` |
+| `src/pardot-submit/save.js` | Returns `null` (dynamic block) |
 
 ### PHP includes
 
@@ -34,7 +56,10 @@ A WordPress Gutenberg block plugin integrating Pardot (Account Engagement) form 
 
 - **OAuth flow:** Salesforce authorization code flow. Credentials (`client_id`, `client_secret`, `business_unit_id`) stored in `wp_options` (autoload off). Tokens refreshed automatically by `BOL_Pardot_API::get_access_token()` when within 60 seconds of expiry.
 - **Form handlers:** `BOL_Pardot_API::get_form_handlers()` fetches from `https://pi.pardot.com/api/v5/objects/form-handlers`, caches in transient `big_orange_pardot_form_handlers` (15 min). Returns `[{id, name, url}]` — the `url` is parsed from the handler's `embedCode` HTML via regex.
-- **REST endpoint:** `GET /wp-json/big-orange-pardot/v1/form-handlers` — requires `manage_options`. Powers the block editor dropdown.
+- **Form handler fields:** `BOL_Pardot_API::get_form_handler_fields( $handler_id )` fetches `/form-handler-fields?formHandlerId={id}`. Returns raw Pardot field objects with `name`, `isRequired`, `dataFormat` (Email/Phone/TextArea → mapped to fieldType; everything else → 'text').
+- **REST endpoints:**
+  - `GET /wp-json/big-orange-pardot/v1/form-handlers` — requires `manage_options`. Powers the block editor handler dropdown.
+  - `GET /wp-json/big-orange-pardot/v1/form-handler-fields?handler_id={id}` — requires `manage_options`. Powers the "Import fields from Pardot" button in the editor.
 - **Help tab:** `BOL_Admin_Page::render_help_tab()` contains user-facing setup documentation. **Update it whenever the plugin's behaviour, setup steps, form fields, or attribution tracking changes.**
 - **Attribution fields:** 8 hidden fields populated by `assets/attribution.js` cookies: `utm_source`, `utm_medium`, `utm_campaign`, `utm_term`, `utm_content`, `referrer_url`, `landing_page_url`, `gclid`.
 

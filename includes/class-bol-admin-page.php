@@ -419,11 +419,21 @@ class BOL_Admin_Page {
 			<h2><?php esc_html_e( 'Using the Block', 'big-orange-pardot' ); ?></h2>
 			<ol>
 				<li><?php esc_html_e( 'In the block editor, insert the Big Orange Pardot block from the Widgets category (or search for "Pardot").', 'big-orange-pardot' ); ?></li>
-				<li><?php esc_html_e( 'Open the block settings panel (sidebar). If the plugin is connected, a dropdown lists all form handlers from your Pardot account.', 'big-orange-pardot' ); ?></li>
-				<li><?php esc_html_e( 'Select the form handler this block should submit to. The Form Handler URL field is populated automatically from the handler\'s embed code.', 'big-orange-pardot' ); ?></li>
+				<li><?php esc_html_e( 'The block inserts with a default set of seven fields (First Name, Last Name, Email, Phone, Company, Job Title, Comments) plus a Submit button. Each field is its own block — you can reorder, delete, or add fields freely using the block editor.', 'big-orange-pardot' ); ?></li>
+				<li><?php esc_html_e( 'Open the block settings panel (sidebar). If the plugin is connected, a dropdown lists all form handlers from your Pardot account. Select the form handler this block should submit to — the Form Handler URL is populated automatically from the handler\'s embed code.', 'big-orange-pardot' ); ?></li>
+				<li><?php esc_html_e( 'Once a form handler is selected, click Import fields from Pardot to replace the inner blocks with the actual fields configured on that handler. Field types and required status are imported automatically.', 'big-orange-pardot' ); ?></li>
 				<li><?php esc_html_e( 'You can also paste a URL directly into the Form Handler URL field if you need to override or bypass the dropdown.', 'big-orange-pardot' ); ?></li>
 			</ol>
-			<p><?php esc_html_e( 'The block renders a form with fields for First Name, Last Name, Email, Phone, Company, Job Title, and Comments. The form is styled to inherit the active theme\'s colors and typography via CSS custom properties.', 'big-orange-pardot' ); ?></p>
+			<h3><?php esc_html_e( 'Customising fields', 'big-orange-pardot' ); ?></h3>
+			<p><?php esc_html_e( 'Select any Pardot Field block inside the form to edit it via the block settings panel. Available settings:', 'big-orange-pardot' ); ?></p>
+			<ul style="list-style: disc; margin-left: 2em;">
+				<li><strong><?php esc_html_e( 'Field Name (Pardot)', 'big-orange-pardot' ); ?></strong> — <?php esc_html_e( 'The HTML name attribute submitted to Pardot. Must match the field name in your form handler.', 'big-orange-pardot' ); ?></li>
+				<li><strong><?php esc_html_e( 'Field Type', 'big-orange-pardot' ); ?></strong> — <?php esc_html_e( 'Text, Email, Phone, or Textarea.', 'big-orange-pardot' ); ?></li>
+				<li><strong><?php esc_html_e( 'Required', 'big-orange-pardot' ); ?></strong> — <?php esc_html_e( 'Adds browser-side validation and a * indicator to the label.', 'big-orange-pardot' ); ?></li>
+				<li><strong><?php esc_html_e( 'Placeholder', 'big-orange-pardot' ); ?></strong> — <?php esc_html_e( 'Placeholder text shown inside the input.', 'big-orange-pardot' ); ?></li>
+				<li><strong><?php esc_html_e( 'Width', 'big-orange-pardot' ); ?></strong> — <?php esc_html_e( 'Full width (spans both grid columns) or Half width (spans one column). Two adjacent half-width fields sit side by side on the frontend.', 'big-orange-pardot' ); ?></li>
+			</ul>
+			<p><?php esc_html_e( 'The form is styled to inherit the active theme\'s colors and typography via CSS custom properties.', 'big-orange-pardot' ); ?></p>
 			<p><?php esc_html_e( 'Kadence Blocks is required — the submit button uses Kadence\'s button classes so it inherits the global button style you have configured in Kadence.', 'big-orange-pardot' ); ?></p>
 
 			<hr />

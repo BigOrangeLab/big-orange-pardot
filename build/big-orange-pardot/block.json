@@ -21,6 +21,13 @@
       "default": 0
     }
   },
+  "providesContext": {
+    "big-orange-pardot/formUrl": "pardotFormUrl"
+  },
+  "allowedBlocks": [
+    "bigorangelab/pardot-field",
+    "bigorangelab/pardot-submit"
+  ],
   "textdomain": "big-orange-pardot",
   "editorScript": "file:./index.js",
   "editorStyle": "file:./index.css",

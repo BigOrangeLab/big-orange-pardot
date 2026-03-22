@@ -21,18 +21,6 @@
 		border-radius: 0 0.25rem 0.25rem 0;
 	}
 
-	// Selected handler name label shown above the preview form.
-	.bol-pardot-handler-name {
-		margin: 0 0 0.75rem;
-		font-size: 0.8125rem;
-		font-style: italic;
-		color: #666;
-	}
-
-	// The preview form in the editor is non-interactive — indicate that clearly.
-	.bol-pardot-preview {
-		pointer-events: none;
-	}
 }
 
 // Inspector panel — not-connected warning notice.

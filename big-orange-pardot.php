@@ -52,7 +52,7 @@ function big_orange_pardot_enqueue_attribution() {
 add_action( 'wp_enqueue_scripts', 'big_orange_pardot_enqueue_attribution' );
 
 /**
- * Registers the REST API endpoint that the block editor uses to list Pardot form handlers.
+ * Registers the REST API endpoints that the block editor uses for Pardot data.
  */
 function big_orange_pardot_rest_init() {
 	register_rest_route(
@@ -70,6 +70,35 @@ function big_orange_pardot_rest_init() {
 			'permission_callback' => static function () {
 				return current_user_can( 'manage_options' );
 			},
+		)
+	);
+
+	register_rest_route(
+		'big-orange-pardot/v1',
+		'/form-handler-fields',
+		array(
+			'methods'             => 'GET',
+			'callback'            => static function ( \WP_REST_Request $request ) {
+				$handler_id = (int) $request->get_param( 'handler_id' );
+				if ( $handler_id <= 0 ) {
+					return new \WP_Error( 'missing_handler_id', __( 'handler_id is required.', 'big-orange-pardot' ), array( 'status' => 400 ) );
+				}
+				$fields = BOL_Pardot_API::get_form_handler_fields( $handler_id );
+				if ( is_wp_error( $fields ) ) {
+					return $fields;
+				}
+				return rest_ensure_response( $fields );
+			},
+			'permission_callback' => static function () {
+				return current_user_can( 'manage_options' );
+			},
+			'args'                => array(
+				'handler_id' => array(
+					'type'              => 'integer',
+					'required'          => true,
+					'sanitize_callback' => 'absint',
+				),
+			),
 		)
 	);
 }

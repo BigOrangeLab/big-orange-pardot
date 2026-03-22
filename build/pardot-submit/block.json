@@ -1,0 +1,25 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "bigorangelab/pardot-submit",
+  "version": "0.1.0",
+  "title": "Pardot Submit Button",
+  "category": "widgets",
+  "description": "The submit button inside a Big Orange Pardot form block.",
+  "parent": [
+    "bigorangelab/big-orange-pardot"
+  ],
+  "supports": {
+    "html": false,
+    "reusable": false
+  },
+  "attributes": {
+    "label": {
+      "type": "string",
+      "default": "Submit"
+    }
+  },
+  "textdomain": "big-orange-pardot",
+  "editorScript": "file:./index.js",
+  "render": "file:./render.php"
+}

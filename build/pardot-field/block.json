@@ -1,0 +1,58 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "bigorangelab/pardot-field",
+  "version": "0.1.0",
+  "title": "Pardot Field",
+  "category": "widgets",
+  "description": "A single form field inside a Big Orange Pardot form block.",
+  "parent": [
+    "bigorangelab/big-orange-pardot"
+  ],
+  "supports": {
+    "html": false,
+    "reusable": false
+  },
+  "attributes": {
+    "fieldName": {
+      "type": "string",
+      "default": ""
+    },
+    "label": {
+      "type": "string",
+      "default": ""
+    },
+    "fieldType": {
+      "type": "string",
+      "default": "text",
+      "enum": [
+        "text",
+        "email",
+        "tel",
+        "textarea"
+      ]
+    },
+    "isRequired": {
+      "type": "boolean",
+      "default": false
+    },
+    "placeholder": {
+      "type": "string",
+      "default": ""
+    },
+    "width": {
+      "type": "string",
+      "default": "full",
+      "enum": [
+        "full",
+        "half"
+      ]
+    }
+  },
+  "usesContext": [
+    "big-orange-pardot/formUrl"
+  ],
+  "textdomain": "big-orange-pardot",
+  "editorScript": "file:./index.js",
+  "render": "file:./render.php"
+}

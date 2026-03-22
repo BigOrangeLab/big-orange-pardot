@@ -19,6 +19,7 @@
 		"@wordpress/block-editor": "latest",
 		"@wordpress/blocks": "latest",
 		"@wordpress/components": "latest",
+		"@wordpress/data": "latest",
 		"@wordpress/element": "latest",
 		"@wordpress/i18n": "latest"
 	},

@@ -3,6 +3,7 @@
 A WordPress Gutenberg block plugin integrating Pardot (Account Engagement) form handlers into WordPress pages.
 
 **GitHub:** https://github.com/BigOrangeLab/big-orange-pardot
+**Playground demo:** `.github/blueprint.json` — installs Kadence Blocks + this plugin from the `main` branch zip; lands on a new page editor.
 
 ## Architecture
 

@@ -571,6 +571,14 @@ export default function Edit( { attributes, setAttributes, clientId } ) {
 			</InspectorControls>
 
 			<div { ...blockProps }>
+				{ ! pardotFormUrl && (
+					<div className="bol-pardot-notice">
+						{ __(
+							'No form handler URL configured — this form will not submit.',
+							'big-orange-pardot'
+						) }
+					</div>
+				) }
 				<div { ...innerBlocksProps } />
 				<div
 					className="bol-pardot-submit"

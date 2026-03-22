@@ -106,7 +106,7 @@ This project follows **WordPress Core coding standards** throughout, enforced by
 - [WordPress CSS Coding Standards](https://developer.wordpress.org/coding-standards/wordpress-coding-standards/css/): tabs for indentation, space before `{`, lowercase properties.
 - Order pseudo-class selectors least-specific first: `&:disabled` before `&:focus` before `&:hover`.
 - Avoid `input, textarea` combined rules when textarea needs additional properties — use separate blocks to satisfy `no-descending-specificity`.
-- Use CSS custom properties (`--wp--preset--*`, `--global-palette*`) with hardcoded fallbacks for theme compatibility.
+- Use CSS custom property fallback chains: block-level `--bol-*` first, then `--global-palette*` (Kadence, if active), then `--wp--preset--*`, then a hardcoded default. Never rely on any single source being present.
 
 ## Debugging approach
 
@@ -131,4 +131,4 @@ composer lint:php
 - PHP 7.4+
 - Node.js (for building assets)
 - Composer (for PHP linting)
-- Kadence Blocks plugin (declared as a plugin dependency via `Requires Plugins` header)
+- Kadence Blocks is **optional** — when active, the form fields and submit button automatically inherit Kadence's global palette CSS custom properties (`--global-palette*`). Without it, styles fall back to WordPress preset colours and hardcoded defaults. The Playground demo installs Kadence to showcase the best experience, but it is not listed as a `Requires Plugins` dependency.

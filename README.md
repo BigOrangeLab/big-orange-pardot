@@ -23,8 +23,9 @@ A WordPress Gutenberg block plugin that embeds Pardot (Account Engagement) form 
 
 - WordPress 6.8+
 - PHP 7.4+
-- [Kadence Blocks](https://wordpress.org/plugins/kadence-blocks/) — the submit button uses Kadence button classes to inherit your global button styles.
 - A Pardot (Account Engagement) account with API access (for the handler dropdown and field import; a form handler URL can also be entered manually).
+
+> **Works great with [Kadence Blocks](https://wordpress.org/plugins/kadence-blocks/)** — when Kadence is active, the submit button and form fields automatically inherit your global palette colours and button styles. The plugin works fine without it, falling back to WordPress preset colours and sensible defaults.
 
 ---
 
@@ -35,7 +36,6 @@ A WordPress Gutenberg block plugin that embeds Pardot (Account Engagement) form 
 1. Download the latest release zip from the [Releases page](https://github.com/BigOrangeLab/big-orange-pardot/releases).
 2. In WordPress, go to **Plugins → Add New Plugin → Upload Plugin** and upload the zip.
 3. Activate **Big Orange Pardot**.
-4. Make sure **Kadence Blocks** is also installed and active.
 
 ### From source
 

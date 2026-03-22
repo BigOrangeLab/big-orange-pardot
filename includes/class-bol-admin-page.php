@@ -443,7 +443,7 @@ class BOL_Admin_Page {
 				<li><strong><?php esc_html_e( 'Focus / Accent Color', 'big-orange-pardot' ); ?></strong> — <?php esc_html_e( 'Outline and border colour when a field is focused; also used for the hover border on inputs.', 'big-orange-pardot' ); ?></li>
 				<li><strong><?php esc_html_e( 'Input Border Radius (px)', 'big-orange-pardot' ); ?></strong> — <?php esc_html_e( 'Corner rounding applied to all inputs and textareas.', 'big-orange-pardot' ); ?></li>
 			</ul>
-			<p class="description"><?php esc_html_e( 'When no custom colours are set, the form falls back to your active theme\'s color palette (Kadence global palette variables, then WordPress preset colors, then sensible hard-coded defaults).', 'big-orange-pardot' ); ?></p>
+			<p class="description"><?php esc_html_e( 'When no custom colours are set, the form falls back to your active theme\'s color palette (Kadence global palette variables if Kadence Blocks is active, then WordPress preset colors, then sensible hard-coded defaults).', 'big-orange-pardot' ); ?></p>
 
 			<h3><?php esc_html_e( 'Form-level styling', 'big-orange-pardot' ); ?></h3>
 			<p><?php esc_html_e( 'Select the outer Big Orange Pardot block itself (not a field inside it) to access additional styling controls in the block settings panel and the block toolbar:', 'big-orange-pardot' ); ?></p>
@@ -454,7 +454,7 @@ class BOL_Admin_Page {
 			</ul>
 
 			<h3><?php esc_html_e( 'Submit button styling', 'big-orange-pardot' ); ?></h3>
-			<p><?php esc_html_e( 'Select the Pardot Submit Button block to access its settings. The button inherits Kadence\'s global button classes by default; the options below let you override individual properties:', 'big-orange-pardot' ); ?></p>
+			<p><?php esc_html_e( 'Select the Pardot Form block to access its submit button settings. The button uses standard WordPress button classes and will pick up Kadence or theme button styles automatically if available; the options below let you override individual properties:', 'big-orange-pardot' ); ?></p>
 			<ul style="list-style: disc; margin-left: 2em;">
 				<li><strong><?php esc_html_e( 'Alignment', 'big-orange-pardot' ); ?></strong> — <?php esc_html_e( 'Left, center, or right — available in the block toolbar.', 'big-orange-pardot' ); ?></li>
 				<li><strong><?php esc_html_e( 'Button Label', 'big-orange-pardot' ); ?></strong> — <?php esc_html_e( 'The button text (defaults to "Submit").', 'big-orange-pardot' ); ?></li>

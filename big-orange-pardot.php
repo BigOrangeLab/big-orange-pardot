@@ -9,7 +9,6 @@
  * License:           GPL-2.0-or-later
  * License URI:       https://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain:       big-orange-pardot
- * Requires Plugins:  kadence-blocks
  *
  * @package BigOrangePardot
  */

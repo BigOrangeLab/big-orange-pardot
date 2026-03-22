@@ -1,6 +1,7 @@
 import {
 	InspectorControls,
 	PanelColorSettings,
+	RichText,
 	store as blockEditorStore,
 	useBlockProps,
 } from '@wordpress/block-editor';
@@ -208,11 +209,37 @@ export default function Edit( { attributes, setAttributes, clientId } ) {
 			</InspectorControls>
 
 			<div { ...blockProps }>
+				<div className="bol-drag-handle" aria-hidden="true">
+					<svg
+						xmlns="http://www.w3.org/2000/svg"
+						viewBox="0 0 18 18"
+						width="18"
+						height="18"
+						aria-hidden="true"
+						focusable="false"
+					>
+						<circle cx="5" cy="5" r="1.5" fill="currentColor" />
+						<circle cx="13" cy="5" r="1.5" fill="currentColor" />
+						<circle cx="5" cy="9" r="1.5" fill="currentColor" />
+						<circle cx="13" cy="9" r="1.5" fill="currentColor" />
+						<circle cx="5" cy="13" r="1.5" fill="currentColor" />
+						<circle cx="13" cy="13" r="1.5" fill="currentColor" />
+					</svg>
+				</div>
 				{ /* eslint-disable-next-line jsx-a11y/label-has-associated-control */ }
 				<label>
-					{ label ||
-						fieldName ||
-						__( '(no label)', 'big-orange-pardot' ) }{ ' ' }
+					<RichText
+						tagName="span"
+						allowedFormats={ [] }
+						value={ label }
+						onChange={ ( value ) =>
+							setAttributes( { label: value } )
+						}
+						placeholder={
+							fieldName ||
+							__( 'Field label…', 'big-orange-pardot' )
+						}
+					/>{ ' ' }
 					{ isRequired && (
 						<span className="bol-required" aria-hidden="true">
 							*

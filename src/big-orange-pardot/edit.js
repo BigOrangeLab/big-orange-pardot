@@ -96,7 +96,10 @@ const DEFAULT_TEMPLATE = [
 			width: 'full',
 		},
 	],
-	[ 'bigorangelab/pardot-submit', { label: 'Submit' } ],
+	[
+		'bigorangelab/pardot-submit',
+		{ label: 'Submit', lock: { move: true, remove: true } },
+	],
 ];
 
 export default function Edit( { attributes, setAttributes, clientId } ) {
@@ -204,6 +207,7 @@ export default function Edit( { attributes, setAttributes, clientId } ) {
 				} );
 				const submitBlock = createBlock( 'bigorangelab/pardot-submit', {
 					label: 'Submit',
+					lock: { move: true, remove: true },
 				} );
 				replaceInnerBlocks( clientId, [ ...fieldBlocks, submitBlock ] );
 				setIsImporting( false );

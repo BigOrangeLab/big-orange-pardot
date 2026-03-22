@@ -3,18 +3,23 @@ import {
 	BlockControls,
 	InspectorControls,
 	PanelColorSettings,
+	store as blockEditorStore,
 	useBlockProps,
 } from '@wordpress/block-editor';
+import { createBlock } from '@wordpress/blocks';
 import {
 	BoxControl,
+	Button,
 	PanelBody,
 	RangeControl,
 	SelectControl,
 	TextControl,
 } from '@wordpress/components';
+import { useDispatch, useSelect } from '@wordpress/data';
+import { plus } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 
-export default function Edit( { attributes, setAttributes } ) {
+export default function Edit( { attributes, setAttributes, clientId } ) {
 	const {
 		label,
 		buttonTextColor,
@@ -29,6 +34,29 @@ export default function Edit( { attributes, setAttributes } ) {
 		buttonShadow,
 		buttonAlignment,
 	} = attributes;
+
+	const { parentClientId, blockIndex } = useSelect(
+		( select ) => {
+			const { getBlockRootClientId, getBlockIndex } =
+				select( blockEditorStore );
+			return {
+				parentClientId: getBlockRootClientId( clientId ),
+				blockIndex: getBlockIndex( clientId ),
+			};
+		},
+		[ clientId ]
+	);
+
+	const { insertBlock } = useDispatch( blockEditorStore );
+
+	function addField() {
+		insertBlock(
+			createBlock( 'bigorangelab/pardot-field' ),
+			blockIndex,
+			parentClientId,
+			true
+		);
+	}
 
 	const blockProps = useBlockProps( {
 		className: 'bol-pardot-submit',
@@ -269,6 +297,17 @@ export default function Edit( { attributes, setAttributes } ) {
 			</InspectorControls>
 
 			<div { ...blockProps }>
+				<div className="bol-add-field-row">
+					<Button
+						className="bol-add-field"
+						icon={ plus }
+						onClick={ addField }
+						size="small"
+						variant="secondary"
+					>
+						{ __( 'Add field', 'big-orange-pardot' ) }
+					</Button>
+				</div>
 				<button
 					type="button"
 					className="kb-button wp-block-button__link"

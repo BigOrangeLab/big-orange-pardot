@@ -17,6 +17,11 @@
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
+
+require_once __DIR__ . '/includes/class-bol-pardot-api.php';
+require_once __DIR__ . '/includes/class-bol-admin-page.php';
+
+new BOL_Admin_Page();
 /**
  * Registers the block(s) metadata from the `blocks-manifest.php` and registers the block type(s)
  * based on the registered block metadata. Behind the scenes, it registers also all assets so they can be enqueued
@@ -45,3 +50,43 @@ function big_orange_pardot_enqueue_attribution() {
 	);
 }
 add_action( 'wp_enqueue_scripts', 'big_orange_pardot_enqueue_attribution' );
+
+/**
+ * Registers the REST API endpoint that the block editor uses to list Pardot form handlers.
+ */
+function big_orange_pardot_rest_init() {
+	register_rest_route(
+		'big-orange-pardot/v1',
+		'/form-handlers',
+		array(
+			'methods'             => 'GET',
+			'callback'            => static function () {
+				$handlers = BOL_Pardot_API::get_form_handlers();
+				if ( is_wp_error( $handlers ) ) {
+					return $handlers;
+				}
+				return rest_ensure_response( $handlers );
+			},
+			'permission_callback' => static function () {
+				return current_user_can( 'manage_options' );
+			},
+		)
+	);
+}
+add_action( 'rest_api_init', 'big_orange_pardot_rest_init' );
+
+/**
+ * Passes the settings page URL to the block editor script so the "not connected"
+ * notice can link directly to the credentials page.
+ */
+function big_orange_pardot_editor_script_data() {
+	wp_localize_script(
+		'bigorangelab-big-orange-pardot-editor-script',
+		'bolPardot',
+		array(
+			'settingsUrl' => admin_url( 'options-general.php?page=big-orange-pardot' ),
+			'isConnected' => BOL_Pardot_API::is_connected(),
+		)
+	);
+}
+add_action( 'enqueue_block_editor_assets', 'big_orange_pardot_editor_script_data' );

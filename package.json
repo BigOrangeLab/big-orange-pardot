@@ -15,8 +15,11 @@
 		"start": "wp-scripts start --blocks-manifest"
 	},
 	"dependencies": {
+		"@wordpress/api-fetch": "latest",
 		"@wordpress/block-editor": "latest",
 		"@wordpress/blocks": "latest",
+		"@wordpress/components": "latest",
+		"@wordpress/element": "latest",
 		"@wordpress/i18n": "latest"
 	},
 	"devDependencies": {

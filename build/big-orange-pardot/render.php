@@ -12,7 +12,7 @@
 
 $pardot_form_url = isset( $attributes['pardotFormUrl'] ) ? trim( $attributes['pardotFormUrl'] ) : '';
 ?>
-<div <?php echo get_block_wrapper_attributes(); ?>>
+<div <?php echo get_block_wrapper_attributes(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- core function, output is already escaped. ?>>
 	<form
 		method="post"
 		action="<?php echo esc_url( $pardot_form_url ); ?>"

@@ -20,6 +20,10 @@ return array(
 			'pardotFormUrl' => array(
 				'type' => 'string',
 				'default' => ''
+			),
+			'pardotFormHandlerId' => array(
+				'type' => 'integer',
+				'default' => 0
 			)
 		),
 		'textdomain' => 'big-orange-pardot',

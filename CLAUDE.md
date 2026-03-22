@@ -1,26 +1,41 @@
 # Big Orange Pardot Plugin
 
-A WordPress block plugin that provides a Gutenberg block for embedding Pardot forms.
+A WordPress Gutenberg block plugin integrating Pardot (Account Engagement) form handlers into WordPress pages.
 
 ## Architecture
 
-- **Main entry:** `big-orange-pardot.php` — registers block types via the WordPress 6.7+ `wp_register_block_types_from_metadata_collection()` API
+- **Main entry:** `big-orange-pardot.php` — registers block types, REST routes, admin page, and scripts
 - **Source:** `src/big-orange-pardot/` — JSX/SCSS source files
 - **Build output:** `build/big-orange-pardot/` — compiled assets (do not edit directly)
 - **Block manifest:** `build/blocks-manifest.php` — auto-generated, do not edit
+- **PHP includes:** `includes/` — server-side API client and admin page classes
 
 ### Block files
 
 | File | Purpose |
 |------|---------|
-| `src/big-orange-pardot/block.json` | Block metadata, attributes, asset registration |
+| `src/big-orange-pardot/block.json` | Block metadata, attributes (`pardotFormUrl`, `pardotFormHandlerId`), asset registration |
 | `src/big-orange-pardot/index.js` | Block registration |
-| `src/big-orange-pardot/edit.js` | React component rendered in the block editor |
-| `src/big-orange-pardot/render.php` | PHP template — dynamic block frontend output |
+| `src/big-orange-pardot/edit.js` | Block editor React component — dropdown to select Pardot form handler, fetched via REST |
+| `src/big-orange-pardot/render.php` | PHP template — dynamic block frontend output (form HTML, hidden attribution fields) |
 | `src/big-orange-pardot/save.js` | Returns `null` (dynamic block, PHP renders output) |
-| `assets/attribution.js` | Global cookie capture + hidden field population (enqueued on every page) |
-| `src/big-orange-pardot/editor.scss` | Editor-only styles |
+| `src/big-orange-pardot/editor.scss` | Editor-only styles (inspector notice, loading spinner) |
 | `src/big-orange-pardot/style.scss` | Frontend (and editor) styles |
+| `assets/attribution.js` | Global cookie capture + hidden field population (enqueued on every page, no build step) |
+
+### PHP includes
+
+| File | Purpose |
+|------|---------|
+| `includes/class-bol-pardot-api.php` | Static API client — OAuth token management, Pardot v5 API requests, form handler cache |
+| `includes/class-bol-admin-page.php` | Settings page (Settings submenu) — credentials, OAuth connect/disconnect, form handler inspector |
+
+### Pardot API integration
+
+- **OAuth flow:** Salesforce authorization code flow. Credentials (`client_id`, `client_secret`, `business_unit_id`) stored in `wp_options` (autoload off). Tokens refreshed automatically by `BOL_Pardot_API::get_access_token()` when within 60 seconds of expiry.
+- **Form handlers:** `BOL_Pardot_API::get_form_handlers()` fetches from `https://pi.pardot.com/api/v5/objects/form-handlers`, caches in transient `big_orange_pardot_form_handlers` (15 min). Returns `[{id, name, url}]` — the `url` is parsed from the handler's `embedCode` HTML via regex.
+- **REST endpoint:** `GET /wp-json/big-orange-pardot/v1/form-handlers` — requires `manage_options`. Powers the block editor dropdown.
+- **Attribution fields:** 8 hidden fields populated by `assets/attribution.js` cookies: `utm_source`, `utm_medium`, `utm_campaign`, `utm_term`, `utm_content`, `referrer_url`, `landing_page_url`, `gclid`.
 
 ## Build System
 
@@ -47,6 +62,28 @@ composer lint:php         # Run PHPCS
 composer lint:php:fix     # Run PHPCBF (auto-fix)
 ```
 
+## Code Style
+
+This project follows **WordPress Core coding standards** throughout, enforced by linting.
+
+### PHP
+- [WordPress PHP Coding Standards](https://developer.wordpress.org/coding-standards/wordpress-coding-standards/php/): Yoda conditions, `array()` (not `[]`), tabs for indentation, spaces inside parentheses, `snake_case` for functions/variables, `PascalCase` for classes.
+- Escape all output (`esc_html__()`, `esc_url()`, `esc_attr()`). Sanitize all input (`sanitize_text_field()`, `wp_unslash()`). Use `check_admin_referer()` for nonce verification before processing POST data.
+- No direct database calls; use WordPress option and transient APIs.
+
+### JavaScript / JSX
+- [WordPress JavaScript Coding Standards](https://developer.wordpress.org/coding-standards/wordpress-coding-standards/javascript/): tabs for indentation, spaces inside braces and parentheses, single quotes.
+- Use `const`/`let`, never `var`.
+- All user-visible strings must be wrapped in `__()` or `sprintf()` from `@wordpress/i18n`. `sprintf()` calls require a `/* translators: ... */` comment **inside the same JSX expression block** as the call (not on a separate line).
+- Avoid flanking whitespace in translation strings — use `{ ' ' }` for explicit spaces between JSX nodes.
+- `/* global SomeGlobal */` comments are required for browser globals not in the default ESLint environment (e.g. `MutationObserver`), and for WP-localized script globals (e.g. `bolPardot`).
+
+### CSS / SCSS
+- [WordPress CSS Coding Standards](https://developer.wordpress.org/coding-standards/wordpress-coding-standards/css/): tabs for indentation, space before `{`, lowercase properties.
+- Order pseudo-class selectors least-specific first: `&:disabled` before `&:focus` before `&:hover`.
+- Avoid `input, textarea` combined rules when textarea needs additional properties — use separate blocks to satisfy `no-descending-specificity`.
+- Use CSS custom properties (`--wp--preset--*`, `--global-palette*`) with hardcoded fallbacks for theme compatibility.
+
 ## Before marking any task as done
 
 Run **both** linters and fix any reported issues:
@@ -63,7 +100,3 @@ composer lint:php
 - Node.js (for building assets)
 - Composer (for PHP linting)
 - Kadence Blocks plugin (declared as a plugin dependency via `Requires Plugins` header)
-
-## Status
-
-Early development / scaffolding phase. The block currently renders placeholder text; Pardot form integration is not yet implemented.

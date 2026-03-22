@@ -7,7 +7,7 @@
 
 .wp-block-bigorangelab-big-orange-pardot {
 	// Subtle outline so the block boundary is visible when not selected.
-	outline: 1px dashed rgba( 0, 0, 0, 0.15 );
+	outline: 1px dashed rgba(0, 0, 0, 0.15);
 	padding: 1rem;
 
 	// Notice shown when no Form Handler URL is configured yet.
@@ -21,8 +21,41 @@
 		border-radius: 0 0.25rem 0.25rem 0;
 	}
 
+	// Selected handler name label shown above the preview form.
+	.bol-pardot-handler-name {
+		margin: 0 0 0.75rem;
+		font-size: 0.8125rem;
+		font-style: italic;
+		color: #666;
+	}
+
 	// The preview form in the editor is non-interactive — indicate that clearly.
 	.bol-pardot-preview {
 		pointer-events: none;
+	}
+}
+
+// Inspector panel — not-connected warning notice.
+.bol-inspector-notice.components-notice {
+	margin: 0 0 8px;
+	padding: 8px 12px;
+
+	.components-notice__content {
+		margin: 0;
+		font-size: 12px;
+	}
+}
+
+// Inspector panel — loading spinner row.
+.bol-inspector-loading {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	padding: 4px 0 8px;
+	font-size: 12px;
+	color: #757575;
+
+	.components-spinner {
+		margin: 0;
 	}
 }

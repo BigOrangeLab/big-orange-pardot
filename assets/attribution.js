@@ -5,14 +5,15 @@
  * and referrer into cookies, then populates hidden fields in any Pardot form
  * found on the page (including forms added dynamically via MutationObserver).
  */
+/* global MutationObserver */
 ( function () {
 	'use strict';
 
-	var COOKIE_EXPIRY_DAYS    = 30;
-	var GCLID_EXPIRY_DAYS     = 90;
-	var COOKIE_PATH           = '/';
+	const COOKIE_EXPIRY_DAYS = 30;
+	const GCLID_EXPIRY_DAYS = 90;
+	const COOKIE_PATH = '/';
 
-	var HIDDEN_FIELD_NAMES = [
+	const HIDDEN_FIELD_NAMES = [
 		'utm_source',
 		'utm_medium',
 		'utm_campaign',
@@ -28,20 +29,26 @@
 	// -------------------------------------------------------------------------
 
 	function setCookie( name, value, days ) {
-		var expires = '';
+		let expires = '';
 		if ( days ) {
-			var date = new Date();
+			const date = new Date();
 			date.setTime( date.getTime() + days * 24 * 60 * 60 * 1000 );
 			expires = '; expires=' + date.toUTCString();
 		}
-		document.cookie = name + '=' + encodeURIComponent( value ) + expires + '; path=' + COOKIE_PATH;
+		document.cookie =
+			name +
+			'=' +
+			encodeURIComponent( value ) +
+			expires +
+			'; path=' +
+			COOKIE_PATH;
 	}
 
 	function getCookie( name ) {
-		var nameEQ = name + '=';
-		var cookies = document.cookie.split( ';' );
-		for ( var i = 0; i < cookies.length; i++ ) {
-			var c = cookies[ i ].trim();
+		const nameEQ = name + '=';
+		const cookies = document.cookie.split( ';' );
+		for ( let i = 0; i < cookies.length; i++ ) {
+			const c = cookies[ i ].trim();
 			if ( c.indexOf( nameEQ ) === 0 ) {
 				return decodeURIComponent( c.substring( nameEQ.length ) );
 			}
@@ -54,7 +61,7 @@
 	// -------------------------------------------------------------------------
 
 	function getUrlParam( name ) {
-		var params = new URLSearchParams( window.location.search );
+		const params = new URLSearchParams( window.location.search );
 		return params.get( name );
 	}
 
@@ -63,33 +70,47 @@
 	// -------------------------------------------------------------------------
 
 	function captureAttribution() {
-		var utmParams = [ 'utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content' ];
+		const utmParams = [
+			'utm_source',
+			'utm_medium',
+			'utm_campaign',
+			'utm_term',
+			'utm_content',
+		];
 
 		// UTM params — overwrite cookies whenever present in URL.
 		utmParams.forEach( function ( param ) {
-			var value = getUrlParam( param );
+			const value = getUrlParam( param );
 			if ( value ) {
 				setCookie( param, value, COOKIE_EXPIRY_DAYS );
 			}
 		} );
 
 		// gclid — overwrite whenever present in URL (90-day window).
-		var gclid = getUrlParam( 'gclid' );
+		const gclid = getUrlParam( 'gclid' );
 		if ( gclid ) {
 			setCookie( 'gclid', gclid, GCLID_EXPIRY_DAYS );
 		}
 
 		// landing_page_url — set once only on first visit.
 		if ( ! getCookie( 'landing_page_url' ) ) {
-			setCookie( 'landing_page_url', window.location.href, COOKIE_EXPIRY_DAYS );
+			setCookie(
+				'landing_page_url',
+				window.location.href,
+				COOKIE_EXPIRY_DAYS
+			);
 		}
 
 		// referrer_url — set once only, external referrers only.
 		if ( ! getCookie( 'referrer_url' ) && document.referrer ) {
 			try {
-				var referrerHost = new URL( document.referrer ).hostname;
+				const referrerHost = new URL( document.referrer ).hostname;
 				if ( referrerHost !== window.location.hostname ) {
-					setCookie( 'referrer_url', document.referrer, COOKIE_EXPIRY_DAYS );
+					setCookie(
+						'referrer_url',
+						document.referrer,
+						COOKIE_EXPIRY_DAYS
+					);
 				}
 			} catch ( e ) {
 				// Malformed referrer — skip.
@@ -102,10 +123,12 @@
 	// -------------------------------------------------------------------------
 
 	function populateForms() {
-		var hiddenInputs = document.querySelectorAll( 'input[type="hidden"]' );
+		const hiddenInputs = document.querySelectorAll(
+			'input[type="hidden"]'
+		);
 		hiddenInputs.forEach( function ( input ) {
 			if ( HIDDEN_FIELD_NAMES.indexOf( input.name ) !== -1 ) {
-				var cookieValue = getCookie( input.name );
+				const cookieValue = getCookie( input.name );
 				if ( cookieValue !== null ) {
 					input.value = cookieValue;
 				}
@@ -117,7 +140,7 @@
 	// MutationObserver — handle dynamically injected forms (modals, off-canvas)
 	// -------------------------------------------------------------------------
 
-	var debounceTimer = null;
+	let debounceTimer = null;
 
 	function debouncedPopulate() {
 		clearTimeout( debounceTimer );
@@ -125,8 +148,8 @@
 	}
 
 	function observeForForms() {
-		var observer = new MutationObserver( function ( mutations ) {
-			for ( var i = 0; i < mutations.length; i++ ) {
+		const observer = new MutationObserver( function ( mutations ) {
+			for ( let i = 0; i < mutations.length; i++ ) {
 				if ( mutations[ i ].addedNodes.length > 0 ) {
 					debouncedPopulate();
 					return;
@@ -136,7 +159,7 @@
 
 		observer.observe( document.body, {
 			childList: true,
-			subtree:   true,
+			subtree: true,
 		} );
 	}
 

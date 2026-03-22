@@ -5,7 +5,7 @@
 	"version": "0.1.0",
 	"title": "Big Orange Pardot",
 	"category": "widgets",
-	"icon": "smiley",
+	"icon": "feedback",
 	"description": "A WordPress Form block for WordPress to integrate with Pardot.",
 	"example": {},
 	"supports": {

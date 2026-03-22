@@ -5,6 +5,7 @@
 	"version": "0.1.0",
 	"title": "Pardot Submit Button",
 	"category": "widgets",
+	"icon": "button",
 	"description": "The submit button inside a Big Orange Pardot form block.",
 	"parent": [ "bigorangelab/big-orange-pardot" ],
 	"supports": {

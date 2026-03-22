@@ -5,6 +5,7 @@
   "version": "0.1.0",
   "title": "Pardot Field",
   "category": "widgets",
+  "icon": "edit-page",
   "description": "A single form field inside a Big Orange Pardot form block.",
   "parent": [
     "bigorangelab/big-orange-pardot"

@@ -8,7 +8,7 @@ return array(
 		'version' => '0.1.0',
 		'title' => 'Big Orange Pardot',
 		'category' => 'widgets',
-		'icon' => 'smiley',
+		'icon' => 'feedback',
 		'description' => 'A WordPress Form block for WordPress to integrate with Pardot.',
 		'example' => array(
 			
@@ -46,6 +46,7 @@ return array(
 		'version' => '0.1.0',
 		'title' => 'Pardot Field',
 		'category' => 'widgets',
+		'icon' => 'edit-page',
 		'description' => 'A single form field inside a Big Orange Pardot form block.',
 		'parent' => array(
 			'bigorangelab/big-orange-pardot'
@@ -104,6 +105,7 @@ return array(
 		'version' => '0.1.0',
 		'title' => 'Pardot Submit Button',
 		'category' => 'widgets',
+		'icon' => 'button',
 		'description' => 'The submit button inside a Big Orange Pardot form block.',
 		'parent' => array(
 			'bigorangelab/big-orange-pardot'

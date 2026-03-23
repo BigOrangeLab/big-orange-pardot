@@ -1,4 +1,4 @@
-import './admin-bar-attribution.css';
+import './admin-bar-attribution.scss';
 
 /**
  * Big Orange Pardot — admin bar attribution cookie clear handler.

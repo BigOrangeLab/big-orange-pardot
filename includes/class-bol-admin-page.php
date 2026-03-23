@@ -430,6 +430,10 @@ class BOL_Admin_Page {
 				<li><?php esc_html_e( 'To start fresh from Pardot\'s field list, click "Replace all with Pardot fields". This removes all current fields and rebuilds them from the handler\'s configuration.', 'big-orange-pardot' ); ?></li>
 			</ol>
 
+			<p class="description">
+				<?php esc_html_e( 'Until a form handler is configured, the form is hidden from site visitors. Editors viewing the page while logged in will see a notice above a non-submittable preview of the form, so they can review the layout in context before the form goes live.', 'big-orange-pardot' ); ?>
+			</p>
+
 			<h3><?php esc_html_e( 'If not connected to Pardot', 'big-orange-pardot' ); ?></h3>
 			<ol>
 				<li><?php esc_html_e( 'Open the block settings panel. Enter the Form Handler URL — found in your Pardot form handler\'s embed code — into the Form Handler URL field.', 'big-orange-pardot' ); ?></li>

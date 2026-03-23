@@ -14,8 +14,8 @@ This plugin provides Gutenberg blocks for embedding and configuring Pardot (Acco
   - `includes/class-bol-pardot-api.php`: Static API client — OAuth token management, form handler cache, form handler fields.
   - `includes/class-bol-admin-page.php`: Two-tab settings page (Settings + Help). **Keep `render_help_tab()` current whenever plugin behaviour changes.**
 - `src/attribution.js`: Front-end attribution and hidden field population script. Built to `build/attribution.js`.
-- `src/admin-bar-attribution.js`: Admin bar "Clear all cookies" handler — expires all 8 attribution cookies and reloads. Built to `build/admin-bar-attribution.js`. Imports `src/admin-bar-attribution.css`.
-- `src/admin-bar-attribution.css`: Styles for the admin bar Attribution panel. Imported from `admin-bar-attribution.js`; built to `build/admin-bar-attribution.css`.
+- `src/admin-bar-attribution.js`: Admin bar "Clear all cookies" handler — expires all 8 attribution cookies and reloads. Built to `build/admin-bar-attribution.js`. Imports `src/admin-bar-attribution.scss`.
+- `src/admin-bar-attribution.scss`: Styles for the admin bar Attribution panel. Imported from `admin-bar-attribution.js`; built to `build/admin-bar-attribution.css`.
 - `build/`: Generated assets and block manifest output. Treat as generated artifacts.
 
 ## Block context flow
@@ -50,7 +50,7 @@ Both require `manage_options`.
 
 ## Admin bar attribution inspector
 
-`bol_register_admin_bar_node()` adds an "Attribution (N)" menu to the WP admin bar, visible only to `manage_options` users. PHP reads `$_COOKIE` for the 8 attribution field values (`BOL_Pardot_API::ATTRIBUTION_FIELDS`). `assets/admin-bar-attribution.js` handles the "Clear all cookies" link (expires all cookies + reloads the page). Styles in `assets/admin-bar-attribution.css`. Both assets enqueued by `bol_enqueue_admin_bar_assets()`, hooked to both `wp_enqueue_scripts` and `admin_enqueue_scripts`.
+`bol_register_admin_bar_node()` adds an "Attribution (N)" menu to the WP admin bar, visible only to `manage_options` users. PHP reads `$_COOKIE` for the 8 attribution field values (`BOL_Pardot_API::ATTRIBUTION_FIELDS`). `src/admin-bar-attribution.js` handles the "Clear all cookies" link (expires all cookies + reloads the page). Styles in `src/admin-bar-attribution.scss` (built to `build/admin-bar-attribution.css`). Both assets enqueued by `bol_enqueue_admin_bar_assets()`, hooked to both `wp_enqueue_scripts` and `admin_enqueue_scripts`.
 
 ## Debugging approach
 

@@ -10,12 +10,14 @@ A WordPress Gutenberg block plugin that embeds Pardot (Account Engagement) form 
 
 - **Native form rendering** — submits directly to your Pardot form handler URL; no iframe, no JS embed.
 - **Gutenberg innerBlocks** — each field is an independent block. Reorder, remove, or add fields freely in the block editor.
-- **Import from Pardot** — when connected, one click imports the actual fields configured on a selected form handler, including field types and required status.
+- **Two-path editor UX** — when connected to Pardot, selecting a form handler auto-inserts missing fields and shows live sync status; when not connected, a URL input and "Common Pardot Fields" panel let you build the form manually without API access.
 - **Flexible layout** — two-column CSS grid; fields can be full-width or half-width, with two adjacent half-width fields displayed side by side.
 - **Shared field styling** — label colour, input background, border colour, focus/accent colour, and border radius are configured once and applied to every field in the form.
 - **Full submit button customisation** — text colour, background or gradient, hover colour, padding, border, border radius, shadow, and alignment.
 - **Form-level styling** — native WordPress block supports for background colour, padding, margin, and border on the outer form wrapper.
 - **Marketing attribution tracking** — captures UTM parameters, Google Click ID, landing page URL, and referrer into cookies on every page, then injects them as hidden fields on any Pardot form found on the page (including dynamically loaded forms).
+- **Admin bar attribution inspector** — administrators see an "Attribution (N)" menu in the WordPress toolbar showing current cookie values and a one-click "Clear all" for testing fresh-visitor attribution flows.
+- **Safe unconfigured preview** — when no form handler URL is set, the form is hidden from visitors; editors previewing the page see a notice and a non-submittable form preview so they can review the layout before go-live.
 
 ---
 

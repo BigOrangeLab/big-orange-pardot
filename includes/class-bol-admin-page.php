@@ -238,6 +238,16 @@ class BOL_Admin_Page {
 	 * @return void
 	 */
 	private function save_credentials() {
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- nonce checked via check_admin_referer() in handle_requests() before this method is called.
+		$business_unit_id = isset( $_POST['bol_business_unit_id'] ) ? sanitize_text_field( wp_unslash( $_POST['bol_business_unit_id'] ) ) : '';
+
+		// Salesforce Organization IDs start with '00D' (15 chars). Business Unit IDs start with '0Uv' (18 chars).
+		// Catch the common mistake of entering the Org ID instead of the Business Unit ID.
+		if ( '' !== $business_unit_id && 0 === stripos( $business_unit_id, '00D' ) ) {
+			wp_safe_redirect( $this->settings_url( 'wrong_id_org_not_unit' ) );
+			exit;
+		}
+
 		$fields = array( 'client_id', 'client_secret', 'business_unit_id' );
 		foreach ( $fields as $field ) {
 				// phpcs:ignore WordPress.Security.NonceVerification.Missing -- nonce checked via check_admin_referer() in handle_requests() before this method is called.
@@ -679,10 +689,15 @@ class BOL_Admin_Page {
 			</ol>
 
 			<h3 id="bol-help-setup-step2"><?php esc_html_e( 'Step 2 — Find your Business Unit ID', 'big-orange-pardot' ); ?></h3>
-			<ol>
-				<li><?php esc_html_e( 'In Salesforce Setup, search for "Account Engagement" and go to Account Engagement → Business Unit Setup.', 'big-orange-pardot' ); ?></li>
-				<li><?php esc_html_e( 'Copy the Business Unit ID — it is an 18-character value beginning with 0Uv. If you prefer, you can skip this and let the plugin load business units automatically after you connect.', 'big-orange-pardot' ); ?></li>
-			</ol>
+			<p><?php esc_html_e( 'You can either let the plugin discover your Business Unit ID automatically, or paste it in manually.', 'big-orange-pardot' ); ?></p>
+			<p><strong><?php esc_html_e( 'Option A — Auto-discover (recommended):', 'big-orange-pardot' ); ?></strong>
+			<?php esc_html_e( 'Enable "Auto-discover Business Units" in the Settings tab before connecting. After you authorize, the plugin queries Salesforce and populates a dropdown of your available Business Units automatically. If your org has only one, it is selected for you.', 'big-orange-pardot' ); ?></p>
+			<p><strong><?php esc_html_e( 'Option B — Manual:', 'big-orange-pardot' ); ?></strong>
+			<?php esc_html_e( 'In Salesforce Setup, search for "Account Engagement" in the Quick Find box, then go to Account Engagement → Business Unit Setup. Copy the 18-character Business Unit ID — it begins with 0Uv.', 'big-orange-pardot' ); ?></p>
+			<p class="description">
+				<strong><?php esc_html_e( 'Common mistake:', 'big-orange-pardot' ); ?></strong>
+				<?php esc_html_e( 'Do not use the Salesforce Organization ID (found in Setup → Company Information). That ID starts with 00D and is not the same as the Business Unit ID. The plugin will warn you if it detects this mistake.', 'big-orange-pardot' ); ?>
+			</p>
 
 			<h3 id="bol-help-setup-step3"><?php esc_html_e( 'Step 3 — Enter credentials and authorize', 'big-orange-pardot' ); ?></h3>
 			<ol>
@@ -1030,7 +1045,8 @@ class BOL_Admin_Page {
 		$error_msg = isset( $_GET['error'] ) ? sanitize_text_field( wp_unslash( $_GET['error'] ) ) : '';
 
 		$messages = array(
-			'saved'                => array( 'success', __( 'Credentials saved.', 'big-orange-pardot' ) ),
+			'saved'                   => array( 'success', __( 'Credentials saved.', 'big-orange-pardot' ) ),
+			'wrong_id_org_not_unit'   => array( 'error', __( 'That looks like a Salesforce Organization ID (starts with 00D), not a Business Unit ID (starts with 0Uv). Find the correct 18-character Business Unit ID under Salesforce Setup → Account Engagement → Business Unit Setup.', 'big-orange-pardot' ) ),
 			'connected'            => array( 'success', __( 'Successfully connected to Pardot!', 'big-orange-pardot' ) ),
 			'log_cleared'          => array( 'success', __( 'API log deleted and logging disabled.', 'big-orange-pardot' ) ),
 			'connected_business_unit_not_supported' => array( 'warning', __( 'Connected to Pardot. Business Unit auto-discovery is unavailable for this Salesforce org, so please enter your Business Unit ID manually.', 'big-orange-pardot' ) ),

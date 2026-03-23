@@ -346,6 +346,11 @@ class BOL_Admin_Page {
 		return '' !== $log_path && file_exists( $log_path );
 	}
 
+	/**
+	 * Returns the active tab slug, defaulting to 'settings'.
+	 *
+	 * @return string
+	 */
 	private function current_tab() {
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		$tab = isset( $_GET['tab'] ) ? sanitize_key( $_GET['tab'] ) : 'settings';

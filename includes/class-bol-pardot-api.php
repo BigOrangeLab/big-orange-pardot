@@ -180,17 +180,21 @@ class BOL_Pardot_API {
 		}
 
 		if ( $size <= $max_bytes ) {
+			// phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents -- Reading a plugin-owned local log file; wp_remote_get() is for remote URLs.
 			$contents = file_get_contents( $path );
 			return false === $contents ? '' : (string) $contents;
 		}
 
+		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fopen -- WP_Filesystem has no fseek() equivalent for partial tail reads.
 		$handle = fopen( $path, 'rb' );
 		if ( false === $handle ) {
 			return '';
 		}
 
 		fseek( $handle, -1 * (int) $max_bytes, SEEK_END );
+		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fread
 		$contents = fread( $handle, (int) $max_bytes );
+		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fclose
 		fclose( $handle );
 
 		if ( false === $contents ) {
@@ -508,14 +512,17 @@ class BOL_Pardot_API {
 
 		$line .= PHP_EOL;
 
-		$file = @fopen( $path, 'ab' );
+		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fopen,WordPress.PHP.NoSilencedErrors.Discouraged -- WP_Filesystem has no append mode; @ suppresses E_WARNING on permission failure, the false check handles the error.
+		$file = @fopen( $path, 'ab' ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fopen,WordPress.PHP.NoSilencedErrors.Discouraged
 		if ( false === $file ) {
 			return;
 		}
 
 		flock( $file, LOCK_EX );
+		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fwrite
 		fwrite( $file, $line );
 		flock( $file, LOCK_UN );
+		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fclose
 		fclose( $file );
 	}
 
@@ -530,6 +537,7 @@ class BOL_Pardot_API {
 	 * @return string
 	 */
 	private static function base64url_encode( $data ) {
+		// phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_encode -- Used for RFC 7636 PKCE challenge encoding, not obfuscation.
 		return rtrim( strtr( base64_encode( $data ), '+/', '-_' ), '=' );
 	}
 

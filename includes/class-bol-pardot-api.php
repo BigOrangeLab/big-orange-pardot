@@ -547,12 +547,6 @@ class BOL_Pardot_API {
 	public static function get_authorize_url( $redirect_uri, $state ) {
 		$code_verifier  = self::base64url_encode( random_bytes( 32 ) );
 		$code_challenge = self::base64url_encode( hash( 'sha256', $code_verifier, true ) );
-		$scopes         = 'pardot_api refresh_token';
-
-		// Opt-in scope needed for Salesforce REST queries (e.g. Business Unit auto-discovery).
-		if ( (bool) get_option( 'big_orange_pardot_enable_salesforce_api_scope', false ) ) {
-			$scopes = 'api pardot_api refresh_token';
-		}
 
 		update_option( 'big_orange_pardot_pkce_verifier', $code_verifier, false );
 
@@ -561,7 +555,7 @@ class BOL_Pardot_API {
 				'response_type'         => 'code',
 				'client_id'             => self::get_client_id(),
 				'redirect_uri'          => rawurlencode( $redirect_uri ),
-				'scope'                 => $scopes,
+				'scope'                 => 'api pardot_api refresh_token',
 				'state'                 => $state,
 				'code_challenge'        => $code_challenge,
 				'code_challenge_method' => 'S256',

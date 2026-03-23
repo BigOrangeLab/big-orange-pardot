@@ -256,10 +256,6 @@ class BOL_Admin_Page {
 		}
 
 		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- nonce checked via check_admin_referer() in handle_requests() before this method is called.
-		$enable_salesforce_api_scope = isset( $_POST['bol_enable_salesforce_api_scope'] ) ? '1' : '0';
-		update_option( 'big_orange_pardot_enable_salesforce_api_scope', $enable_salesforce_api_scope, false );
-
-		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- nonce checked via check_admin_referer() in handle_requests() before this method is called.
 		$enable_api_logging = isset( $_POST['bol_enable_api_logging'] ) ? '1' : '0';
 		update_option( 'big_orange_pardot_enable_api_logging', $enable_api_logging, false );
 
@@ -308,27 +304,20 @@ class BOL_Admin_Page {
 			exit;
 		}
 
-		$notice             = 'connected';
+		$notice              = 'connected';
 		$current_business_id = BOL_Pardot_API::get_business_unit_id();
-		$business_units     = BOL_Pardot_API::get_business_units( true );
+		$business_units      = BOL_Pardot_API::get_business_units( true );
 
-		if ( is_wp_error( $business_units ) ) {
-			if ( 'business_units_not_supported' === $business_units->get_error_code() ) {
-				update_option( 'big_orange_pardot_enable_salesforce_api_scope', '0', false );
-				wp_safe_redirect( $this->settings_url( 'connected_business_unit_not_supported' ) );
-				exit;
+		if ( ! is_wp_error( $business_units ) ) {
+			if ( '' === $current_business_id && 1 === count( $business_units ) ) {
+				update_option( 'big_orange_pardot_business_unit_id', (string) $business_units[0]['id'], false );
+				$notice = 'connected_business_unit_set';
+			} elseif ( '' === $current_business_id && count( $business_units ) > 1 ) {
+				$notice = 'connected_select_business_unit';
 			}
-
-			wp_safe_redirect( $this->settings_url( 'connected_business_unit_lookup_failed', $business_units->get_error_message() ) );
-			exit;
 		}
-
-		if ( '' === $current_business_id && 1 === count( $business_units ) ) {
-			update_option( 'big_orange_pardot_business_unit_id', (string) $business_units[0]['id'], false );
-			$notice = 'connected_business_unit_set';
-		} elseif ( '' === $current_business_id && count( $business_units ) > 1 ) {
-			$notice = 'connected_select_business_unit';
-		}
+		// On any lookup failure (API not supported, network error, etc.) fall through
+		// with $notice = 'connected' so the user can enter their Business Unit ID manually.
 
 		wp_safe_redirect( $this->settings_url( $notice ) );
 		exit;
@@ -439,20 +428,15 @@ class BOL_Admin_Page {
 	private function render_settings_tab() {
 		$business_units       = array();
 		$business_units_error = '';
-		$enable_sf_api_scope  = (bool) get_option( 'big_orange_pardot_enable_salesforce_api_scope', false );
 		$enable_api_logging   = BOL_Pardot_API::is_api_logging_enabled();
 
 		if ( BOL_Pardot_API::is_connected() ) {
 			$business_units = BOL_Pardot_API::get_business_units();
 			if ( is_wp_error( $business_units ) ) {
-				if ( 'business_units_not_supported' === $business_units->get_error_code() ) {
-					update_option( 'big_orange_pardot_enable_salesforce_api_scope', '0', false );
-					$enable_sf_api_scope  = false;
-					$business_units_error = __( 'This Salesforce org does not expose Business Units via API. Enter your Business Unit ID manually.', 'big-orange-pardot' );
-				} else {
+				if ( 'business_units_not_supported' !== $business_units->get_error_code() ) {
 					$business_units_error = $business_units->get_error_message();
 				}
-				$business_units       = array();
+				$business_units = array();
 			}
 		}
 
@@ -520,18 +504,6 @@ class BOL_Admin_Page {
 						<?php if ( '' !== $business_units_error ) : ?>
 							<p class="description" style="color:#b32d2e;"><?php echo esc_html( $business_units_error ); ?></p>
 						<?php endif; ?>
-					</td>
-				</tr>
-				<tr>
-					<th scope="row">
-						<label for="bol_enable_salesforce_api_scope"><?php esc_html_e( 'Auto-discover Business Units', 'big-orange-pardot' ); ?></label>
-					</th>
-					<td>
-						<label>
-							<input type="checkbox" id="bol_enable_salesforce_api_scope" name="bol_enable_salesforce_api_scope" value="1" <?php checked( $enable_sf_api_scope ); ?> />
-							<?php esc_html_e( 'Request Salesforce API scope (api) during connect so business units can be loaded automatically.', 'big-orange-pardot' ); ?>
-						</label>
-						<p class="description"><?php esc_html_e( 'If connecting fails with "invalid_scope", uncheck this and reconnect. You can still paste a Business Unit ID manually.', 'big-orange-pardot' ); ?></p>
 					</td>
 				</tr>
 				<tr>
@@ -713,12 +685,9 @@ class BOL_Admin_Page {
 				<li><?php esc_html_e( 'From the Connected App detail page, click Manage Consumer Details to view your Consumer Key and Consumer Secret.', 'big-orange-pardot' ); ?></li>
 			</ol>
 
-			<h3 id="bol-help-setup-step2"><?php esc_html_e( 'Step 2 — Find your Business Unit ID', 'big-orange-pardot' ); ?></h3>
-			<p><?php esc_html_e( 'You can either let the plugin discover your Business Unit ID automatically, or paste it in manually.', 'big-orange-pardot' ); ?></p>
-			<p><strong><?php esc_html_e( 'Option A — Auto-discover (recommended):', 'big-orange-pardot' ); ?></strong>
-			<?php esc_html_e( 'Enable "Auto-discover Business Units" in the Settings tab before connecting. After you authorize, the plugin queries Salesforce and populates a dropdown of your available Business Units automatically. If your org has only one, it is selected for you.', 'big-orange-pardot' ); ?></p>
-			<p><strong><?php esc_html_e( 'Option B — Manual:', 'big-orange-pardot' ); ?></strong>
-			<?php esc_html_e( 'In Salesforce Setup, search for "Account Engagement" in the Quick Find box, then go to Account Engagement → Business Unit Setup. Copy the 18-character Business Unit ID — it begins with 0Uv.', 'big-orange-pardot' ); ?></p>
+			<h3 id="bol-help-setup-step2"><?php esc_html_e( 'Step 2 — Business Unit ID', 'big-orange-pardot' ); ?></h3>
+			<p><?php esc_html_e( 'After you authorize in Step 3, the plugin automatically queries Salesforce and fills in your Business Unit ID. If your org has only one Business Unit it is selected for you; if it has several, a dropdown appears so you can choose the right one.', 'big-orange-pardot' ); ?></p>
+			<p><?php esc_html_e( 'If auto-discovery is unavailable for your org, you can paste the ID in manually. Find it in Salesforce Setup by searching "Account Engagement" in the Quick Find box, then going to Account Engagement → Business Unit Setup. The ID is an 18-character value beginning with 0Uv.', 'big-orange-pardot' ); ?></p>
 			<p class="description">
 				<strong><?php esc_html_e( 'Common mistake:', 'big-orange-pardot' ); ?></strong>
 				<?php esc_html_e( 'Do not use the Salesforce Organization ID (found in Setup → Company Information). That ID starts with 00D and is not the same as the Business Unit ID. The plugin will warn you if it detects this mistake.', 'big-orange-pardot' ); ?>

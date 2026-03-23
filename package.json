@@ -1,6 +1,6 @@
 {
 	"name": "big-orange-pardot",
-	"version": "0.1.0",
+	"version": "1.0.0",
 	"description": "A WordPress Form block for WordPress to integrate with Pardot.",
 	"author": "George Stephanis / Big Orange Lab",
 	"license": "GPL-2.0-or-later",

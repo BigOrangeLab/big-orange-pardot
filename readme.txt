@@ -2,7 +2,7 @@
 Contributors:      georgestephanis
 Tags:              pardot, account engagement, salesforce, forms, gutenberg
 Tested up to:      6.8
-Stable tag:        0.1.0
+Stable tag:        1.0.0
 Requires at least: 6.8
 Requires PHP:      7.4
 License:           GPL-2.0-or-later
@@ -71,10 +71,10 @@ If no form handler URL is configured, the form is hidden from site visitors to p
 
 == Changelog ==
 
-= 0.1.0 =
+= 1.0.0 =
 * Initial release.
 
 == Upgrade Notice ==
 
-= 0.1.0 =
+= 1.0.0 =
 Initial release.

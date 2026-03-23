@@ -12,24 +12,10 @@
 
 $pardot_form_url = isset( $attributes['pardotFormUrl'] ) ? trim( $attributes['pardotFormUrl'] ) : '';
 
-if ( empty( $pardot_form_url ) ) {
-	if ( ! current_user_can( 'edit_post', get_the_ID() ) ) {
-		return; // Silently render nothing for visitors — don't present an unusable form.
-	}
-	$edit_link = get_edit_post_link( get_the_ID() );
-	?>
-	<div <?php echo get_block_wrapper_attributes(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- core function, output is already escaped. ?>>
-		<div class="bol-pardot-notice">
-			<?php esc_html_e( 'This Pardot form has no form handler configured and will not submit.', 'big-orange-pardot' ); ?>
-			<?php if ( $edit_link ) : ?>
-				<a href="<?php echo esc_url( $edit_link ); ?>">
-					<?php esc_html_e( 'Edit this page to configure it.', 'big-orange-pardot' ); ?>
-				</a>
-			<?php endif; ?>
-		</div>
-	</div>
-	<?php
-	return;
+$unconfigured = empty( $pardot_form_url );
+
+if ( $unconfigured && ! current_user_can( 'edit_post', get_the_ID() ) ) {
+	return; // Silently render nothing for visitors — don't present an unusable form.
 }
 
 $submit_label = isset( $attributes['submitLabel'] ) && '' !== $attributes['submitLabel']
@@ -107,9 +93,27 @@ if ( ! empty( $attributes['fieldBorderRadius'] ) ) {
 $extra_attrs = ! empty( $custom_props ) ? array( 'style' => implode( '; ', $custom_props ) ) : array();
 ?>
 <div <?php echo get_block_wrapper_attributes( $extra_attrs ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- core function, output is already escaped. ?>>
+
+	<?php if ( $unconfigured ) : ?>
+		<?php $edit_link = get_edit_post_link( get_the_ID() ); ?>
+		<div class="bol-pardot-notice">
+			<?php esc_html_e( 'This Pardot form has no form handler configured and will not submit.', 'big-orange-pardot' ); ?>
+			<?php if ( $edit_link ) : ?>
+				<a href="<?php echo esc_url( $edit_link ); ?>">
+					<?php esc_html_e( 'Edit this page to configure it.', 'big-orange-pardot' ); ?>
+				</a>
+			<?php endif; ?>
+		</div>
+	<?php endif; ?>
+
 	<form
 		method="post"
+		<?php if ( ! $unconfigured ) : ?>
 		action="<?php echo esc_url( $pardot_form_url ); ?>"
+		<?php endif; ?>
+		<?php if ( $unconfigured ) : ?>
+		onsubmit="return false;"
+		<?php endif; ?>
 		novalidate
 	>
 

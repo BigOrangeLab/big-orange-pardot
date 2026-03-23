@@ -2,7 +2,7 @@
 /**
  * Plugin Name:       Big Orange Pardot
  * Description:       A WordPress Form block for WordPress to integrate with Pardot.
- * Version:           0.1.0
+ * Version:           1.0.0
  * Requires at least: 6.8
  * Requires PHP:      7.4
  * Author:            George Stephanis / Big Orange Lab
@@ -44,7 +44,7 @@ function big_orange_pardot_enqueue_attribution() {
 		'big-orange-pardot-attribution',
 		plugins_url( 'build/attribution.js', __FILE__ ),
 		array(),
-		'0.1.0',
+		'1.0.0',
 		array( 'strategy' => 'defer' )
 	);
 }

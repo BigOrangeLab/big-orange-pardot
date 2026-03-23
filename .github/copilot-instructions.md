@@ -6,7 +6,7 @@ This plugin provides Gutenberg blocks for embedding and configuring Pardot (Acco
 
 ## High-level structure
 
-- `big-orange-pardot.php`: Main plugin bootstrap. Registers blocks, REST routes, admin page, and scripts.
+- `big-orange-pardot.php`: Main plugin bootstrap. Registers blocks, REST routes, admin page, scripts, and admin bar attribution inspector.
 - `src/`: Source of truth for block code (JSX/SCSS/PHP render templates).
   - `src/pardot-form/`: Parent form block (`bigorangelab/pardot-form`) — two-path editor UX: **connected** mode (OAuth active) shows the handler dropdown, auto-inserts any missing fields when a handler is selected, displays a sync status ("X of Y Pardot fields present"), an "Add missing field(s)" button, and a "Replace all with Pardot fields" reset button; **unconnected** mode shows a prominent URL input and a "Common Pardot Fields" panel for one-click insertion of 8 standard Pardot field names. `existingFieldNames` from `useSelect(getBlocks(clientId))` drives both sync status and common-fields presence checks. Stores shared field style attributes and emits them as `--bol-*` CSS custom properties. Also owns all submit button attributes — rendered inline, not as a separate child block. `save.js` returns `<InnerBlocks.Content />` (not `null`) to serialize inner blocks.
   - `src/pardot-field/`: Child field block (`bigorangelab/pardot-field`) — attributes: `fieldName`, `label`, `fieldType` (text/email/tel/textarea), `isRequired`, `placeholder`, `width` (full/half). The "Field Styling" panel in `edit.js` reads and writes style attributes on the **parent** block (via `getBlockRootClientId`/`updateBlockAttributes`), keeping styling consistent across all fields. `render.php` does NOT call `get_block_wrapper_attributes()` so the CSS grid on the parent `<form>` applies cleanly.
@@ -14,6 +14,8 @@ This plugin provides Gutenberg blocks for embedding and configuring Pardot (Acco
   - `includes/class-bol-pardot-api.php`: Static API client — OAuth token management, form handler cache, form handler fields.
   - `includes/class-bol-admin-page.php`: Two-tab settings page (Settings + Help). **Keep `render_help_tab()` current whenever plugin behaviour changes.**
 - `assets/attribution.js`: Front-end attribution and hidden field population script. No build step.
+- `assets/admin-bar-attribution.js`: Admin bar "Clear all cookies" handler — expires all 8 attribution cookies and reloads. No build step.
+- `assets/admin-bar-attribution.css`: Styles for the admin bar Attribution panel. No build step.
 - `build/`: Generated assets and block manifest output. Treat as generated artifacts.
 
 ## Block context flow
@@ -45,6 +47,10 @@ The parent block wrapper emits these custom properties, consumed by `style.scss`
 - `GET /wp-json/big-orange-pardot/v1/form-handler-fields?handler_id={id}` — returns fields for a handler. Powers the "Import fields from Pardot" button.
 
 Both require `manage_options`.
+
+## Admin bar attribution inspector
+
+`bol_register_admin_bar_node()` adds an "Attribution (N)" menu to the WP admin bar, visible only to `manage_options` users. PHP reads `$_COOKIE` for the 8 attribution field values (`BOL_Pardot_API::ATTRIBUTION_FIELDS`). `assets/admin-bar-attribution.js` handles the "Clear all cookies" link (expires all cookies + reloads the page). Styles in `assets/admin-bar-attribution.css`. Both assets enqueued by `bol_enqueue_admin_bar_assets()`, hooked to both `wp_enqueue_scripts` and `admin_enqueue_scripts`.
 
 ## Debugging approach
 

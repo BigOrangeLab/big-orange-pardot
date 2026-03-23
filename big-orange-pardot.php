@@ -104,6 +104,87 @@ function big_orange_pardot_rest_init() {
 add_action( 'rest_api_init', 'big_orange_pardot_rest_init' );
 
 /**
+ * Adds an Attribution Cookies menu to the admin bar for administrators.
+ * Shows current cookie values captured by attribution.js and a "Clear all" action.
+ *
+ * @param WP_Admin_Bar $wp_admin_bar Admin bar instance.
+ */
+function bol_register_admin_bar_node( WP_Admin_Bar $wp_admin_bar ) {
+	if ( ! current_user_can( 'manage_options' ) ) {
+		return;
+	}
+
+	$set_count = 0;
+	foreach ( BOL_Pardot_API::ATTRIBUTION_FIELDS as $field ) {
+		if ( ! empty( $_COOKIE[ $field ] ) ) {
+			++$set_count;
+		}
+	}
+
+	$wp_admin_bar->add_node(
+		array(
+			'id'    => 'bol-attribution',
+			'title' => sprintf(
+				/* translators: %d: number of attribution cookies currently set */
+				__( 'Attribution (%d)', 'big-orange-pardot' ),
+				$set_count
+			),
+		)
+	);
+
+	foreach ( BOL_Pardot_API::ATTRIBUTION_FIELDS as $field ) {
+		$raw     = isset( $_COOKIE[ $field ] ) ? sanitize_text_field( wp_unslash( $_COOKIE[ $field ] ) ) : '';
+		$display = $raw ? $raw : __( '(not set)', 'big-orange-pardot' );
+		$wp_admin_bar->add_node(
+			array(
+				'id'     => 'bol-attribution-field-' . $field,
+				'parent' => 'bol-attribution',
+				'title'  => '<span class="bol-ab-field-name">' . esc_html( $field ) . '</span>'
+							. '<span class="bol-ab-field-value' . ( $raw ? '' : ' bol-ab-field-empty' ) . '">'
+							. esc_html( $display ) . '</span>',
+				'meta'   => array( 'tabindex' => '0' ),
+			)
+		);
+	}
+
+	$wp_admin_bar->add_node(
+		array(
+			'id'     => 'bol-attribution-clear',
+			'parent' => 'bol-attribution',
+			'title'  => __( 'Clear all cookies', 'big-orange-pardot' ),
+			'href'   => '#',
+			'meta'   => array( 'class' => 'bol-ab-clear' ),
+		)
+	);
+}
+add_action( 'admin_bar_menu', 'bol_register_admin_bar_node', 100 );
+
+/**
+ * Enqueues the admin-bar attribution inspector script and styles.
+ * Runs on both frontend and wp-admin when the admin bar is visible to admins.
+ */
+function bol_enqueue_admin_bar_assets() {
+	if ( ! is_admin_bar_showing() || ! current_user_can( 'manage_options' ) ) {
+		return;
+	}
+	wp_enqueue_script(
+		'big-orange-pardot-admin-bar',
+		plugins_url( 'assets/admin-bar-attribution.js', __FILE__ ),
+		array(),
+		'1.0.0',
+		array( 'strategy' => 'defer' )
+	);
+	wp_enqueue_style(
+		'big-orange-pardot-admin-bar',
+		plugins_url( 'assets/admin-bar-attribution.css', __FILE__ ),
+		array( 'admin-bar' ),
+		'1.0.0'
+	);
+}
+add_action( 'wp_enqueue_scripts', 'bol_enqueue_admin_bar_assets' );
+add_action( 'admin_enqueue_scripts', 'bol_enqueue_admin_bar_assets' );
+
+/**
  * Passes the settings page URL to the block editor script so the "not connected"
  * notice can link directly to the credentials page.
  */

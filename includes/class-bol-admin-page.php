@@ -514,6 +514,19 @@ class BOL_Admin_Page {
 				?>
 			</p>
 
+			<hr />
+
+			<h2><?php esc_html_e( 'Testing &amp; Debugging', 'big-orange-pardot' ); ?></h2>
+			<p>
+				<?php esc_html_e( 'When you are logged in as an administrator, a small "Attribution (N)" menu appears in the WordPress admin bar on every page of the site. It shows the current value of each attribution cookie — or "(not set)" if that cookie has not been captured yet.', 'big-orange-pardot' ); ?>
+			</p>
+			<p>
+				<?php esc_html_e( 'The menu also includes a "Clear all cookies" link. Clicking it deletes all eight attribution cookies and reloads the page, so you can simulate a fresh visitor without opening a private browser window.', 'big-orange-pardot' ); ?>
+			</p>
+			<p class="description">
+				<?php esc_html_e( 'The admin bar inspector is only visible to users with the manage_options capability and has no effect on site visitors.', 'big-orange-pardot' ); ?>
+			</p>
+
 		</div>
 		<?php
 	}

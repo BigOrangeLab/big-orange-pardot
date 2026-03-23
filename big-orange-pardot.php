@@ -190,7 +190,7 @@ add_action( 'admin_enqueue_scripts', 'bol_enqueue_admin_bar_assets' );
  */
 function big_orange_pardot_editor_script_data() {
 	wp_localize_script(
-		'bigorangelab-big-orange-pardot-editor-script',
+		'bigorangelab-pardot-form-editor-script',
 		'bolPardot',
 		array(
 			'settingsUrl' => admin_url( 'options-general.php?page=big-orange-pardot' ),

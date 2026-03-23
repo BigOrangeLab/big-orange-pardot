@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-03-23T13:08:52+00:00\n"
+"POT-Creation-Date: 2026-03-23T13:15:28+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: big-orange-pardot\n"
@@ -52,8 +52,8 @@ msgstr ""
 
 #: build/pardot-form/render.php:23
 #: src/pardot-form/render.php:23
-#: build/pardot-form/index.js:3
-#: src/pardot-form/edit.js:929
+#: build/pardot-form/index.js:4
+#: src/pardot-form/edit.js:943
 msgid "Submit"
 msgstr ""
 
@@ -416,8 +416,8 @@ msgid "Spacing inside and outside the form wrapper."
 msgstr ""
 
 #: includes/class-bol-admin-page.php:469
-#: build/pardot-form/index.js:3
-#: src/pardot-form/edit.js:820
+#: build/pardot-form/index.js:4
+#: src/pardot-form/edit.js:834
 msgid "Border"
 msgstr ""
 
@@ -875,131 +875,138 @@ msgstr ""
 
 #: build/pardot-form/index.js:3
 #: src/pardot-form/edit.js:644
-msgid "Pardot is not connected."
+msgid "You can manually set the form URL and fields below."
 msgstr ""
 
-#: build/pardot-form/index.js:3
-#: src/pardot-form/edit.js:650
-msgid "Configure credentials →"
+#. translators: %s: link to the Pardot settings page
+#: build/pardot-form/index.js:4
+#: src/pardot-form/edit.js:653
+#, js-format
+msgid "To connect directly to Pardot for easier configuration, %s."
 msgstr ""
 
-#: build/pardot-form/index.js:3
-#: src/pardot-form/edit.js:660
+#: build/pardot-form/index.js:4
+#: src/pardot-form/edit.js:662
+msgid "set up your credentials here"
+msgstr ""
+
+#: build/pardot-form/index.js:4
+#: src/pardot-form/edit.js:674
 msgid "Form Handler URL"
 msgstr ""
 
-#: build/pardot-form/index.js:3
-#: src/pardot-form/edit.js:664
+#: build/pardot-form/index.js:4
+#: src/pardot-form/edit.js:678
 msgid "The URL your form will POST to. Found in your Pardot form handler's embed code."
 msgstr ""
 
-#: build/pardot-form/index.js:3
-#: src/pardot-form/edit.js:684
+#: build/pardot-form/index.js:4
+#: src/pardot-form/edit.js:698
 msgid "Common Pardot Fields"
 msgstr ""
 
-#: build/pardot-form/index.js:3
-#: src/pardot-form/edit.js:691
+#: build/pardot-form/index.js:4
+#: src/pardot-form/edit.js:705
 msgid "Quick-add standard Pardot fields to your form:"
 msgstr ""
 
-#: build/pardot-form/index.js:3
-#: src/pardot-form/edit.js:711
+#: build/pardot-form/index.js:4
+#: src/pardot-form/edit.js:725
 msgid "✓"
 msgstr ""
 
-#: build/pardot-form/index.js:3
-#: src/pardot-form/edit.js:723
+#: build/pardot-form/index.js:4
+#: src/pardot-form/edit.js:737
 msgid "Add"
 msgstr ""
 
-#: build/pardot-form/index.js:3
-#: src/pardot-form/edit.js:744
+#: build/pardot-form/index.js:4
+#: src/pardot-form/edit.js:758
 msgid "Button Colors"
 msgstr ""
 
-#: build/pardot-form/index.js:3
-#: src/pardot-form/edit.js:753
+#: build/pardot-form/index.js:4
+#: src/pardot-form/edit.js:767
 msgid "Text Color"
 msgstr ""
 
-#: build/pardot-form/index.js:3
-#: src/pardot-form/edit.js:768
+#: build/pardot-form/index.js:4
+#: src/pardot-form/edit.js:782
 msgid "Background"
 msgstr ""
 
-#: build/pardot-form/index.js:3
-#: src/pardot-form/edit.js:776
+#: build/pardot-form/index.js:4
+#: src/pardot-form/edit.js:790
 msgid "Hover Background"
 msgstr ""
 
-#: build/pardot-form/index.js:3
-#: src/pardot-form/edit.js:787
+#: build/pardot-form/index.js:4
+#: src/pardot-form/edit.js:801
 msgid "Button Appearance"
 msgstr ""
 
-#: build/pardot-form/index.js:3
-#: src/pardot-form/edit.js:791
+#: build/pardot-form/index.js:4
+#: src/pardot-form/edit.js:805
 msgid "Padding"
 msgstr ""
 
-#: build/pardot-form/index.js:3
-#: src/pardot-form/edit.js:798
+#: build/pardot-form/index.js:4
+#: src/pardot-form/edit.js:812
 msgid "Border Radius (px)"
 msgstr ""
 
-#: build/pardot-form/index.js:3
-#: src/pardot-form/edit.js:829
+#: build/pardot-form/index.js:4
+#: src/pardot-form/edit.js:843
 msgid "Border Color"
 msgstr ""
 
-#: build/pardot-form/index.js:3
-#: src/pardot-form/edit.js:837
+#: build/pardot-form/index.js:4
+#: src/pardot-form/edit.js:851
 msgid "Border Width (px)"
 msgstr ""
 
-#: build/pardot-form/index.js:3
-#: src/pardot-form/edit.js:859
+#: build/pardot-form/index.js:4
+#: src/pardot-form/edit.js:873
 msgid "Border Style"
 msgstr ""
 
-#: build/pardot-form/index.js:3
-#: src/pardot-form/edit.js:863
+#: build/pardot-form/index.js:4
+#: src/pardot-form/edit.js:877
 msgid "—"
 msgstr ""
 
-#: build/pardot-form/index.js:3
-#: src/pardot-form/edit.js:867
+#: build/pardot-form/index.js:4
+#: src/pardot-form/edit.js:881
 msgid "Solid"
 msgstr ""
 
-#: build/pardot-form/index.js:3
-#: src/pardot-form/edit.js:871
+#: build/pardot-form/index.js:4
+#: src/pardot-form/edit.js:885
 msgid "Dashed"
 msgstr ""
 
-#: build/pardot-form/index.js:3
-#: src/pardot-form/edit.js:875
+#: build/pardot-form/index.js:4
+#: src/pardot-form/edit.js:889
 msgid "Dotted"
 msgstr ""
 
-#: build/pardot-form/index.js:3
-#: src/pardot-form/edit.js:879
+#: build/pardot-form/index.js:4
+#: src/pardot-form/edit.js:893
 msgid "Double"
 msgstr ""
 
-#: build/pardot-form/index.js:3
-#: src/pardot-form/edit.js:889
+#: build/pardot-form/index.js:4
+#: src/pardot-form/edit.js:903
 msgid "Box Shadow"
 msgstr ""
 
-#: build/pardot-form/index.js:3
-#: src/pardot-form/edit.js:894
+#: build/pardot-form/index.js:4
+#: src/pardot-form/edit.js:908
 msgid "Any valid CSS box-shadow value."
 msgstr ""
 
-#: build/pardot-form/index.js:3
-#: src/pardot-form/edit.js:906
+#: build/pardot-form/index.js:4
+#: src/pardot-form/edit.js:920
 msgid "No form handler URL configured — this form will not submit."
 msgstr ""
 

@@ -637,21 +637,35 @@ export default function Edit( { attributes, setAttributes, clientId } ) {
 						<>
 							{ /* Not-connected notice */ }
 							<Notice
-								status="warning"
+								status="info"
 								isDismissible={ false }
 								className="bol-inspector-notice"
 							>
 								{ __(
-									'Pardot is not connected.',
+									'You can manually set the form URL and fields below.',
 									'big-orange-pardot'
 								) }
 								{ settingsUrl && (
-									<a href={ settingsUrl }>
-										{ __(
-											'Configure credentials →',
-											'big-orange-pardot'
+									<>
+										{ ' ' }
+										{ sprintf(
+											/* translators: %s: link to the Pardot settings page */
+											__(
+												'To connect directly to Pardot for easier configuration, %s.',
+												'big-orange-pardot'
+											),
+											<a
+												href={ settingsUrl }
+												target="_blank"
+												rel="noreferrer"
+											>
+												{ __(
+													'set up your credentials here',
+													'big-orange-pardot'
+												) }
+											</a>
 										) }
-									</a>
+									</>
 								) }
 							</Notice>
 

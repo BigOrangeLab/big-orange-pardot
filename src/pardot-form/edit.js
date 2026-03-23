@@ -21,7 +21,11 @@ import {
 	TextControl,
 } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { useEffect, useState } from '@wordpress/element';
+import {
+	createInterpolateElement,
+	useEffect,
+	useState,
+} from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import './editor.scss';
 
@@ -648,22 +652,22 @@ export default function Edit( { attributes, setAttributes, clientId } ) {
 								{ settingsUrl && (
 									<>
 										{ ' ' }
-										{ sprintf(
-											/* translators: %s: link to the Pardot settings page */
+										{ createInterpolateElement(
+											/* translators: <a> and </a> are the opening and closing tags of a link to the Pardot settings page. Do not translate them. */
 											__(
-												'To connect directly to Pardot for easier configuration, %s.',
+												'To connect directly to Pardot for easier configuration, <a>set up your credentials here</a>.',
 												'big-orange-pardot'
 											),
-											<a
-												href={ settingsUrl }
-												target="_blank"
-												rel="noreferrer"
-											>
-												{ __(
-													'set up your credentials here',
-													'big-orange-pardot'
-												) }
-											</a>
+											{
+												a: (
+													// eslint-disable-next-line jsx-a11y/anchor-has-content
+													<a
+														href={ settingsUrl }
+														target="_blank"
+														rel="noreferrer"
+													/>
+												),
+											}
 										) }
 									</>
 								) }

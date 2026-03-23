@@ -127,6 +127,11 @@ composer lint:php
 
 2. If the task adds or changes user-visible behaviour, update the **Help tab** in `includes/class-bol-admin-page.php` (`render_help_tab()`).
 3. Update **`CLAUDE.md`** and **`.github/copilot-instructions.md`** with any architectural changes.
+4. If any translatable strings were added, changed, or removed (in PHP or JS), regenerate the POT file:
+
+```bash
+studio wp --path=/Users/georgestephanis/Studio/pardot i18n make-pot wp-content/plugins/big-orange-pardot wp-content/plugins/big-orange-pardot/languages/big-orange-pardot.pot --domain=big-orange-pardot
+```
 
 ## Requirements
 

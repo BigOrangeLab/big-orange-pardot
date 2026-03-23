@@ -1,0 +1,1028 @@
+# Copyright (C) 2026 George Stephanis / Big Orange Lab
+# This file is distributed under the GPL-2.0-or-later.
+msgid ""
+msgstr ""
+"Project-Id-Version: Big Orange Pardot 1.0.0\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/big-orange-pardot\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"POT-Creation-Date: 2026-03-23T13:08:52+00:00\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"X-Generator: WP-CLI 2.12.0\n"
+"X-Domain: big-orange-pardot\n"
+
+#. Plugin Name of the plugin
+#: big-orange-pardot.php
+#: includes/class-bol-admin-page.php:63
+#: includes/class-bol-admin-page.php:64
+#: includes/class-bol-admin-page.php:250
+msgid "Big Orange Pardot"
+msgstr ""
+
+#. Description of the plugin
+#: big-orange-pardot.php
+msgid "A WordPress Form block for WordPress to integrate with Pardot."
+msgstr ""
+
+#. Author of the plugin
+#: big-orange-pardot.php
+msgid "George Stephanis / Big Orange Lab"
+msgstr ""
+
+#: big-orange-pardot.php:83
+msgid "handler_id is required."
+msgstr ""
+
+#. translators: %d: number of attribution cookies currently set
+#: big-orange-pardot.php:129
+#, php-format
+msgid "Attribution (%d)"
+msgstr ""
+
+#: big-orange-pardot.php:137
+msgid "(not set)"
+msgstr ""
+
+#: big-orange-pardot.php:154
+msgid "Clear all cookies"
+msgstr ""
+
+#: build/pardot-form/render.php:23
+#: src/pardot-form/render.php:23
+#: build/pardot-form/index.js:3
+#: src/pardot-form/edit.js:929
+msgid "Submit"
+msgstr ""
+
+#: build/pardot-form/render.php:100
+#: src/pardot-form/render.php:100
+msgid "This Pardot form has no form handler configured and will not submit."
+msgstr ""
+
+#: build/pardot-form/render.php:103
+#: src/pardot-form/render.php:103
+msgid "Edit this page to configure it."
+msgstr ""
+
+#: includes/class-bol-admin-page.php:81
+#: includes/class-bol-admin-page.php:255
+#: includes/class-bol-admin-page.php:408
+msgid "Settings"
+msgstr ""
+
+#: includes/class-bol-admin-page.php:259
+msgid "Help"
+msgstr ""
+
+#: includes/class-bol-admin-page.php:284
+msgid "API Credentials"
+msgstr ""
+
+#. translators: %s: link to Salesforce Connected App documentation
+#: includes/class-bol-admin-page.php:289
+#, php-format
+msgid "Enter the credentials from your Salesforce %s. The redirect URI to register is shown below."
+msgstr ""
+
+#: includes/class-bol-admin-page.php:290
+msgid "Connected App"
+msgstr ""
+
+#: includes/class-bol-admin-page.php:295
+msgid "Redirect URI to register:"
+msgstr ""
+
+#: includes/class-bol-admin-page.php:302
+msgid "Consumer Key (Client ID)"
+msgstr ""
+
+#: includes/class-bol-admin-page.php:311
+msgid "Consumer Secret (Client Secret)"
+msgstr ""
+
+#: includes/class-bol-admin-page.php:320
+msgid "Business Unit ID"
+msgstr ""
+
+#: includes/class-bol-admin-page.php:326
+msgid "18-character ID starting with 0Uv. Found in Salesforce Setup under Account Engagement → Business Unit Setup."
+msgstr ""
+
+#: includes/class-bol-admin-page.php:333
+msgid "Save Credentials"
+msgstr ""
+
+#: includes/class-bol-admin-page.php:337
+msgid "Connect to Pardot"
+msgstr ""
+
+#: includes/class-bol-admin-page.php:358
+msgid "Overview"
+msgstr ""
+
+#: includes/class-bol-admin-page.php:359
+msgid "Big Orange Pardot adds a Gutenberg block that embeds a Pardot (Account Engagement) form directly on any page or post. Rather than using an iframe, it renders a native HTML form that submits directly to your Pardot form handler, giving you full control over styling and layout."
+msgstr ""
+
+#: includes/class-bol-admin-page.php:360
+msgid "The plugin also automatically captures marketing attribution data (UTM parameters, Google Click ID, landing page URL, and referrer) into cookies on every page load, then injects those values as hidden fields on any Pardot form found on the page — even forms loaded dynamically after the page renders."
+msgstr ""
+
+#: includes/class-bol-admin-page.php:364
+msgid "Setup: Connecting to Salesforce"
+msgstr ""
+
+#. translators: %s: Salesforce OAuth documentation link
+#: includes/class-bol-admin-page.php:369
+#, php-format
+msgid "The plugin connects to Pardot using the %s. This requires creating a Connected App in Salesforce once, then authorizing it here. There is no simpler authentication path — Salesforce requires a Connected App for all API access."
+msgstr ""
+
+#: includes/class-bol-admin-page.php:370
+msgid "OAuth 2.0 Web Server Flow"
+msgstr ""
+
+#: includes/class-bol-admin-page.php:375
+msgid "Step 1 — Create a Salesforce Connected App"
+msgstr ""
+
+#: includes/class-bol-admin-page.php:377
+msgid "In Salesforce, go to Setup → Apps → App Manager and click New Connected App."
+msgstr ""
+
+#: includes/class-bol-admin-page.php:378
+msgid "Give it a name (e.g. \"WordPress Pardot Integration\") and fill in a contact email."
+msgstr ""
+
+#: includes/class-bol-admin-page.php:379
+msgid "Under API (Enable OAuth Settings), check Enable OAuth Settings."
+msgstr ""
+
+#: includes/class-bol-admin-page.php:381
+msgid "Set the Callback URL (Redirect URI) to:"
+msgstr ""
+
+#: includes/class-bol-admin-page.php:385
+msgid "Under Selected OAuth Scopes, add:"
+msgstr ""
+
+#: includes/class-bol-admin-page.php:387
+msgid "Access and manage your Pardot data"
+msgstr ""
+
+#: includes/class-bol-admin-page.php:388
+msgid "Perform requests at any time (allows token refresh without re-authorization)"
+msgstr ""
+
+#: includes/class-bol-admin-page.php:391
+msgid "Save the Connected App. Salesforce may take a few minutes to activate it."
+msgstr ""
+
+#: includes/class-bol-admin-page.php:392
+msgid "From the Connected App detail page, click Manage Consumer Details to view your Consumer Key and Consumer Secret."
+msgstr ""
+
+#: includes/class-bol-admin-page.php:395
+msgid "Step 2 — Find your Business Unit ID"
+msgstr ""
+
+#: includes/class-bol-admin-page.php:397
+msgid "In Salesforce Setup, search for \"Account Engagement\" and go to Account Engagement → Business Unit Setup."
+msgstr ""
+
+#: includes/class-bol-admin-page.php:398
+msgid "Copy the Business Unit ID — it is an 18-character value beginning with 0Uv."
+msgstr ""
+
+#: includes/class-bol-admin-page.php:401
+msgid "Step 3 — Enter credentials and authorize"
+msgstr ""
+
+#. translators: %s: link to the Settings tab
+#: includes/class-bol-admin-page.php:407
+#, php-format
+msgid "Go to the %s tab and enter your Consumer Key, Consumer Secret, and Business Unit ID, then click Save Credentials."
+msgstr ""
+
+#: includes/class-bol-admin-page.php:412
+msgid "Click Connect to Pardot. You will be redirected to Salesforce to log in and approve access."
+msgstr ""
+
+#: includes/class-bol-admin-page.php:413
+msgid "After approving, Salesforce redirects back here automatically. The connection status will show Connected."
+msgstr ""
+
+#: includes/class-bol-admin-page.php:415
+msgid "Access tokens are refreshed automatically in the background — you should only need to authorize once unless you explicitly disconnect or revoke access in Salesforce."
+msgstr ""
+
+#: includes/class-bol-admin-page.php:419
+msgid "Using the Block"
+msgstr ""
+
+#: includes/class-bol-admin-page.php:421
+msgid "In the block editor, insert the Big Orange Pardot block from the Widgets category (or search for \"Pardot\")."
+msgstr ""
+
+#: includes/class-bol-admin-page.php:422
+msgid "The block inserts with a default set of seven fields (First Name, Last Name, Email, Phone, Company, Job Title, Comments) plus a Submit button. Each field is its own block — you can reorder, delete, or add fields freely using the block editor."
+msgstr ""
+
+#: includes/class-bol-admin-page.php:425
+msgid "If connected to Pardot"
+msgstr ""
+
+#: includes/class-bol-admin-page.php:427
+msgid "Open the block settings panel. A dropdown lists all form handlers from your Pardot account. Select the handler this form should submit to — the submission URL is set automatically."
+msgstr ""
+
+#: includes/class-bol-admin-page.php:428
+msgid "Any fields the handler expects that are not already in your form are added automatically when you select a handler. Review the added fields and adjust labels, types, or widths as needed."
+msgstr ""
+
+#: includes/class-bol-admin-page.php:429
+msgid "The settings panel shows how many Pardot fields are present in your form. Use the \"Add missing field(s)\" button to insert any remaining expected fields."
+msgstr ""
+
+#: includes/class-bol-admin-page.php:430
+msgid "To start fresh from Pardot's field list, click \"Replace all with Pardot fields\". This removes all current fields and rebuilds them from the handler's configuration."
+msgstr ""
+
+#: includes/class-bol-admin-page.php:434
+msgid "Until a form handler is configured, the form is hidden from site visitors. Editors viewing the page while logged in will see a notice above a non-submittable preview of the form, so they can review the layout in context before the form goes live."
+msgstr ""
+
+#: includes/class-bol-admin-page.php:437
+msgid "If not connected to Pardot"
+msgstr ""
+
+#: includes/class-bol-admin-page.php:439
+msgid "Open the block settings panel. Enter the Form Handler URL — found in your Pardot form handler's embed code — into the Form Handler URL field."
+msgstr ""
+
+#: includes/class-bol-admin-page.php:440
+msgid "Open the \"Common Pardot Fields\" panel to quickly add standard Pardot field names to your form. Fields already present show a check mark; click \"Add\" for any you want to include."
+msgstr ""
+
+#: includes/class-bol-admin-page.php:441
+msgid "You can also add fields manually via the block editor and type any Pardot field name directly into the Field Name setting on each field block."
+msgstr ""
+
+#: includes/class-bol-admin-page.php:443
+msgid "Customising fields"
+msgstr ""
+
+#: includes/class-bol-admin-page.php:444
+msgid "Select any Pardot Field block inside the form to edit it via the block settings panel. Available settings:"
+msgstr ""
+
+#: includes/class-bol-admin-page.php:446
+#: build/pardot-field/index.js:1
+#: src/pardot-field/edit.js:67
+msgid "Field Name (Pardot)"
+msgstr ""
+
+#: includes/class-bol-admin-page.php:446
+msgid "The HTML name attribute submitted to Pardot. Must match the field name in your form handler."
+msgstr ""
+
+#: includes/class-bol-admin-page.php:447
+#: build/pardot-field/index.js:1
+#: src/pardot-field/edit.js:81
+msgid "Field Type"
+msgstr ""
+
+#: includes/class-bol-admin-page.php:447
+msgid "Text, Email, Phone, or Textarea."
+msgstr ""
+
+#: includes/class-bol-admin-page.php:448
+#: build/pardot-field/index.js:1
+#: src/pardot-field/edit.js:106
+msgid "Required"
+msgstr ""
+
+#: includes/class-bol-admin-page.php:448
+msgid "Adds browser-side validation and a * indicator to the label."
+msgstr ""
+
+#: includes/class-bol-admin-page.php:449
+#: build/pardot-field/index.js:1
+#: src/pardot-field/edit.js:113
+msgid "Placeholder"
+msgstr ""
+
+#: includes/class-bol-admin-page.php:449
+msgid "Placeholder text shown inside the input."
+msgstr ""
+
+#: includes/class-bol-admin-page.php:450
+#: build/pardot-field/index.js:1
+#: src/pardot-field/edit.js:120
+msgid "Width"
+msgstr ""
+
+#: includes/class-bol-admin-page.php:450
+msgid "Full width (spans both grid columns) or Half width (spans one column). Two adjacent half-width fields sit side by side on the frontend."
+msgstr ""
+
+#: includes/class-bol-admin-page.php:453
+msgid "Field styling"
+msgstr ""
+
+#: includes/class-bol-admin-page.php:454
+msgid "When any Pardot Field block is selected, the block settings panel shows a Field Styling section. Changes made here apply to every field in the form — the settings are stored once on the parent form block and cascade to all fields automatically."
+msgstr ""
+
+#: includes/class-bol-admin-page.php:456
+#: build/pardot-field/index.js:1
+#: src/pardot-field/edit.js:152
+msgid "Label Color"
+msgstr ""
+
+#: includes/class-bol-admin-page.php:456
+msgid "Text colour for all field labels."
+msgstr ""
+
+#: includes/class-bol-admin-page.php:457
+#: build/pardot-field/index.js:1
+#: src/pardot-field/edit.js:157
+msgid "Input Background"
+msgstr ""
+
+#: includes/class-bol-admin-page.php:457
+msgid "Background colour for text inputs and textareas."
+msgstr ""
+
+#: includes/class-bol-admin-page.php:458
+#: build/pardot-field/index.js:1
+#: src/pardot-field/edit.js:165
+msgid "Input Border Color"
+msgstr ""
+
+#: includes/class-bol-admin-page.php:458
+msgid "Border colour for text inputs and textareas."
+msgstr ""
+
+#: includes/class-bol-admin-page.php:459
+#: build/pardot-field/index.js:1
+#: src/pardot-field/edit.js:173
+msgid "Focus / Accent Color"
+msgstr ""
+
+#: includes/class-bol-admin-page.php:459
+msgid "Outline and border colour when a field is focused; also used for the hover border on inputs."
+msgstr ""
+
+#: includes/class-bol-admin-page.php:460
+#: build/pardot-field/index.js:1
+#: src/pardot-field/edit.js:181
+msgid "Input Border Radius (px)"
+msgstr ""
+
+#: includes/class-bol-admin-page.php:460
+msgid "Corner rounding applied to all inputs and textareas."
+msgstr ""
+
+#: includes/class-bol-admin-page.php:462
+msgid "When no custom colours are set, the form falls back to your active theme's color palette (Kadence global palette variables if Kadence Blocks is active, then WordPress preset colors, then sensible hard-coded defaults)."
+msgstr ""
+
+#: includes/class-bol-admin-page.php:464
+msgid "Form-level styling"
+msgstr ""
+
+#: includes/class-bol-admin-page.php:465
+msgid "Select the outer Big Orange Pardot block itself (not a field inside it) to access additional styling controls in the block settings panel and the block toolbar:"
+msgstr ""
+
+#: includes/class-bol-admin-page.php:467
+msgid "Color → Background"
+msgstr ""
+
+#: includes/class-bol-admin-page.php:467
+msgid "Background colour of the entire form wrapper."
+msgstr ""
+
+#: includes/class-bol-admin-page.php:468
+msgid "Dimensions → Padding / Margin"
+msgstr ""
+
+#: includes/class-bol-admin-page.php:468
+msgid "Spacing inside and outside the form wrapper."
+msgstr ""
+
+#: includes/class-bol-admin-page.php:469
+#: build/pardot-form/index.js:3
+#: src/pardot-form/edit.js:820
+msgid "Border"
+msgstr ""
+
+#: includes/class-bol-admin-page.php:469
+msgid "Border color, width, style, and radius for the form wrapper."
+msgstr ""
+
+#: includes/class-bol-admin-page.php:472
+msgid "Submit button styling"
+msgstr ""
+
+#: includes/class-bol-admin-page.php:473
+msgid "Select the Pardot Form block to access its submit button settings. The button uses standard WordPress button classes and will pick up Kadence or theme button styles automatically if available; the options below let you override individual properties:"
+msgstr ""
+
+#: includes/class-bol-admin-page.php:475
+msgid "Alignment"
+msgstr ""
+
+#: includes/class-bol-admin-page.php:475
+msgid "Left, center, or right — available in the block toolbar."
+msgstr ""
+
+#: includes/class-bol-admin-page.php:476
+msgid "Button Label"
+msgstr ""
+
+#: includes/class-bol-admin-page.php:476
+msgid "The button text (defaults to \"Submit\")."
+msgstr ""
+
+#: includes/class-bol-admin-page.php:477
+msgid "Button Colors → Text Color"
+msgstr ""
+
+#: includes/class-bol-admin-page.php:477
+msgid "Button label colour."
+msgstr ""
+
+#: includes/class-bol-admin-page.php:478
+msgid "Button Colors → Background"
+msgstr ""
+
+#: includes/class-bol-admin-page.php:478
+msgid "Solid background colour or gradient for the button."
+msgstr ""
+
+#: includes/class-bol-admin-page.php:479
+msgid "Button Colors → Hover Background"
+msgstr ""
+
+#: includes/class-bol-admin-page.php:479
+msgid "Background colour shown when the button is hovered."
+msgstr ""
+
+#: includes/class-bol-admin-page.php:480
+msgid "Button Appearance → Padding"
+msgstr ""
+
+#: includes/class-bol-admin-page.php:480
+msgid "Inner spacing on each side of the button label."
+msgstr ""
+
+#: includes/class-bol-admin-page.php:481
+msgid "Button Appearance → Border Radius (px)"
+msgstr ""
+
+#: includes/class-bol-admin-page.php:481
+msgid "Corner rounding for the button."
+msgstr ""
+
+#: includes/class-bol-admin-page.php:482
+msgid "Button Appearance → Border"
+msgstr ""
+
+#: includes/class-bol-admin-page.php:482
+msgid "Border color, width, and style."
+msgstr ""
+
+#: includes/class-bol-admin-page.php:483
+msgid "Button Appearance → Box Shadow"
+msgstr ""
+
+#: includes/class-bol-admin-page.php:483
+msgid "Any valid CSS box-shadow value (e.g. \"0 2px 8px rgba(0,0,0,0.15)\")."
+msgstr ""
+
+#: includes/class-bol-admin-page.php:484
+msgid "Dimensions → Margin"
+msgstr ""
+
+#: includes/class-bol-admin-page.php:484
+msgid "Outer spacing around the button wrapper."
+msgstr ""
+
+#: includes/class-bol-admin-page.php:489
+msgid "Attribution Tracking"
+msgstr ""
+
+#: includes/class-bol-admin-page.php:490
+msgid "A small script runs on every page of your site (not just pages with the form). It captures marketing attribution data into cookies and injects that data as hidden fields on any Pardot form it finds on the page — including forms loaded dynamically after page load."
+msgstr ""
+
+#: includes/class-bol-admin-page.php:491
+msgid "The following hidden fields are submitted with every form and must be mapped in your Pardot form handler to be recorded:"
+msgstr ""
+
+#: includes/class-bol-admin-page.php:495
+msgid "Field name"
+msgstr ""
+
+#: includes/class-bol-admin-page.php:496
+msgid "What it captures"
+msgstr ""
+
+#: includes/class-bol-admin-page.php:497
+msgid "Cookie lifetime"
+msgstr ""
+
+#: includes/class-bol-admin-page.php:501
+msgid "UTM source parameter"
+msgstr ""
+
+#: includes/class-bol-admin-page.php:501
+#: includes/class-bol-admin-page.php:502
+#: includes/class-bol-admin-page.php:503
+#: includes/class-bol-admin-page.php:504
+#: includes/class-bol-admin-page.php:505
+msgid "30 days, overwritten on each visit"
+msgstr ""
+
+#: includes/class-bol-admin-page.php:502
+msgid "UTM medium parameter"
+msgstr ""
+
+#: includes/class-bol-admin-page.php:503
+msgid "UTM campaign parameter"
+msgstr ""
+
+#: includes/class-bol-admin-page.php:504
+msgid "UTM term parameter"
+msgstr ""
+
+#: includes/class-bol-admin-page.php:505
+msgid "UTM content parameter"
+msgstr ""
+
+#: includes/class-bol-admin-page.php:506
+msgid "Google Click ID (from Google Ads)"
+msgstr ""
+
+#: includes/class-bol-admin-page.php:506
+msgid "90 days, overwritten on each visit"
+msgstr ""
+
+#: includes/class-bol-admin-page.php:507
+msgid "Full URL of the first page visited"
+msgstr ""
+
+#: includes/class-bol-admin-page.php:507
+#: includes/class-bol-admin-page.php:508
+msgid "30 days, set once and never overwritten"
+msgstr ""
+
+#: includes/class-bol-admin-page.php:508
+msgid "Referring URL from outside this domain"
+msgstr ""
+
+#. translators: %s: link to Form Handler Inspector
+#: includes/class-bol-admin-page.php:515
+#, php-format
+msgid "Unmapped fields are silently ignored by Pardot. Use the %s on the Settings tab to verify which of these fields are configured in each of your form handlers."
+msgstr ""
+
+#: includes/class-bol-admin-page.php:516
+#: includes/class-bol-admin-page.php:580
+msgid "Form Handler Inspector"
+msgstr ""
+
+#: includes/class-bol-admin-page.php:523
+msgid "Testing &amp; Debugging"
+msgstr ""
+
+#: includes/class-bol-admin-page.php:525
+msgid "When you are logged in as an administrator, a small \"Attribution (N)\" menu appears in the WordPress admin bar on every page of the site. It shows the current value of each attribution cookie — or \"(not set)\" if that cookie has not been captured yet."
+msgstr ""
+
+#: includes/class-bol-admin-page.php:528
+msgid "The menu also includes a \"Clear all cookies\" link. Clicking it deletes all eight attribution cookies and reloads the page, so you can simulate a fresh visitor without opening a private browser window."
+msgstr ""
+
+#: includes/class-bol-admin-page.php:531
+msgid "The admin bar inspector is only visible to users with the manage_options capability and has no effect on site visitors."
+msgstr ""
+
+#: includes/class-bol-admin-page.php:546
+msgid "Pardot Connection"
+msgstr ""
+
+#: includes/class-bol-admin-page.php:550
+msgid "Connected"
+msgstr ""
+
+#: includes/class-bol-admin-page.php:555
+msgid "Disconnect"
+msgstr ""
+
+#: includes/class-bol-admin-page.php:560
+msgid "Not connected"
+msgstr ""
+
+#: includes/class-bol-admin-page.php:563
+msgid "Save your credentials above, then click Connect to Pardot."
+msgstr ""
+
+#: includes/class-bol-admin-page.php:582
+msgid "Select a form handler to see which attribution fields your plugin submits are actually mapped in Pardot."
+msgstr ""
+
+#: includes/class-bol-admin-page.php:597
+msgid "No form handlers found in your Pardot account."
+msgstr ""
+
+#: includes/class-bol-admin-page.php:608
+#: build/pardot-form/index.js:1
+#: src/pardot-form/edit.js:482
+msgid "— Select a form handler —"
+msgstr ""
+
+#: includes/class-bol-admin-page.php:620
+msgid "Inspect"
+msgstr ""
+
+#: includes/class-bol-admin-page.php:665
+msgid "Attribution Field Mapping"
+msgstr ""
+
+#: includes/class-bol-admin-page.php:669
+msgid "All attribution fields are mapped in this form handler."
+msgstr ""
+
+#: includes/class-bol-admin-page.php:673
+msgid "Some attribution fields are not mapped. Unmapped fields will be silently ignored by Pardot."
+msgstr ""
+
+#: includes/class-bol-admin-page.php:680
+msgid "Field Name (submitted by plugin)"
+msgstr ""
+
+#: includes/class-bol-admin-page.php:681
+msgid "Mapped in Pardot?"
+msgstr ""
+
+#: includes/class-bol-admin-page.php:690
+msgid "Mapped"
+msgstr ""
+
+#: includes/class-bol-admin-page.php:692
+msgid "Not mapped"
+msgstr ""
+
+#: includes/class-bol-admin-page.php:700
+msgid "All Form Handler Fields"
+msgstr ""
+
+#: includes/class-bol-admin-page.php:702
+msgid "No fields configured for this form handler."
+msgstr ""
+
+#: includes/class-bol-admin-page.php:707
+msgid "Name"
+msgstr ""
+
+#: includes/class-bol-admin-page.php:708
+msgid "Prospect Field"
+msgstr ""
+
+#: includes/class-bol-admin-page.php:709
+msgid "Required?"
+msgstr ""
+
+#: includes/class-bol-admin-page.php:710
+msgid "Format"
+msgstr ""
+
+#: includes/class-bol-admin-page.php:718
+msgid "Yes"
+msgstr ""
+
+#: includes/class-bol-admin-page.php:718
+msgid "No"
+msgstr ""
+
+#: includes/class-bol-admin-page.php:744
+msgid "Credentials saved."
+msgstr ""
+
+#: includes/class-bol-admin-page.php:745
+msgid "Successfully connected to Pardot!"
+msgstr ""
+
+#: includes/class-bol-admin-page.php:746
+msgid "Disconnected from Pardot."
+msgstr ""
+
+#: includes/class-bol-admin-page.php:747
+msgid "OAuth state mismatch — possible CSRF attempt. Please try connecting again."
+msgstr ""
+
+#. translators: %s: error message
+#: includes/class-bol-admin-page.php:748
+#, php-format
+msgid "OAuth error: %s"
+msgstr ""
+
+#: includes/class-bol-pardot-api.php:180
+msgid "No refresh token stored."
+msgstr ""
+
+#: includes/class-bol-pardot-api.php:213
+msgid "Unknown token error."
+msgstr ""
+
+#. translators: %d: HTTP status code
+#: includes/class-bol-pardot-api.php:291
+#, php-format
+msgid "Pardot API returned HTTP %d."
+msgstr ""
+
+#: build/pardot-field/index.js:1
+#: src/pardot-field/edit.js:64
+msgid "Field Settings"
+msgstr ""
+
+#: build/pardot-field/index.js:1
+#: src/pardot-field/edit.js:75
+msgid "The HTML name attribute submitted to Pardot."
+msgstr ""
+
+#: build/pardot-field/index.js:1
+#: src/pardot-field/edit.js:85
+msgid "Text"
+msgstr ""
+
+#: build/pardot-field/index.js:1
+#: src/pardot-field/edit.js:89
+msgid "Email"
+msgstr ""
+
+#: build/pardot-field/index.js:1
+#: src/pardot-field/edit.js:93
+msgid "Phone"
+msgstr ""
+
+#: build/pardot-field/index.js:1
+#: src/pardot-field/edit.js:97
+msgid "Textarea"
+msgstr ""
+
+#: build/pardot-field/index.js:1
+#: src/pardot-field/edit.js:124
+msgid "Full width"
+msgstr ""
+
+#: build/pardot-field/index.js:1
+#: src/pardot-field/edit.js:128
+msgid "Half width"
+msgstr ""
+
+#: build/pardot-field/index.js:1
+#: src/pardot-field/edit.js:135
+msgid "Two adjacent half-width fields display side by side on the frontend."
+msgstr ""
+
+#: build/pardot-field/index.js:1
+#: src/pardot-field/edit.js:146
+msgid "Field Styling"
+msgstr ""
+
+#: build/pardot-field/index.js:1
+#: src/pardot-field/edit.js:203
+msgid "These settings apply to all fields in this form."
+msgstr ""
+
+#: build/pardot-field/index.js:1
+#: src/pardot-field/edit.js:240
+msgid "Field label…"
+msgstr ""
+
+#. translators: %s: field label or name
+#: build/pardot-field/index.js:2
+#: src/pardot-field/index.js:15
+#, js-format
+msgid "Field: %s"
+msgstr ""
+
+#: build/pardot-field/index.js:2
+#: src/pardot-field/index.js:18
+msgid "Pardot Field"
+msgstr ""
+
+#: build/pardot-form/index.js:1
+#: src/pardot-form/edit.js:507
+msgid "Pardot Settings"
+msgstr ""
+
+#: build/pardot-form/index.js:1
+#: src/pardot-form/edit.js:516
+msgid "Loading form handlers…"
+msgstr ""
+
+#: build/pardot-form/index.js:1
+#: src/pardot-form/edit.js:527
+msgid "Could not load form handlers from Pardot. Check your connection on the"
+msgstr ""
+
+#: build/pardot-form/index.js:1
+#: src/pardot-form/edit.js:533
+msgid "Settings page"
+msgstr ""
+
+#: build/pardot-form/index.js:1
+#: src/pardot-form/edit.js:546
+msgid "Form Handler"
+msgstr ""
+
+#: build/pardot-form/index.js:1
+#: src/pardot-form/edit.js:553
+msgid "The form will POST to this handler's URL."
+msgstr ""
+
+#: build/pardot-form/index.js:1
+#: src/pardot-form/edit.js:571
+msgid "Checking fields…"
+msgstr ""
+
+#. translators: 1: matched field count, 2: total handler field count
+#: build/pardot-form/index.js:2
+#: src/pardot-form/edit.js:582
+#, js-format
+msgid "%1$d of %2$d Pardot fields present in form."
+msgstr ""
+
+#. translators: %d: number of missing fields
+#: build/pardot-form/index.js:3
+#: src/pardot-form/edit.js:601
+#, js-format
+msgid "Add %d missing field(s)"
+msgstr ""
+
+#: build/pardot-form/index.js:3
+#: src/pardot-form/edit.js:629
+msgid "Replace all with Pardot fields"
+msgstr ""
+
+#: build/pardot-form/index.js:3
+#: src/pardot-form/edit.js:644
+msgid "Pardot is not connected."
+msgstr ""
+
+#: build/pardot-form/index.js:3
+#: src/pardot-form/edit.js:650
+msgid "Configure credentials →"
+msgstr ""
+
+#: build/pardot-form/index.js:3
+#: src/pardot-form/edit.js:660
+msgid "Form Handler URL"
+msgstr ""
+
+#: build/pardot-form/index.js:3
+#: src/pardot-form/edit.js:664
+msgid "The URL your form will POST to. Found in your Pardot form handler's embed code."
+msgstr ""
+
+#: build/pardot-form/index.js:3
+#: src/pardot-form/edit.js:684
+msgid "Common Pardot Fields"
+msgstr ""
+
+#: build/pardot-form/index.js:3
+#: src/pardot-form/edit.js:691
+msgid "Quick-add standard Pardot fields to your form:"
+msgstr ""
+
+#: build/pardot-form/index.js:3
+#: src/pardot-form/edit.js:711
+msgid "✓"
+msgstr ""
+
+#: build/pardot-form/index.js:3
+#: src/pardot-form/edit.js:723
+msgid "Add"
+msgstr ""
+
+#: build/pardot-form/index.js:3
+#: src/pardot-form/edit.js:744
+msgid "Button Colors"
+msgstr ""
+
+#: build/pardot-form/index.js:3
+#: src/pardot-form/edit.js:753
+msgid "Text Color"
+msgstr ""
+
+#: build/pardot-form/index.js:3
+#: src/pardot-form/edit.js:768
+msgid "Background"
+msgstr ""
+
+#: build/pardot-form/index.js:3
+#: src/pardot-form/edit.js:776
+msgid "Hover Background"
+msgstr ""
+
+#: build/pardot-form/index.js:3
+#: src/pardot-form/edit.js:787
+msgid "Button Appearance"
+msgstr ""
+
+#: build/pardot-form/index.js:3
+#: src/pardot-form/edit.js:791
+msgid "Padding"
+msgstr ""
+
+#: build/pardot-form/index.js:3
+#: src/pardot-form/edit.js:798
+msgid "Border Radius (px)"
+msgstr ""
+
+#: build/pardot-form/index.js:3
+#: src/pardot-form/edit.js:829
+msgid "Border Color"
+msgstr ""
+
+#: build/pardot-form/index.js:3
+#: src/pardot-form/edit.js:837
+msgid "Border Width (px)"
+msgstr ""
+
+#: build/pardot-form/index.js:3
+#: src/pardot-form/edit.js:859
+msgid "Border Style"
+msgstr ""
+
+#: build/pardot-form/index.js:3
+#: src/pardot-form/edit.js:863
+msgid "—"
+msgstr ""
+
+#: build/pardot-form/index.js:3
+#: src/pardot-form/edit.js:867
+msgid "Solid"
+msgstr ""
+
+#: build/pardot-form/index.js:3
+#: src/pardot-form/edit.js:871
+msgid "Dashed"
+msgstr ""
+
+#: build/pardot-form/index.js:3
+#: src/pardot-form/edit.js:875
+msgid "Dotted"
+msgstr ""
+
+#: build/pardot-form/index.js:3
+#: src/pardot-form/edit.js:879
+msgid "Double"
+msgstr ""
+
+#: build/pardot-form/index.js:3
+#: src/pardot-form/edit.js:889
+msgid "Box Shadow"
+msgstr ""
+
+#: build/pardot-form/index.js:3
+#: src/pardot-form/edit.js:894
+msgid "Any valid CSS box-shadow value."
+msgstr ""
+
+#: build/pardot-form/index.js:3
+#: src/pardot-form/edit.js:906
+msgid "No form handler URL configured — this form will not submit."
+msgstr ""
+
+#: build/pardot-field/block.json
+#: src/pardot-field/block.json
+msgctxt "block title"
+msgid "Pardot Field"
+msgstr ""
+
+#: build/pardot-field/block.json
+#: src/pardot-field/block.json
+msgctxt "block description"
+msgid "A single form field inside a Big Orange Pardot form block."
+msgstr ""
+
+#: build/pardot-form/block.json
+#: src/pardot-form/block.json
+msgctxt "block title"
+msgid "Pardot Form"
+msgstr ""
+
+#: build/pardot-form/block.json
+#: src/pardot-form/block.json
+msgctxt "block description"
+msgid "A WordPress Form block for WordPress to integrate with Pardot."
+msgstr ""

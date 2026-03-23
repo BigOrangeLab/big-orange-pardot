@@ -353,15 +353,50 @@ class BOL_Admin_Page {
 	private function render_help_tab() {
 		$redirect_uri = $this->settings_url();
 		?>
+		<style>
+			.bol-help-toc { background: #f6f7f7; border: 1px solid #dcdcde; border-radius: 4px; display: inline-block; margin: 1.5em 0; padding: 1em 1.5em; }
+			.bol-help-toc p { font-weight: 600; margin: 0 0 .5em; }
+			.bol-help-toc ol { list-style: decimal; margin: 0; padding-left: 1.5em; }
+			.bol-help-toc ol ol { list-style: lower-alpha; margin-top: .25em; }
+			.bol-help-toc li { margin-bottom: .25em; }
+		</style>
 		<div class="bol-help">
 
-			<h2><?php esc_html_e( 'Overview', 'big-orange-pardot' ); ?></h2>
+			<nav class="bol-help-toc" aria-label="<?php esc_attr_e( 'Table of contents', 'big-orange-pardot' ); ?>">
+				<p><?php esc_html_e( 'Contents', 'big-orange-pardot' ); ?></p>
+				<ol>
+					<li><a href="#bol-help-overview"><?php esc_html_e( 'Overview', 'big-orange-pardot' ); ?></a></li>
+					<li>
+						<a href="#bol-help-setup"><?php esc_html_e( 'Setup: Connecting to Salesforce', 'big-orange-pardot' ); ?></a>
+						<ol>
+							<li><a href="#bol-help-setup-step1"><?php esc_html_e( 'Step 1 — Create a Salesforce Connected App', 'big-orange-pardot' ); ?></a></li>
+							<li><a href="#bol-help-setup-step2"><?php esc_html_e( 'Step 2 — Find your Business Unit ID', 'big-orange-pardot' ); ?></a></li>
+							<li><a href="#bol-help-setup-step3"><?php esc_html_e( 'Step 3 — Enter credentials and authorize', 'big-orange-pardot' ); ?></a></li>
+						</ol>
+					</li>
+					<li>
+						<a href="#bol-help-block"><?php esc_html_e( 'Using the Block', 'big-orange-pardot' ); ?></a>
+						<ol>
+							<li><a href="#bol-help-block-connected"><?php esc_html_e( 'If connected to Pardot', 'big-orange-pardot' ); ?></a></li>
+							<li><a href="#bol-help-block-unconnected"><?php esc_html_e( 'If not connected to Pardot', 'big-orange-pardot' ); ?></a></li>
+							<li><a href="#bol-help-block-fields"><?php esc_html_e( 'Customising fields', 'big-orange-pardot' ); ?></a></li>
+							<li><a href="#bol-help-block-field-styling"><?php esc_html_e( 'Field styling', 'big-orange-pardot' ); ?></a></li>
+							<li><a href="#bol-help-block-form-styling"><?php esc_html_e( 'Form-level styling', 'big-orange-pardot' ); ?></a></li>
+							<li><a href="#bol-help-block-button"><?php esc_html_e( 'Submit button styling', 'big-orange-pardot' ); ?></a></li>
+						</ol>
+					</li>
+					<li><a href="#bol-help-attribution"><?php esc_html_e( 'Attribution Tracking', 'big-orange-pardot' ); ?></a></li>
+					<li><a href="#bol-help-debugging"><?php esc_html_e( 'Testing &amp; Debugging', 'big-orange-pardot' ); ?></a></li>
+				</ol>
+			</nav>
+
+			<h2 id="bol-help-overview"><?php esc_html_e( 'Overview', 'big-orange-pardot' ); ?></h2>
 			<p><?php esc_html_e( 'Big Orange Pardot adds a Gutenberg block that embeds a Pardot (Account Engagement) form directly on any page or post. Rather than using an iframe, it renders a native HTML form that submits directly to your Pardot form handler, giving you full control over styling and layout.', 'big-orange-pardot' ); ?></p>
 			<p><?php esc_html_e( 'The plugin also automatically captures marketing attribution data (UTM parameters, Google Click ID, landing page URL, and referrer) into cookies on every page load, then injects those values as hidden fields on any Pardot form found on the page — even forms loaded dynamically after the page renders.', 'big-orange-pardot' ); ?></p>
 
 			<hr />
 
-			<h2><?php esc_html_e( 'Setup: Connecting to Salesforce', 'big-orange-pardot' ); ?></h2>
+			<h2 id="bol-help-setup"><?php esc_html_e( 'Setup: Connecting to Salesforce', 'big-orange-pardot' ); ?></h2>
 			<p>
 				<?php
 				printf(
@@ -372,7 +407,7 @@ class BOL_Admin_Page {
 				?>
 			</p>
 
-			<h3><?php esc_html_e( 'Step 1 — Create a Salesforce Connected App', 'big-orange-pardot' ); ?></h3>
+			<h3 id="bol-help-setup-step1"><?php esc_html_e( 'Step 1 — Create a Salesforce Connected App', 'big-orange-pardot' ); ?></h3>
 			<ol>
 				<li><?php esc_html_e( 'In Salesforce, go to Setup → Apps → App Manager and click New Connected App.', 'big-orange-pardot' ); ?></li>
 				<li><?php esc_html_e( 'Give it a name (e.g. "WordPress Pardot Integration") and fill in a contact email.', 'big-orange-pardot' ); ?></li>
@@ -392,13 +427,13 @@ class BOL_Admin_Page {
 				<li><?php esc_html_e( 'From the Connected App detail page, click Manage Consumer Details to view your Consumer Key and Consumer Secret.', 'big-orange-pardot' ); ?></li>
 			</ol>
 
-			<h3><?php esc_html_e( 'Step 2 — Find your Business Unit ID', 'big-orange-pardot' ); ?></h3>
+			<h3 id="bol-help-setup-step2"><?php esc_html_e( 'Step 2 — Find your Business Unit ID', 'big-orange-pardot' ); ?></h3>
 			<ol>
 				<li><?php esc_html_e( 'In Salesforce Setup, search for "Account Engagement" and go to Account Engagement → Business Unit Setup.', 'big-orange-pardot' ); ?></li>
 				<li><?php esc_html_e( 'Copy the Business Unit ID — it is an 18-character value beginning with 0Uv.', 'big-orange-pardot' ); ?></li>
 			</ol>
 
-			<h3><?php esc_html_e( 'Step 3 — Enter credentials and authorize', 'big-orange-pardot' ); ?></h3>
+			<h3 id="bol-help-setup-step3"><?php esc_html_e( 'Step 3 — Enter credentials and authorize', 'big-orange-pardot' ); ?></h3>
 			<ol>
 				<li>
 					<?php
@@ -416,13 +451,13 @@ class BOL_Admin_Page {
 
 			<hr />
 
-			<h2><?php esc_html_e( 'Using the Block', 'big-orange-pardot' ); ?></h2>
+			<h2 id="bol-help-block"><?php esc_html_e( 'Using the Block', 'big-orange-pardot' ); ?></h2>
 			<ol>
 				<li><?php esc_html_e( 'In the block editor, insert the Big Orange Pardot block from the Widgets category (or search for "Pardot").', 'big-orange-pardot' ); ?></li>
 				<li><?php esc_html_e( 'The block inserts with a default set of seven fields (First Name, Last Name, Email, Phone, Company, Job Title, Comments) plus a Submit button. Each field is its own block — you can reorder, delete, or add fields freely using the block editor.', 'big-orange-pardot' ); ?></li>
 			</ol>
 
-			<h3><?php esc_html_e( 'If connected to Pardot', 'big-orange-pardot' ); ?></h3>
+			<h3 id="bol-help-block-connected"><?php esc_html_e( 'If connected to Pardot', 'big-orange-pardot' ); ?></h3>
 			<ol>
 				<li><?php esc_html_e( 'Open the block settings panel. A dropdown lists all form handlers from your Pardot account. Select the handler this form should submit to — the submission URL is set automatically.', 'big-orange-pardot' ); ?></li>
 				<li><?php esc_html_e( 'Any fields the handler expects that are not already in your form are added automatically when you select a handler. Review the added fields and adjust labels, types, or widths as needed.', 'big-orange-pardot' ); ?></li>
@@ -434,13 +469,13 @@ class BOL_Admin_Page {
 				<?php esc_html_e( 'Until a form handler is configured, the form is hidden from site visitors. Editors viewing the page while logged in will see a notice above a non-submittable preview of the form, so they can review the layout in context before the form goes live.', 'big-orange-pardot' ); ?>
 			</p>
 
-			<h3><?php esc_html_e( 'If not connected to Pardot', 'big-orange-pardot' ); ?></h3>
+			<h3 id="bol-help-block-unconnected"><?php esc_html_e( 'If not connected to Pardot', 'big-orange-pardot' ); ?></h3>
 			<ol>
 				<li><?php esc_html_e( 'Open the block settings panel. Enter the Form Handler URL — found in your Pardot form handler\'s embed code — into the Form Handler URL field.', 'big-orange-pardot' ); ?></li>
 				<li><?php esc_html_e( 'Open the "Common Pardot Fields" panel to quickly add standard Pardot field names to your form. Fields already present show a check mark; click "Add" for any you want to include.', 'big-orange-pardot' ); ?></li>
 				<li><?php esc_html_e( 'You can also add fields manually via the block editor and type any Pardot field name directly into the Field Name setting on each field block.', 'big-orange-pardot' ); ?></li>
 			</ol>
-			<h3><?php esc_html_e( 'Customising fields', 'big-orange-pardot' ); ?></h3>
+			<h3 id="bol-help-block-fields"><?php esc_html_e( 'Customising fields', 'big-orange-pardot' ); ?></h3>
 			<p><?php esc_html_e( 'Select any Pardot Field block inside the form to edit it via the block settings panel. Available settings:', 'big-orange-pardot' ); ?></p>
 			<ul style="list-style: disc; margin-left: 2em;">
 				<li><strong><?php esc_html_e( 'Field Name (Pardot)', 'big-orange-pardot' ); ?></strong> — <?php esc_html_e( 'The HTML name attribute submitted to Pardot. Must match the field name in your form handler.', 'big-orange-pardot' ); ?></li>
@@ -450,7 +485,7 @@ class BOL_Admin_Page {
 				<li><strong><?php esc_html_e( 'Width', 'big-orange-pardot' ); ?></strong> — <?php esc_html_e( 'Full width (spans both grid columns) or Half width (spans one column). Two adjacent half-width fields sit side by side on the frontend.', 'big-orange-pardot' ); ?></li>
 			</ul>
 
-			<h3><?php esc_html_e( 'Field styling', 'big-orange-pardot' ); ?></h3>
+			<h3 id="bol-help-block-field-styling"><?php esc_html_e( 'Field styling', 'big-orange-pardot' ); ?></h3>
 			<p><?php esc_html_e( 'When any Pardot Field block is selected, the block settings panel shows a Field Styling section. Changes made here apply to every field in the form — the settings are stored once on the parent form block and cascade to all fields automatically.', 'big-orange-pardot' ); ?></p>
 			<ul style="list-style: disc; margin-left: 2em;">
 				<li><strong><?php esc_html_e( 'Label Color', 'big-orange-pardot' ); ?></strong> — <?php esc_html_e( 'Text colour for all field labels.', 'big-orange-pardot' ); ?></li>
@@ -461,7 +496,7 @@ class BOL_Admin_Page {
 			</ul>
 			<p class="description"><?php esc_html_e( 'When no custom colours are set, the form falls back to your active theme\'s color palette (Kadence global palette variables if Kadence Blocks is active, then WordPress preset colors, then sensible hard-coded defaults).', 'big-orange-pardot' ); ?></p>
 
-			<h3><?php esc_html_e( 'Form-level styling', 'big-orange-pardot' ); ?></h3>
+			<h3 id="bol-help-block-form-styling"><?php esc_html_e( 'Form-level styling', 'big-orange-pardot' ); ?></h3>
 			<p><?php esc_html_e( 'Select the outer Big Orange Pardot block itself (not a field inside it) to access additional styling controls in the block settings panel and the block toolbar:', 'big-orange-pardot' ); ?></p>
 			<ul style="list-style: disc; margin-left: 2em;">
 				<li><strong><?php esc_html_e( 'Color → Background', 'big-orange-pardot' ); ?></strong> — <?php esc_html_e( 'Background colour of the entire form wrapper.', 'big-orange-pardot' ); ?></li>
@@ -469,7 +504,7 @@ class BOL_Admin_Page {
 				<li><strong><?php esc_html_e( 'Border', 'big-orange-pardot' ); ?></strong> — <?php esc_html_e( 'Border color, width, style, and radius for the form wrapper.', 'big-orange-pardot' ); ?></li>
 			</ul>
 
-			<h3><?php esc_html_e( 'Submit button styling', 'big-orange-pardot' ); ?></h3>
+			<h3 id="bol-help-block-button"><?php esc_html_e( 'Submit button styling', 'big-orange-pardot' ); ?></h3>
 			<p><?php esc_html_e( 'Select the Pardot Form block to access its submit button settings. The button uses standard WordPress button classes and will pick up Kadence or theme button styles automatically if available; the options below let you override individual properties:', 'big-orange-pardot' ); ?></p>
 			<ul style="list-style: disc; margin-left: 2em;">
 				<li><strong><?php esc_html_e( 'Alignment', 'big-orange-pardot' ); ?></strong> — <?php esc_html_e( 'Left, center, or right — available in the block toolbar.', 'big-orange-pardot' ); ?></li>
@@ -486,7 +521,7 @@ class BOL_Admin_Page {
 
 			<hr />
 
-			<h2><?php esc_html_e( 'Attribution Tracking', 'big-orange-pardot' ); ?></h2>
+			<h2 id="bol-help-attribution"><?php esc_html_e( 'Attribution Tracking', 'big-orange-pardot' ); ?></h2>
 			<p><?php esc_html_e( 'A small script runs on every page of your site (not just pages with the form). It captures marketing attribution data into cookies and injects that data as hidden fields on any Pardot form it finds on the page — including forms loaded dynamically after page load.', 'big-orange-pardot' ); ?></p>
 			<p><?php esc_html_e( 'The following hidden fields are submitted with every form and must be mapped in your Pardot form handler to be recorded:', 'big-orange-pardot' ); ?></p>
 			<table class="widefat striped" style="max-width: 600px;">
@@ -520,7 +555,7 @@ class BOL_Admin_Page {
 
 			<hr />
 
-			<h2><?php esc_html_e( 'Testing &amp; Debugging', 'big-orange-pardot' ); ?></h2>
+			<h2 id="bol-help-debugging"><?php esc_html_e( 'Testing &amp; Debugging', 'big-orange-pardot' ); ?></h2>
 			<p>
 				<?php esc_html_e( 'When you are logged in as an administrator, a small "Attribution (N)" menu appears in the WordPress admin bar on every page of the site. It shows the current value of each attribution cookie — or "(not set)" if that cookie has not been captured yet.', 'big-orange-pardot' ); ?>
 			</p>

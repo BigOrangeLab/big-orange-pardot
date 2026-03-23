@@ -180,6 +180,7 @@ function bol_enqueue_admin_bar_assets() {
 		array( 'admin-bar' ),
 		'1.0.0'
 	);
+	wp_style_add_data( 'big-orange-pardot-admin-bar', 'rtl', 'replace' );
 }
 add_action( 'wp_enqueue_scripts', 'bol_enqueue_admin_bar_assets' );
 add_action( 'admin_enqueue_scripts', 'bol_enqueue_admin_bar_assets' );

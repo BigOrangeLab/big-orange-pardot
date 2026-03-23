@@ -126,20 +126,41 @@ class BOL_Pardot_API {
 	// -------------------------------------------------------------------------
 
 	/**
+	 * Base64url-encodes a binary string (RFC 4648 §5, no padding).
+	 *
+	 * @param string $data Raw binary data.
+	 * @return string
+	 */
+	private static function base64url_encode( $data ) {
+		return rtrim( strtr( base64_encode( $data ), '+/', '-_' ), '=' );
+	}
+
+	/**
 	 * Builds the Salesforce authorization URL to redirect the admin to.
+	 *
+	 * Generates a PKCE code_verifier (RFC 7636), stores it in wp_options for
+	 * retrieval during the token exchange, and includes the derived code_challenge
+	 * in the returned URL.
 	 *
 	 * @param string $redirect_uri The redirect URI registered with the Connected App.
 	 * @param string $state        A random nonce for CSRF protection.
 	 * @return string
 	 */
 	public static function get_authorize_url( $redirect_uri, $state ) {
+		$code_verifier  = self::base64url_encode( random_bytes( 32 ) );
+		$code_challenge = self::base64url_encode( hash( 'sha256', $code_verifier, true ) );
+
+		update_option( 'big_orange_pardot_pkce_verifier', $code_verifier, false );
+
 		return add_query_arg(
 			array(
-				'response_type' => 'code',
-				'client_id'     => self::get_client_id(),
-				'redirect_uri'  => rawurlencode( $redirect_uri ),
-				'scope'         => 'pardot_api refresh_token',
-				'state'         => $state,
+				'response_type'         => 'code',
+				'client_id'             => self::get_client_id(),
+				'redirect_uri'          => rawurlencode( $redirect_uri ),
+				'scope'                 => 'pardot_api refresh_token',
+				'state'                 => $state,
+				'code_challenge'        => $code_challenge,
+				'code_challenge_method' => 'S256',
 			),
 			self::AUTH_URL
 		);
@@ -148,22 +169,32 @@ class BOL_Pardot_API {
 	/**
 	 * Exchanges an authorization code for access + refresh tokens and stores them.
 	 *
+	 * Retrieves and deletes the stored PKCE code_verifier and includes it in the
+	 * token request so Salesforce can verify the challenge sent during authorization.
+	 *
 	 * @param string $code         The authorization code from the OAuth callback.
 	 * @param string $redirect_uri The redirect URI used in the initial authorization request.
 	 * @return true|\WP_Error True on success, WP_Error on failure.
 	 */
 	public static function exchange_code( $code, $redirect_uri ) {
+		$code_verifier = (string) get_option( 'big_orange_pardot_pkce_verifier', '' );
+		delete_option( 'big_orange_pardot_pkce_verifier' );
+
+		$body = array(
+			'grant_type'    => 'authorization_code',
+			'client_id'     => self::get_client_id(),
+			'client_secret' => self::get_client_secret(),
+			'redirect_uri'  => $redirect_uri,
+			'code'          => $code,
+		);
+
+		if ( '' !== $code_verifier ) {
+			$body['code_verifier'] = $code_verifier;
+		}
+
 		$response = wp_remote_post(
 			self::TOKEN_URL,
-			array(
-				'body' => array(
-					'grant_type'    => 'authorization_code',
-					'client_id'     => self::get_client_id(),
-					'client_secret' => self::get_client_secret(),
-					'redirect_uri'  => $redirect_uri,
-					'code'          => $code,
-				),
-			)
+			array( 'body' => $body )
 		);
 
 		return self::handle_token_response( $response );

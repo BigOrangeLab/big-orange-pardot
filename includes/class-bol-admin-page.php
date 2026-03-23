@@ -343,10 +343,33 @@ class BOL_Admin_Page {
 	 *
 	 * @return string
 	 */
+	/**
+	 * Returns true when the Logs tab should be visible: logging is on or a log file already exists.
+	 *
+	 * @return bool
+	 */
+	private function logs_tab_visible() {
+		if ( BOL_Pardot_API::is_api_logging_enabled() ) {
+			return true;
+		}
+
+		$log_path = BOL_Pardot_API::get_api_log_path();
+		return '' !== $log_path && file_exists( $log_path );
+	}
+
 	private function current_tab() {
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		$tab = isset( $_GET['tab'] ) ? sanitize_key( $_GET['tab'] ) : 'settings';
-		return in_array( $tab, array( 'settings', 'help', 'logs' ), true ) ? $tab : 'settings';
+		if ( ! in_array( $tab, array( 'settings', 'help', 'logs' ), true ) ) {
+			return 'settings';
+		}
+
+		// If someone navigates directly to the logs tab but it is not visible, fall back to settings.
+		if ( 'logs' === $tab && ! $this->logs_tab_visible() ) {
+			return 'settings';
+		}
+
+		return $tab;
 	}
 
 	/**
@@ -389,10 +412,12 @@ class BOL_Admin_Page {
 					class="nav-tab<?php echo 'help' === $current_tab ? ' nav-tab-active' : ''; ?>">
 					<?php esc_html_e( 'Help', 'big-orange-pardot' ); ?>
 				</a>
+				<?php if ( $this->logs_tab_visible() ) : ?>
 				<a href="<?php echo esc_url( $this->tab_url( 'logs' ) ); ?>"
 					class="nav-tab<?php echo 'logs' === $current_tab ? ' nav-tab-active' : ''; ?>">
 					<?php esc_html_e( 'Logs', 'big-orange-pardot' ); ?>
 				</a>
+			<?php endif; ?>
 			</nav>
 
 			<?php if ( 'help' === $current_tab ) : ?>

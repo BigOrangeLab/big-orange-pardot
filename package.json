@@ -23,7 +23,9 @@
 		"@wordpress/block-editor": "latest",
 		"@wordpress/blocks": "latest",
 		"@wordpress/components": "latest",
+		"@wordpress/dataviews": "latest",
 		"@wordpress/data": "latest",
+		"@wordpress/dom-ready": "latest",
 		"@wordpress/element": "latest",
 		"@wordpress/i18n": "latest",
 		"@wordpress/icons": "^12.0.0"

@@ -52,7 +52,68 @@ class BOL_Admin_Page {
 	public function __construct() {
 		add_action( 'admin_menu', array( $this, 'register_menu' ) );
 		add_action( 'admin_init', array( $this, 'handle_requests' ) );
+		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_admin_assets' ) );
 		add_filter( 'plugin_action_links_big-orange-pardot/big-orange-pardot.php', array( $this, 'add_settings_link' ) );
+	}
+
+	/**
+	 * Enqueues admin assets for the Logs tab.
+	 *
+	 * @param string $hook_suffix Current admin page hook suffix.
+	 * @return void
+	 */
+	public function enqueue_admin_assets( $hook_suffix ) {
+		if ( 'settings_page_' . self::SLUG !== $hook_suffix ) {
+			return;
+		}
+
+		if ( 'logs' !== $this->current_tab() ) {
+			return;
+		}
+
+		$plugin_file = dirname( __DIR__ ) . '/big-orange-pardot.php';
+		$asset_file  = dirname( __DIR__ ) . '/build/log-viewer.asset.php';
+		$asset_data  = file_exists( $asset_file ) ? include $asset_file : array(
+			'dependencies' => array( 'wp-dom-ready', 'wp-element', 'wp-i18n', 'wp-components' ),
+			'version'      => '1.0.1',
+		);
+
+		$deps = isset( $asset_data['dependencies'] ) && is_array( $asset_data['dependencies'] ) ? $asset_data['dependencies'] : array();
+		$deps = array_values(
+			array_filter(
+				$deps,
+				static function ( $dep ) {
+					return wp_script_is( $dep, 'registered' );
+				}
+			)
+		);
+
+		$version = isset( $asset_data['version'] ) ? (string) $asset_data['version'] : '1.0.1';
+
+		wp_enqueue_script(
+			'big-orange-pardot-log-viewer',
+			plugins_url( 'build/log-viewer.js', $plugin_file ),
+			$deps,
+			$version,
+			true
+		);
+
+		wp_enqueue_style(
+			'big-orange-pardot-log-viewer',
+			plugins_url( 'build/log-viewer.css', $plugin_file ),
+			array( 'wp-components' ),
+			$version
+		);
+
+		wp_add_inline_script(
+			'big-orange-pardot-log-viewer',
+			'window.bolPardotLogsPageConfig = ' . wp_json_encode(
+				array(
+					'items' => BOL_Pardot_API::get_api_log_entries( 1000 ),
+				)
+			) . ';',
+			'before'
+		);
 	}
 
 	// -------------------------------------------------------------------------
@@ -243,6 +304,7 @@ class BOL_Admin_Page {
 
 		if ( is_wp_error( $business_units ) ) {
 			if ( 'business_units_not_supported' === $business_units->get_error_code() ) {
+				update_option( 'big_orange_pardot_enable_salesforce_api_scope', '0', false );
 				wp_safe_redirect( $this->settings_url( 'connected_business_unit_not_supported' ) );
 				exit;
 			}
@@ -349,6 +411,8 @@ class BOL_Admin_Page {
 			$business_units = BOL_Pardot_API::get_business_units();
 			if ( is_wp_error( $business_units ) ) {
 				if ( 'business_units_not_supported' === $business_units->get_error_code() ) {
+					update_option( 'big_orange_pardot_enable_salesforce_api_scope', '0', false );
+					$enable_sf_api_scope  = false;
 					$business_units_error = __( 'This Salesforce org does not expose Business Units via API. Enter your Business Unit ID manually.', 'big-orange-pardot' );
 				} else {
 					$business_units_error = $business_units->get_error_message();
@@ -476,7 +540,7 @@ class BOL_Admin_Page {
 		$log_exists      = '' !== $log_path && file_exists( $log_path );
 		$log_is_readable = $log_exists && is_readable( $log_path );
 		$log_size        = $log_exists ? (int) filesize( $log_path ) : 0;
-		$log_contents    = $log_is_readable ? BOL_Pardot_API::get_api_log_contents() : '';
+		$log_entries     = $log_is_readable ? BOL_Pardot_API::get_api_log_entries( 1000 ) : array();
 		?>
 		<?php $this->render_notices(); ?>
 
@@ -499,6 +563,10 @@ class BOL_Admin_Page {
 					<th scope="row"><?php esc_html_e( 'Log size', 'big-orange-pardot' ); ?></th>
 					<td><?php echo esc_html( size_format( $log_size ) ); ?></td>
 				</tr>
+				<tr>
+					<th scope="row"><?php esc_html_e( 'Parsed entries', 'big-orange-pardot' ); ?></th>
+					<td><?php echo esc_html( number_format_i18n( count( $log_entries ) ) ); ?></td>
+				</tr>
 			<?php endif; ?>
 		</table>
 
@@ -517,11 +585,12 @@ class BOL_Admin_Page {
 			<div class="notice notice-error inline"><p>
 				<?php esc_html_e( 'The log file exists but is not readable by WordPress.', 'big-orange-pardot' ); ?>
 			</p></div>
-		<?php elseif ( '' === $log_contents ) : ?>
+		<?php elseif ( empty( $log_entries ) ) : ?>
 			<p><?php esc_html_e( 'The log file is empty.', 'big-orange-pardot' ); ?></p>
 		<?php else : ?>
-			<p class="description"><?php esc_html_e( 'Showing the latest log content.', 'big-orange-pardot' ); ?></p>
-			<textarea readonly="readonly" class="large-text code" rows="24"><?php echo esc_textarea( $log_contents ); ?></textarea>
+			<div id="bol-pardot-log-viewer-app">
+				<p><?php esc_html_e( 'Loading log viewer…', 'big-orange-pardot' ); ?></p>
+			</div>
 		<?php endif; ?>
 		<?php
 	}
@@ -745,7 +814,7 @@ class BOL_Admin_Page {
 				<?php esc_html_e( 'The menu also includes a "Clear all cookies" link. Clicking it deletes all eight attribution cookies and reloads the page, so you can simulate a fresh visitor without opening a private browser window.', 'big-orange-pardot' ); ?>
 			</p>
 			<p>
-				<?php esc_html_e( 'For API troubleshooting, enable API Logging on the Settings tab. Request/response activity for Salesforce and Pardot is written to your uploads directory and can be viewed on the Logs tab. From that tab, "Delete Log and Disable Logging" removes the file and turns logging off.', 'big-orange-pardot' ); ?>
+				<?php esc_html_e( 'For API troubleshooting, enable API Logging on the Settings tab. Request/response activity for Salesforce and Pardot is written to your uploads directory and shown on the Logs tab in a filterable table with per-entry inspection. From that tab, "Delete Log and Disable Logging" removes the file and turns logging off.', 'big-orange-pardot' ); ?>
 			</p>
 			<p class="description">
 				<?php esc_html_e( 'The admin bar inspector is only visible to users with the manage_options capability and has no effect on site visitors.', 'big-orange-pardot' ); ?>

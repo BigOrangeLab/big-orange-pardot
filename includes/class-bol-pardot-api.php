@@ -224,6 +224,206 @@ class BOL_Pardot_API {
 	}
 
 	/**
+	 * Returns normalized API log entries for UI rendering.
+	 *
+	 * @param int $limit Maximum entries to return.
+	 * @return array<int, array<string, mixed>>
+	 */
+	public static function get_api_log_entries( $limit = 500 ) {
+		$path = self::get_api_log_path();
+
+		if ( '' === $path || ! file_exists( $path ) || ! is_readable( $path ) ) {
+			return array();
+		}
+
+		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents -- Reading plugin-owned debug log.
+		$contents = file_get_contents( $path );
+		if ( false === $contents || '' === trim( (string) $contents ) ) {
+			return array();
+		}
+
+		$raw_entries = self::decode_log_entries_from_text( (string) $contents );
+		if ( empty( $raw_entries ) ) {
+			return array();
+		}
+
+		$entries = array();
+		foreach ( $raw_entries as $entry ) {
+			if ( ! is_array( $entry ) ) {
+				continue;
+			}
+
+			$entries[] = self::normalize_log_entry( $entry );
+		}
+
+		usort(
+			$entries,
+			static function ( $left, $right ) {
+				return strcmp( (string) ( $right['timestamp'] ?? '' ), (string) ( $left['timestamp'] ?? '' ) );
+			}
+		);
+
+		$limit = max( 1, (int) $limit );
+		return array_slice( $entries, 0, $limit );
+	}
+
+	/**
+	 * Decodes one or more JSON log objects from text content.
+	 *
+	 * Supports newline-delimited JSON and concatenated JSON objects.
+	 *
+	 * @param string $contents Raw log file contents.
+	 * @return array<int, array<string, mixed>>
+	 */
+	private static function decode_log_entries_from_text( $contents ) {
+		$entries = array();
+
+		$lines = preg_split( '/\R+/', $contents );
+		if ( is_array( $lines ) ) {
+			foreach ( $lines as $line ) {
+				$line = trim( (string) $line );
+				if ( '' === $line ) {
+					continue;
+				}
+
+				$decoded = json_decode( $line, true );
+				if ( is_array( $decoded ) ) {
+					$entries[] = $decoded;
+				}
+			}
+		}
+
+		if ( ! empty( $entries ) ) {
+			return $entries;
+		}
+
+		// Fallback scanner for concatenated JSON objects without reliable newlines.
+		$length       = strlen( $contents );
+		$depth        = 0;
+		$start        = -1;
+		$in_string    = false;
+		$is_escaped   = false;
+
+		for ( $i = 0; $i < $length; $i++ ) {
+			$char = $contents[ $i ];
+
+			if ( $in_string ) {
+				if ( $is_escaped ) {
+					$is_escaped = false;
+					continue;
+				}
+
+				if ( '\\' === $char ) {
+					$is_escaped = true;
+					continue;
+				}
+
+				if ( '"' === $char ) {
+					$in_string = false;
+				}
+
+				continue;
+			}
+
+			if ( '"' === $char ) {
+				$in_string = true;
+				continue;
+			}
+
+			if ( '{' === $char ) {
+				if ( 0 === $depth ) {
+					$start = $i;
+				}
+				$depth++;
+				continue;
+			}
+
+			if ( '}' === $char && $depth > 0 ) {
+				$depth--;
+				if ( 0 === $depth && $start >= 0 ) {
+					$chunk   = substr( $contents, $start, $i - $start + 1 );
+					$decoded = json_decode( $chunk, true );
+					if ( is_array( $decoded ) ) {
+						$entries[] = $decoded;
+					}
+					$start = -1;
+				}
+			}
+		}
+
+		return $entries;
+	}
+
+	/**
+	 * Builds a UI-friendly normalized log entry.
+	 *
+	 * @param array<string, mixed> $entry Raw log entry.
+	 * @return array<string, mixed>
+	 */
+	private static function normalize_log_entry( $entry ) {
+		$status = isset( $entry['status'] ) ? (string) $entry['status'] : '';
+		$error  = isset( $entry['error'] ) ? (string) $entry['error'] : '';
+
+		$response = isset( $entry['response'] ) && is_array( $entry['response'] ) ? $entry['response'] : array();
+
+		$response_code    = '';
+		$response_message = '';
+
+		if ( isset( $response['code'] ) ) {
+			$response_code = (string) $response['code'];
+		}
+
+		if ( isset( $response['message'] ) ) {
+			$response_message = (string) $response['message'];
+		} elseif ( isset( $response[0]['message'] ) ) {
+			$response_message = (string) $response[0]['message'];
+		}
+
+		$summary_parts = array();
+		if ( '' !== $error ) {
+			$summary_parts[] = $error;
+		}
+		if ( '' !== $response_message ) {
+			$summary_parts[] = $response_message;
+		}
+
+		$summary = implode( ' | ', array_unique( $summary_parts ) );
+
+		$request = isset( $entry['request'] ) ? $entry['request'] : array();
+		$request_summary = '';
+		if ( is_array( $request ) && isset( $request['body']['grant_type'] ) ) {
+			$request_summary = sprintf(
+				/* translators: %s: OAuth grant type */
+				__( 'grant_type: %s', 'big-orange-pardot' ),
+				(string) $request['body']['grant_type']
+			);
+		}
+
+		$url = isset( $entry['url'] ) ? (string) $entry['url'] : '';
+		$path = '';
+		if ( '' !== $url ) {
+			$parsed = wp_parse_url( $url );
+			if ( is_array( $parsed ) && ! empty( $parsed['path'] ) ) {
+				$path = (string) $parsed['path'];
+			}
+		}
+
+		return array(
+			'timestamp'        => isset( $entry['timestamp'] ) ? (string) $entry['timestamp'] : '',
+			'service'          => isset( $entry['service'] ) ? (string) $entry['service'] : '',
+			'method'           => isset( $entry['method'] ) ? (string) $entry['method'] : '',
+			'status'           => '' !== $status ? $status : $response_code,
+			'url'              => $url,
+			'path'             => $path,
+			'summary'          => $summary,
+			'request_summary'  => $request_summary,
+			'raw_request'      => wp_json_encode( $request, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES ),
+			'raw_response'     => wp_json_encode( isset( $entry['response'] ) ? $entry['response'] : array(), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES ),
+			'raw_error'        => $error,
+		);
+	}
+
+	/**
 	 * Sanitizes potentially sensitive values before writing log entries.
 	 *
 	 * @param mixed $value Value to sanitize.

@@ -58,7 +58,7 @@ The plugin connects to Pardot via the Salesforce OAuth 2.0 Web Server Flow. Opti
 
 You can also paste a form handler URL directly into the block without connecting to Pardot, which skips the OAuth setup entirely.
 
-For troubleshooting, you can enable API logging in plugin settings. Salesforce/Pardot requests are written to the WordPress uploads directory and viewable from the plugin's Logs tab, where you can also delete the log and disable logging.
+For troubleshooting, you can enable API logging in plugin settings. Salesforce/Pardot requests are written to the WordPress uploads directory and shown in a structured, filterable table on the plugin's Logs tab, where you can inspect entries and delete the log (which also disables logging).
 
 ---
 

@@ -16,6 +16,7 @@ This plugin provides Gutenberg blocks for embedding and configuring Pardot (Acco
 - `src/attribution.js`: Front-end attribution and hidden field population script. Built to `build/attribution.js`.
 - `src/admin-bar-attribution.js`: Admin bar "Clear all cookies" handler — expires all 8 attribution cookies and reloads. Built to `build/admin-bar-attribution.js`. Imports `src/admin-bar-attribution.scss`.
 - `src/admin-bar-attribution.scss`: Styles for the admin bar Attribution panel. Imported from `admin-bar-attribution.js`; built to `build/admin-bar-attribution.css`.
+- `src/log-viewer.js` + `src/log-viewer-app.js` + `src/log-viewer.scss`: Logs tab app and styles. Built to `build/log-viewer.js` and `build/log-viewer.css`. Renders parsed API log entries in a WordPress DataViews table with status badges, a failed-only toggle, and row inspection actions.
 - `build/`: Generated assets and block manifest output. Treat as generated artifacts.
 
 ## Block context flow

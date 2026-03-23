@@ -6,5 +6,6 @@ module.exports = {
 		...( await defaultConfig.entry() ),
 		attribution: './src/attribution.js',
 		'admin-bar-attribution': './src/admin-bar-attribution.js',
+		'log-viewer': './src/log-viewer.js',
 	} ),
 };

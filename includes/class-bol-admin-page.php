@@ -40,6 +40,13 @@ class BOL_Admin_Page {
 	const NONCE_DISCONNECT = 'bol_disconnect';
 
 	/**
+	 * Nonce action for log management actions.
+	 *
+	 * @var string
+	 */
+	const NONCE_LOGS = 'bol_logs';
+
+	/**
 	 * Registers all admin hooks.
 	 */
 	public function __construct() {
@@ -105,6 +112,18 @@ class BOL_Admin_Page {
 
 		// OAuth callback — Salesforce redirected back with ?code=&state=.
 		// phpcs:disable WordPress.Security.NonceVerification.Recommended
+		if ( isset( $_GET['error'], $_GET['state'] ) && ! isset( $_GET['notice'] ) ) {
+			$error_description = isset( $_GET['error_description'] ) ? sanitize_text_field( wp_unslash( $_GET['error_description'] ) ) : '';
+			$error_message     = sanitize_text_field( wp_unslash( $_GET['error'] ) );
+
+			if ( '' !== $error_description ) {
+				$error_message .= ': ' . $error_description;
+			}
+
+			wp_safe_redirect( $this->settings_url( 'oauth_error', $error_message ) );
+			exit;
+		}
+
 		if ( isset( $_GET['code'], $_GET['state'] ) ) {
 			$this->handle_oauth_callback(
 				sanitize_text_field( wp_unslash( $_GET['code'] ) ),
@@ -140,6 +159,16 @@ class BOL_Admin_Page {
 			wp_safe_redirect( $this->settings_url( 'disconnected' ) );
 			exit;
 		}
+
+		// Clear API log and disable logging.
+		if ( isset( $_POST['bol_clear_api_log'] ) ) {
+			check_admin_referer( self::NONCE_LOGS );
+			update_option( 'big_orange_pardot_enable_api_logging', '0', false );
+
+			BOL_Pardot_API::clear_api_log();
+			wp_safe_redirect( $this->tab_url( 'logs' ) . '&notice=log_cleared' );
+			exit;
+		}
 	}
 
 	/**
@@ -154,6 +183,15 @@ class BOL_Admin_Page {
 			$value = isset( $_POST[ 'bol_' . $field ] ) ? sanitize_text_field( wp_unslash( $_POST[ 'bol_' . $field ] ) ) : '';
 			update_option( 'big_orange_pardot_' . $field, $value, false );
 		}
+
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- nonce checked via check_admin_referer() in handle_requests() before this method is called.
+		$enable_salesforce_api_scope = isset( $_POST['bol_enable_salesforce_api_scope'] ) ? '1' : '0';
+		update_option( 'big_orange_pardot_enable_salesforce_api_scope', $enable_salesforce_api_scope, false );
+
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- nonce checked via check_admin_referer() in handle_requests() before this method is called.
+		$enable_api_logging = isset( $_POST['bol_enable_api_logging'] ) ? '1' : '0';
+		update_option( 'big_orange_pardot_enable_api_logging', $enable_api_logging, false );
+
 		wp_safe_redirect( $this->settings_url( 'saved' ) );
 		exit;
 	}
@@ -199,7 +237,28 @@ class BOL_Admin_Page {
 			exit;
 		}
 
-		wp_safe_redirect( $this->settings_url( 'connected' ) );
+		$notice             = 'connected';
+		$current_business_id = BOL_Pardot_API::get_business_unit_id();
+		$business_units     = BOL_Pardot_API::get_business_units( true );
+
+		if ( is_wp_error( $business_units ) ) {
+			if ( 'business_units_not_supported' === $business_units->get_error_code() ) {
+				wp_safe_redirect( $this->settings_url( 'connected_business_unit_not_supported' ) );
+				exit;
+			}
+
+			wp_safe_redirect( $this->settings_url( 'connected_business_unit_lookup_failed', $business_units->get_error_message() ) );
+			exit;
+		}
+
+		if ( '' === $current_business_id && 1 === count( $business_units ) ) {
+			update_option( 'big_orange_pardot_business_unit_id', (string) $business_units[0]['id'], false );
+			$notice = 'connected_business_unit_set';
+		} elseif ( '' === $current_business_id && count( $business_units ) > 1 ) {
+			$notice = 'connected_select_business_unit';
+		}
+
+		wp_safe_redirect( $this->settings_url( $notice ) );
 		exit;
 	}
 
@@ -215,7 +274,7 @@ class BOL_Admin_Page {
 	private function current_tab() {
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		$tab = isset( $_GET['tab'] ) ? sanitize_key( $_GET['tab'] ) : 'settings';
-		return in_array( $tab, array( 'settings', 'help' ), true ) ? $tab : 'settings';
+		return in_array( $tab, array( 'settings', 'help', 'logs' ), true ) ? $tab : 'settings';
 	}
 
 	/**
@@ -258,10 +317,16 @@ class BOL_Admin_Page {
 					class="nav-tab<?php echo 'help' === $current_tab ? ' nav-tab-active' : ''; ?>">
 					<?php esc_html_e( 'Help', 'big-orange-pardot' ); ?>
 				</a>
+				<a href="<?php echo esc_url( $this->tab_url( 'logs' ) ); ?>"
+					class="nav-tab<?php echo 'logs' === $current_tab ? ' nav-tab-active' : ''; ?>">
+					<?php esc_html_e( 'Logs', 'big-orange-pardot' ); ?>
+				</a>
 			</nav>
 
 			<?php if ( 'help' === $current_tab ) : ?>
 				<?php $this->render_help_tab(); ?>
+			<?php elseif ( 'logs' === $current_tab ) : ?>
+				<?php $this->render_logs_tab(); ?>
 			<?php else : ?>
 				<?php $this->render_settings_tab(); ?>
 			<?php endif; ?>
@@ -275,6 +340,23 @@ class BOL_Admin_Page {
 	 * @return void
 	 */
 	private function render_settings_tab() {
+		$business_units       = array();
+		$business_units_error = '';
+		$enable_sf_api_scope  = (bool) get_option( 'big_orange_pardot_enable_salesforce_api_scope', false );
+		$enable_api_logging   = BOL_Pardot_API::is_api_logging_enabled();
+
+		if ( BOL_Pardot_API::is_connected() ) {
+			$business_units = BOL_Pardot_API::get_business_units();
+			if ( is_wp_error( $business_units ) ) {
+				if ( 'business_units_not_supported' === $business_units->get_error_code() ) {
+					$business_units_error = __( 'This Salesforce org does not expose Business Units via API. Enter your Business Unit ID manually.', 'big-orange-pardot' );
+				} else {
+					$business_units_error = $business_units->get_error_message();
+				}
+				$business_units       = array();
+			}
+		}
+
 		?>
 		<?php $this->render_notices(); ?>
 
@@ -320,10 +402,49 @@ class BOL_Admin_Page {
 						<label for="bol_business_unit_id"><?php esc_html_e( 'Business Unit ID', 'big-orange-pardot' ); ?></label>
 					</th>
 					<td>
-						<input type="text" id="bol_business_unit_id" name="bol_business_unit_id" class="regular-text"
-							value="<?php echo esc_attr( BOL_Pardot_API::get_business_unit_id() ); ?>" autocomplete="off"
-							placeholder="0Uv..." />
-						<p class="description"><?php esc_html_e( '18-character ID starting with 0Uv. Found in Salesforce Setup under Account Engagement → Business Unit Setup.', 'big-orange-pardot' ); ?></p>
+						<?php if ( ! empty( $business_units ) ) : ?>
+							<select id="bol_business_unit_id" name="bol_business_unit_id" class="regular-text">
+								<option value=""><?php esc_html_e( '— Select a Business Unit —', 'big-orange-pardot' ); ?></option>
+								<?php foreach ( $business_units as $business_unit ) : ?>
+									<option value="<?php echo esc_attr( $business_unit['id'] ); ?>" <?php selected( BOL_Pardot_API::get_business_unit_id(), $business_unit['id'] ); ?>>
+										<?php echo esc_html( $business_unit['name'] ); ?> (<?php echo esc_html( $business_unit['id'] ); ?>)
+									</option>
+								<?php endforeach; ?>
+							</select>
+							<p class="description"><?php esc_html_e( 'Business units were loaded automatically from Salesforce after connecting.', 'big-orange-pardot' ); ?></p>
+						<?php else : ?>
+							<input type="text" id="bol_business_unit_id" name="bol_business_unit_id" class="regular-text"
+								value="<?php echo esc_attr( BOL_Pardot_API::get_business_unit_id() ); ?>" autocomplete="off"
+								placeholder="0Uv..." />
+							<p class="description"><?php esc_html_e( '18-character ID starting with 0Uv. Connect first to auto-load your business units, or paste an ID manually from Salesforce Setup under Account Engagement → Business Unit Setup.', 'big-orange-pardot' ); ?></p>
+						<?php endif; ?>
+						<?php if ( '' !== $business_units_error ) : ?>
+							<p class="description" style="color:#b32d2e;"><?php echo esc_html( $business_units_error ); ?></p>
+						<?php endif; ?>
+					</td>
+				</tr>
+				<tr>
+					<th scope="row">
+						<label for="bol_enable_salesforce_api_scope"><?php esc_html_e( 'Auto-discover Business Units', 'big-orange-pardot' ); ?></label>
+					</th>
+					<td>
+						<label>
+							<input type="checkbox" id="bol_enable_salesforce_api_scope" name="bol_enable_salesforce_api_scope" value="1" <?php checked( $enable_sf_api_scope ); ?> />
+							<?php esc_html_e( 'Request Salesforce API scope (api) during connect so business units can be loaded automatically.', 'big-orange-pardot' ); ?>
+						</label>
+						<p class="description"><?php esc_html_e( 'If connecting fails with "invalid_scope", uncheck this and reconnect. You can still paste a Business Unit ID manually.', 'big-orange-pardot' ); ?></p>
+					</td>
+				</tr>
+				<tr>
+					<th scope="row">
+						<label for="bol_enable_api_logging"><?php esc_html_e( 'API Logging', 'big-orange-pardot' ); ?></label>
+					</th>
+					<td>
+						<label>
+							<input type="checkbox" id="bol_enable_api_logging" name="bol_enable_api_logging" value="1" <?php checked( $enable_api_logging ); ?> />
+							<?php esc_html_e( 'Log Salesforce/Pardot API requests to the uploads directory.', 'big-orange-pardot' ); ?>
+						</label>
+						<p class="description"><?php esc_html_e( 'Logs may contain metadata about requests and responses. Sensitive values like tokens and secrets are redacted.', 'big-orange-pardot' ); ?></p>
 					</td>
 				</tr>
 			</table>
@@ -342,6 +463,66 @@ class BOL_Admin_Page {
 
 		<?php $this->render_connection_section(); ?>
 		<?php $this->render_inspector_section(); ?>
+		<?php
+	}
+
+	/**
+	 * Renders the Logs tab content.
+	 *
+	 * @return void
+	 */
+	private function render_logs_tab() {
+		$log_path        = BOL_Pardot_API::get_api_log_path();
+		$log_exists      = '' !== $log_path && file_exists( $log_path );
+		$log_is_readable = $log_exists && is_readable( $log_path );
+		$log_size        = $log_exists ? (int) filesize( $log_path ) : 0;
+		$log_contents    = $log_is_readable ? BOL_Pardot_API::get_api_log_contents() : '';
+		?>
+		<?php $this->render_notices(); ?>
+
+		<h2><?php esc_html_e( 'API Logs', 'big-orange-pardot' ); ?></h2>
+		<p class="description">
+			<?php esc_html_e( 'Use this tab to inspect Salesforce/Pardot API activity when troubleshooting connection and data issues.', 'big-orange-pardot' ); ?>
+		</p>
+
+		<table class="form-table" role="presentation">
+			<tr>
+				<th scope="row"><?php esc_html_e( 'Logging status', 'big-orange-pardot' ); ?></th>
+				<td><?php echo BOL_Pardot_API::is_api_logging_enabled() ? esc_html__( 'Enabled', 'big-orange-pardot' ) : esc_html__( 'Disabled', 'big-orange-pardot' ); ?></td>
+			</tr>
+			<tr>
+				<th scope="row"><?php esc_html_e( 'Log file path', 'big-orange-pardot' ); ?></th>
+				<td><code><?php echo esc_html( '' !== $log_path ? $log_path : __( '(unavailable)', 'big-orange-pardot' ) ); ?></code></td>
+			</tr>
+			<?php if ( $log_exists ) : ?>
+				<tr>
+					<th scope="row"><?php esc_html_e( 'Log size', 'big-orange-pardot' ); ?></th>
+					<td><?php echo esc_html( size_format( $log_size ) ); ?></td>
+				</tr>
+			<?php endif; ?>
+		</table>
+
+		<form method="post" action="">
+			<?php wp_nonce_field( self::NONCE_LOGS ); ?>
+			<p class="submit">
+				<button type="submit" name="bol_clear_api_log" class="button button-secondary">
+					<?php esc_html_e( 'Delete Log and Disable Logging', 'big-orange-pardot' ); ?>
+				</button>
+			</p>
+		</form>
+
+		<?php if ( ! $log_exists ) : ?>
+			<p><?php esc_html_e( 'No log file exists yet.', 'big-orange-pardot' ); ?></p>
+		<?php elseif ( ! $log_is_readable ) : ?>
+			<div class="notice notice-error inline"><p>
+				<?php esc_html_e( 'The log file exists but is not readable by WordPress.', 'big-orange-pardot' ); ?>
+			</p></div>
+		<?php elseif ( '' === $log_contents ) : ?>
+			<p><?php esc_html_e( 'The log file is empty.', 'big-orange-pardot' ); ?></p>
+		<?php else : ?>
+			<p class="description"><?php esc_html_e( 'Showing the latest log content.', 'big-orange-pardot' ); ?></p>
+			<textarea readonly="readonly" class="large-text code" rows="24"><?php echo esc_textarea( $log_contents ); ?></textarea>
+		<?php endif; ?>
 		<?php
 	}
 
@@ -421,6 +602,7 @@ class BOL_Admin_Page {
 					<ul style="list-style: disc; margin-left: 2em;">
 						<li><strong>pardot_api</strong> — <?php esc_html_e( 'Access and manage your Pardot data', 'big-orange-pardot' ); ?></li>
 						<li><strong>refresh_token, offline_access</strong> — <?php esc_html_e( 'Perform requests at any time (allows token refresh without re-authorization)', 'big-orange-pardot' ); ?></li>
+						<li><strong>api</strong> — <?php esc_html_e( 'Optional: needed only if you want the plugin to auto-load Account Engagement Business Units.', 'big-orange-pardot' ); ?></li>
 					</ul>
 				</li>
 				<li><?php esc_html_e( 'Save the Connected App. Salesforce may take a few minutes to activate it.', 'big-orange-pardot' ); ?></li>
@@ -430,7 +612,7 @@ class BOL_Admin_Page {
 			<h3 id="bol-help-setup-step2"><?php esc_html_e( 'Step 2 — Find your Business Unit ID', 'big-orange-pardot' ); ?></h3>
 			<ol>
 				<li><?php esc_html_e( 'In Salesforce Setup, search for "Account Engagement" and go to Account Engagement → Business Unit Setup.', 'big-orange-pardot' ); ?></li>
-				<li><?php esc_html_e( 'Copy the Business Unit ID — it is an 18-character value beginning with 0Uv.', 'big-orange-pardot' ); ?></li>
+				<li><?php esc_html_e( 'Copy the Business Unit ID — it is an 18-character value beginning with 0Uv. If you prefer, you can skip this and let the plugin load business units automatically after you connect.', 'big-orange-pardot' ); ?></li>
 			</ol>
 
 			<h3 id="bol-help-setup-step3"><?php esc_html_e( 'Step 3 — Enter credentials and authorize', 'big-orange-pardot' ); ?></h3>
@@ -439,7 +621,7 @@ class BOL_Admin_Page {
 					<?php
 					printf(
 						/* translators: %s: link to the Settings tab */
-						esc_html__( 'Go to the %s tab and enter your Consumer Key, Consumer Secret, and Business Unit ID, then click Save Credentials.', 'big-orange-pardot' ),
+						esc_html__( 'Go to the %s tab and enter your Consumer Key and Consumer Secret. You can enter a Business Unit ID now, or let the plugin load available business units after connecting. Click Save Credentials.', 'big-orange-pardot' ),
 						'<a href="' . esc_url( $this->tab_url( 'settings' ) ) . '">' . esc_html__( 'Settings', 'big-orange-pardot' ) . '</a>'
 					);
 					?>
@@ -561,6 +743,9 @@ class BOL_Admin_Page {
 			</p>
 			<p>
 				<?php esc_html_e( 'The menu also includes a "Clear all cookies" link. Clicking it deletes all eight attribution cookies and reloads the page, so you can simulate a fresh visitor without opening a private browser window.', 'big-orange-pardot' ); ?>
+			</p>
+			<p>
+				<?php esc_html_e( 'For API troubleshooting, enable API Logging on the Settings tab. Request/response activity for Salesforce and Pardot is written to your uploads directory and can be viewed on the Logs tab. From that tab, "Delete Log and Disable Logging" removes the file and turns logging off.', 'big-orange-pardot' ); ?>
 			</p>
 			<p class="description">
 				<?php esc_html_e( 'The admin bar inspector is only visible to users with the manage_options capability and has no effect on site visitors.', 'big-orange-pardot' ); ?>
@@ -778,6 +963,11 @@ class BOL_Admin_Page {
 		$messages = array(
 			'saved'                => array( 'success', __( 'Credentials saved.', 'big-orange-pardot' ) ),
 			'connected'            => array( 'success', __( 'Successfully connected to Pardot!', 'big-orange-pardot' ) ),
+			'log_cleared'          => array( 'success', __( 'API log deleted and logging disabled.', 'big-orange-pardot' ) ),
+			'connected_business_unit_not_supported' => array( 'warning', __( 'Connected to Pardot. Business Unit auto-discovery is unavailable for this Salesforce org, so please enter your Business Unit ID manually.', 'big-orange-pardot' ) ),
+			'connected_business_unit_set' => array( 'success', __( 'Successfully connected to Pardot and automatically selected your Business Unit.', 'big-orange-pardot' ) ),
+			'connected_select_business_unit' => array( 'warning', __( 'Successfully connected to Pardot. Multiple Business Units were found, so please select one and save credentials.', 'big-orange-pardot' ) ),
+			'connected_business_unit_lookup_failed' => array( 'warning', sprintf( /* translators: %s: error message */ __( 'Connected to Pardot, but Business Unit lookup failed: %s', 'big-orange-pardot' ), esc_html( $error_msg ) ) ),
 			'disconnected'         => array( 'success', __( 'Disconnected from Pardot.', 'big-orange-pardot' ) ),
 			'oauth_state_mismatch' => array( 'error', __( 'OAuth state mismatch — possible CSRF attempt. Please try connecting again.', 'big-orange-pardot' ) ),
 			'oauth_error'          => array( 'error', sprintf( /* translators: %s: error message */ __( 'OAuth error: %s', 'big-orange-pardot' ), esc_html( $error_msg ) ) ),

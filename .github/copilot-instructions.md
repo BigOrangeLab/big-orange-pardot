@@ -8,11 +8,11 @@ This plugin provides Gutenberg blocks for embedding and configuring Pardot (Acco
 
 - `big-orange-pardot.php`: Main plugin bootstrap. Registers blocks, REST routes, admin page, scripts, and admin bar attribution inspector.
 - `src/`: Source of truth for block code (JSX/SCSS/PHP render templates).
-  - `src/pardot-form/`: Parent form block (`bigorangelab/pardot-form`) — two-path editor UX: **connected** mode (OAuth active) shows the handler dropdown, auto-inserts any missing fields when a handler is selected, displays a sync status ("X of Y Pardot fields present"), an "Add missing field(s)" button, and a "Replace all with Pardot fields" reset button; **unconnected** mode shows a prominent URL input and a "Common Pardot Fields" panel for one-click insertion of 8 standard Pardot field names. `existingFieldNames` from `useSelect(getBlocks(clientId))` drives both sync status and common-fields presence checks. Stores shared field style attributes and emits them as `--bol-*` CSS custom properties. Also owns all submit button attributes — rendered inline, not as a separate child block. `save.js` returns `<InnerBlocks.Content />` (not `null`) to serialize inner blocks.
-  - `src/pardot-field/`: Child field block (`bigorangelab/pardot-field`) — attributes: `fieldName`, `label`, `fieldType` (text/email/tel/textarea), `isRequired`, `placeholder`, `width` (full/half). The "Field Styling" panel in `edit.js` reads and writes style attributes on the **parent** block (via `getBlockRootClientId`/`updateBlockAttributes`), keeping styling consistent across all fields. `render.php` does NOT call `get_block_wrapper_attributes()` so the CSS grid on the parent `<form>` applies cleanly.
+    - `src/pardot-form/`: Parent form block (`bigorangelab/pardot-form`) — two-path editor UX: **connected** mode (OAuth active) shows the handler dropdown, auto-inserts any missing fields when a handler is selected, displays a sync status ("X of Y Pardot fields present"), an "Add missing field(s)" button, and a "Replace all with Pardot fields" reset button; **unconnected** mode shows a prominent URL input and a "Common Pardot Fields" panel for one-click insertion of 8 standard Pardot field names. `existingFieldNames` from `useSelect(getBlocks(clientId))` drives both sync status and common-fields presence checks. Stores shared field style attributes and emits them as `--bol-*` CSS custom properties. Also owns all submit button attributes — rendered inline, not as a separate child block. `save.js` returns `<InnerBlocks.Content />` (not `null`) to serialize inner blocks.
+    - `src/pardot-field/`: Child field block (`bigorangelab/pardot-field`) — attributes: `fieldName`, `label`, `fieldType` (text/email/tel/textarea), `isRequired`, `placeholder`, `width` (full/half). The "Field Styling" panel in `edit.js` reads and writes style attributes on the **parent** block (via `getBlockRootClientId`/`updateBlockAttributes`), keeping styling consistent across all fields. `render.php` does NOT call `get_block_wrapper_attributes()` so the CSS grid on the parent `<form>` applies cleanly.
 - `includes/`: PHP classes for Pardot API integration and plugin admin/settings UI.
-  - `includes/class-bol-pardot-api.php`: Static API client — OAuth token management, form handler cache, form handler fields.
-  - `includes/class-bol-admin-page.php`: Two-tab settings page (Settings + Help). **Keep `render_help_tab()` current whenever plugin behaviour changes.**
+    - `includes/class-bol-pardot-api.php`: Static API client — OAuth token management, optional Salesforce Business Unit discovery/cache (requires `api` scope), optional JSONL API request logging to uploads (sensitive values redacted), form handler cache, form handler fields.
+    - `includes/class-bol-admin-page.php`: Three-tab settings page (Settings + Help + Logs), including connect-flow Business Unit auto-discovery, API logging toggle, and log viewer/delete controls. **Keep `render_help_tab()` current whenever plugin behaviour changes.**
 - `src/attribution.js`: Front-end attribution and hidden field population script. Built to `build/attribution.js`.
 - `src/admin-bar-attribution.js`: Admin bar "Clear all cookies" handler — expires all 8 attribution cookies and reloads. Built to `build/admin-bar-attribution.js`. Imports `src/admin-bar-attribution.scss`.
 - `src/admin-bar-attribution.scss`: Styles for the admin bar Attribution panel. Imported from `admin-bar-attribution.js`; built to `build/admin-bar-attribution.css`.
@@ -25,6 +25,7 @@ The parent block declares `"providesContext": { "big-orange-pardot/formUrl": "pa
 ## CSS grid layout
 
 The parent `<form>` uses a two-column CSS grid. Child block wrapper divs are direct grid children:
+
 - `.bol-pardot-field--full` → `grid-column: span 2`
 - `.bol-pardot-field--half` → `grid-column: span 1`
 - `.bol-pardot-submit` → `grid-column: span 2`
@@ -34,6 +35,7 @@ In the block editor, Gutenberg wraps each inner block in a `.wp-block` div, whic
 ## Field styling CSS custom properties
 
 The parent block wrapper emits these custom properties, consumed by `style.scss`:
+
 - `--bol-label-color` — label text colour
 - `--bol-input-bg` — input/textarea background
 - `--bol-border-color` — input/textarea border colour

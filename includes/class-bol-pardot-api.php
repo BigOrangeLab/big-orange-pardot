@@ -39,6 +39,20 @@ class BOL_Pardot_API {
 	const AUTH_URL = 'https://login.salesforce.com/services/oauth2/authorize';
 
 	/**
+	 * Log file name for optional API request logging.
+	 *
+	 * @var string
+	 */
+	const LOG_FILE_NAME = 'big-orange-pardot-api.log';
+
+	/**
+	 * Salesforce REST API version used for Business Unit discovery.
+	 *
+	 * @var string
+	 */
+	const SALESFORCE_API_VERSION = 'v62.0';
+
+	/**
 	 * Attribution field names the plugin submits via hidden inputs.
 	 * Used to flag mapped vs. unmapped fields in the admin inspector.
 	 *
@@ -118,7 +132,191 @@ class BOL_Pardot_API {
 		delete_option( 'big_orange_pardot_access_token' );
 		delete_option( 'big_orange_pardot_refresh_token' );
 		delete_option( 'big_orange_pardot_token_expires' );
+		delete_option( 'big_orange_pardot_instance_url' );
 		delete_transient( 'big_orange_pardot_form_handlers' );
+		delete_transient( 'big_orange_pardot_business_units' );
+	}
+
+	/**
+	 * Returns true when API logging is enabled in settings.
+	 *
+	 * @return bool
+	 */
+	public static function is_api_logging_enabled() {
+		return (bool) get_option( 'big_orange_pardot_enable_api_logging', false );
+	}
+
+	/**
+	 * Returns the full path to the API log file in uploads, or empty string on failure.
+	 *
+	 * @return string
+	 */
+	public static function get_api_log_path() {
+		$uploads = wp_upload_dir();
+
+		if ( ! empty( $uploads['error'] ) || empty( $uploads['basedir'] ) ) {
+			return '';
+		}
+
+		return trailingslashit( $uploads['basedir'] ) . self::LOG_FILE_NAME;
+	}
+
+	/**
+	 * Returns API log contents, optionally truncated to the latest bytes.
+	 *
+	 * @param int $max_bytes Maximum bytes to return from the end of the file.
+	 * @return string
+	 */
+	public static function get_api_log_contents( $max_bytes = 500000 ) {
+		$path = self::get_api_log_path();
+
+		if ( '' === $path || ! file_exists( $path ) || ! is_readable( $path ) ) {
+			return '';
+		}
+
+		$size = filesize( $path );
+		if ( false === $size ) {
+			return '';
+		}
+
+		if ( $size <= $max_bytes ) {
+			$contents = file_get_contents( $path );
+			return false === $contents ? '' : (string) $contents;
+		}
+
+		$handle = fopen( $path, 'rb' );
+		if ( false === $handle ) {
+			return '';
+		}
+
+		fseek( $handle, -1 * (int) $max_bytes, SEEK_END );
+		$contents = fread( $handle, (int) $max_bytes );
+		fclose( $handle );
+
+		if ( false === $contents ) {
+			return '';
+		}
+
+		$contents = (string) $contents;
+
+		// Avoid showing a cut-off first line in the UI.
+		$first_newline = strpos( $contents, "\n" );
+		if ( false !== $first_newline ) {
+			$contents = substr( $contents, $first_newline + 1 );
+		}
+
+		return $contents;
+	}
+
+	/**
+	 * Deletes the API log file if present.
+	 *
+	 * @return bool True when deleted or file was absent.
+	 */
+	public static function clear_api_log() {
+		$path = self::get_api_log_path();
+
+		if ( '' === $path || ! file_exists( $path ) ) {
+			return true;
+		}
+
+		return (bool) wp_delete_file( $path );
+	}
+
+	/**
+	 * Sanitizes potentially sensitive values before writing log entries.
+	 *
+	 * @param mixed $value Value to sanitize.
+	 * @return mixed
+	 */
+	private static function sanitize_log_value( $value ) {
+		$sensitive_keys = array(
+			'authorization',
+			'access_token',
+			'refresh_token',
+			'client_secret',
+			'password',
+			'code_verifier',
+		);
+
+		if ( is_array( $value ) ) {
+			$sanitized = array();
+			foreach ( $value as $key => $item ) {
+				$key_lc = strtolower( (string) $key );
+				if ( in_array( $key_lc, $sensitive_keys, true ) ) {
+					$sanitized[ $key ] = '[redacted]';
+					continue;
+				}
+
+				$sanitized[ $key ] = self::sanitize_log_value( $item );
+			}
+
+			return $sanitized;
+		}
+
+		if ( is_string( $value ) ) {
+			if ( strlen( $value ) > 5000 ) {
+				return substr( $value, 0, 5000 ) . '...[truncated]';
+			}
+
+			return $value;
+		}
+
+		return $value;
+	}
+
+	/**
+	 * Writes a single structured JSON log line for an API request.
+	 *
+	 * @param string          $service Service label (salesforce|pardot).
+	 * @param string          $method  HTTP method.
+	 * @param string          $url     Request URL.
+	 * @param array           $args    Sanitized request args.
+	 * @param array|\WP_Error $result  HTTP response or WP_Error.
+	 * @return void
+	 */
+	private static function log_http_transaction( $service, $method, $url, $args, $result ) {
+		if ( ! self::is_api_logging_enabled() ) {
+			return;
+		}
+
+		$path = self::get_api_log_path();
+		if ( '' === $path ) {
+			return;
+		}
+
+		$entry = array(
+			'timestamp' => gmdate( 'c' ),
+			'service'   => $service,
+			'method'    => strtoupper( $method ),
+			'url'       => $url,
+			'request'   => self::sanitize_log_value( $args ),
+		);
+
+		if ( is_wp_error( $result ) ) {
+			$entry['error'] = $result->get_error_message();
+		} else {
+			$body              = wp_remote_retrieve_body( $result );
+			$entry['status']   = (int) wp_remote_retrieve_response_code( $result );
+			$entry['response'] = self::sanitize_log_value( json_decode( $body, true ) ?: $body );
+		}
+
+		$line = wp_json_encode( $entry, JSON_UNESCAPED_SLASHES );
+		if ( false === $line ) {
+			return;
+		}
+
+		$line .= PHP_EOL;
+
+		$file = @fopen( $path, 'ab' );
+		if ( false === $file ) {
+			return;
+		}
+
+		flock( $file, LOCK_EX );
+		fwrite( $file, $line );
+		flock( $file, LOCK_UN );
+		fclose( $file );
 	}
 
 	// -------------------------------------------------------------------------
@@ -149,6 +347,12 @@ class BOL_Pardot_API {
 	public static function get_authorize_url( $redirect_uri, $state ) {
 		$code_verifier  = self::base64url_encode( random_bytes( 32 ) );
 		$code_challenge = self::base64url_encode( hash( 'sha256', $code_verifier, true ) );
+		$scopes         = 'pardot_api refresh_token';
+
+		// Opt-in scope needed for Salesforce REST queries (e.g. Business Unit auto-discovery).
+		if ( (bool) get_option( 'big_orange_pardot_enable_salesforce_api_scope', false ) ) {
+			$scopes = 'api pardot_api refresh_token';
+		}
 
 		update_option( 'big_orange_pardot_pkce_verifier', $code_verifier, false );
 
@@ -157,7 +361,7 @@ class BOL_Pardot_API {
 				'response_type'         => 'code',
 				'client_id'             => self::get_client_id(),
 				'redirect_uri'          => rawurlencode( $redirect_uri ),
-				'scope'                 => 'pardot_api refresh_token',
+				'scope'                 => $scopes,
 				'state'                 => $state,
 				'code_challenge'        => $code_challenge,
 				'code_challenge_method' => 'S256',
@@ -197,6 +401,8 @@ class BOL_Pardot_API {
 			array( 'body' => $body )
 		);
 
+		self::log_http_transaction( 'salesforce', 'POST', self::TOKEN_URL, array( 'body' => $body ), $response );
+
 		return self::handle_token_response( $response );
 	}
 
@@ -221,6 +427,21 @@ class BOL_Pardot_API {
 					'refresh_token' => $refresh_token,
 				),
 			)
+		);
+
+		self::log_http_transaction(
+			'salesforce',
+			'POST',
+			self::TOKEN_URL,
+			array(
+				'body' => array(
+					'grant_type'    => 'refresh_token',
+					'client_id'     => self::get_client_id(),
+					'client_secret' => self::get_client_secret(),
+					'refresh_token' => $refresh_token,
+				),
+			),
+			$response
 		);
 
 		return self::handle_token_response( $response );
@@ -248,11 +469,26 @@ class BOL_Pardot_API {
 		update_option( 'big_orange_pardot_access_token', $body['access_token'], false );
 		update_option( 'big_orange_pardot_token_expires', time() + (int) ( $body['expires_in'] ?? 3600 ), false );
 
+		if ( ! empty( $body['instance_url'] ) ) {
+			update_option( 'big_orange_pardot_instance_url', esc_url_raw( (string) $body['instance_url'] ), false );
+		}
+
 		if ( ! empty( $body['refresh_token'] ) ) {
 			update_option( 'big_orange_pardot_refresh_token', $body['refresh_token'], false );
 		}
 
+		delete_transient( 'big_orange_pardot_business_units' );
+
 		return true;
+	}
+
+	/**
+	 * Returns the stored Salesforce instance URL.
+	 *
+	 * @return string
+	 */
+	public static function get_salesforce_instance_url() {
+		return self::get_opt( 'instance_url' );
 	}
 
 	/**
@@ -307,6 +543,20 @@ class BOL_Pardot_API {
 				),
 				'timeout' => 15,
 			)
+		);
+
+		self::log_http_transaction(
+			'pardot',
+			'GET',
+			$url,
+			array(
+				'headers' => array(
+					'Authorization'           => 'Bearer ' . $token,
+					'Pardot-Business-Unit-Id' => self::get_business_unit_id(),
+				),
+				'timeout' => 15,
+			),
+			$response
 		);
 
 		if ( is_wp_error( $response ) ) {
@@ -392,5 +642,107 @@ class BOL_Pardot_API {
 		}
 
 		return (array) ( $response['values'] ?? array() );
+	}
+
+	// -------------------------------------------------------------------------
+	// Salesforce Business Units
+	// -------------------------------------------------------------------------
+
+	/**
+	 * Returns Pardot Business Units from Salesforce, optionally forcing a refresh.
+	 *
+	 * @param bool $force_refresh Whether to bypass the transient cache.
+	 * @return array|\WP_Error Array of arrays with keys: id, name.
+	 */
+	public static function get_business_units( $force_refresh = false ) {
+		if ( ! $force_refresh ) {
+			$cached = get_transient( 'big_orange_pardot_business_units' );
+			if ( false !== $cached ) {
+				return $cached;
+			}
+		}
+
+		$token = self::get_access_token();
+		if ( is_wp_error( $token ) ) {
+			return $token;
+		}
+
+		$instance_url = self::get_salesforce_instance_url();
+		if ( '' === $instance_url ) {
+			return new \WP_Error( 'missing_instance_url', __( 'Salesforce instance URL is not available yet. Please reconnect to Salesforce.', 'big-orange-pardot' ) );
+		}
+
+		$query = 'SELECT Id, Name FROM PardotBusinessUnit ORDER BY Name';
+		$url   = trailingslashit( untrailingslashit( $instance_url ) ) . 'services/data/' . self::SALESFORCE_API_VERSION . '/query';
+		$url   = add_query_arg( 'q', $query, $url );
+
+		$response = wp_remote_get(
+			$url,
+			array(
+				'headers' => array(
+					'Authorization' => 'Bearer ' . $token,
+				),
+				'timeout' => 15,
+			)
+		);
+
+		self::log_http_transaction(
+			'salesforce',
+			'GET',
+			$url,
+			array(
+				'headers' => array(
+					'Authorization' => 'Bearer ' . $token,
+				),
+				'timeout' => 15,
+			),
+			$response
+		);
+
+		if ( is_wp_error( $response ) ) {
+			return $response;
+		}
+
+		$code = wp_remote_retrieve_response_code( $response );
+		$body = json_decode( wp_remote_retrieve_body( $response ), true );
+
+		if ( (int) $code < 200 || (int) $code >= 300 ) {
+			if ( ! empty( $body[0]['message'] ) ) {
+				$message = (string) $body[0]['message'];
+			} elseif ( ! empty( $body['message'] ) ) {
+				$message = (string) $body['message'];
+			} else {
+				$message = sprintf(
+					/* translators: %d: HTTP status code */
+					__( 'Salesforce API returned HTTP %d while loading Business Units.', 'big-orange-pardot' ),
+					$code
+				);
+			}
+
+			if ( false !== stripos( $message, 'sObject type' ) && false !== stripos( $message, 'PardotBusinessUnit' ) && false !== stripos( $message, 'not supported' ) ) {
+				return new \WP_Error(
+					'business_units_not_supported',
+					__( 'Connected to Salesforce, but this org cannot query Account Engagement Business Units via API. Please paste your Business Unit ID manually.', 'big-orange-pardot' )
+				);
+			}
+
+			return new \WP_Error( 'business_units_error', $message );
+		}
+
+		$business_units = array();
+		foreach ( (array) ( $body['records'] ?? array() ) as $record ) {
+			if ( empty( $record['Id'] ) ) {
+				continue;
+			}
+
+			$business_units[] = array(
+				'id'   => (string) $record['Id'],
+				'name' => (string) ( $record['Name'] ?? $record['Id'] ),
+			);
+		}
+
+		set_transient( 'big_orange_pardot_business_units', $business_units, 15 * MINUTE_IN_SECONDS );
+
+		return $business_units;
 	}
 }

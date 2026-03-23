@@ -54,9 +54,11 @@ Copy (or symlink) the directory into your WordPress `wp-content/plugins/` folder
 
 ## Connecting to Pardot
 
-The plugin connects to Pardot via the Salesforce OAuth 2.0 Web Server Flow. Full setup instructions — including how to create a Salesforce Connected App and find your Business Unit ID — are on the plugin's **Settings → Big Orange Pardot → Help** tab after activation.
+The plugin connects to Pardot via the Salesforce OAuth 2.0 Web Server Flow. Optionally, it can auto-query and populate available Business Units when your Connected App allows the Salesforce `api` scope. Full setup instructions are on the plugin's **Settings → Big Orange Pardot → Help** tab after activation.
 
 You can also paste a form handler URL directly into the block without connecting to Pardot, which skips the OAuth setup entirely.
+
+For troubleshooting, you can enable API logging in plugin settings. Salesforce/Pardot requests are written to the WordPress uploads directory and viewable from the plugin's Logs tab, where you can also delete the log and disable logging.
 
 ---
 

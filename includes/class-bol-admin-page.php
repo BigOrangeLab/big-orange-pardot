@@ -1039,17 +1039,17 @@ class BOL_Admin_Page {
 		$error_msg = isset( $_GET['error'] ) ? sanitize_text_field( wp_unslash( $_GET['error'] ) ) : '';
 
 		$messages = array(
-			'saved'                   => array( 'success', __( 'Credentials saved.', 'big-orange-pardot' ) ),
-			'wrong_id_org_not_unit'   => array( 'error', __( 'That looks like a Salesforce Organization ID (starts with 00D), not a Business Unit ID (starts with 0Uv). Find the correct 18-character Business Unit ID under Salesforce Setup → Account Engagement → Business Unit Setup.', 'big-orange-pardot' ) ),
-			'connected'            => array( 'success', __( 'Successfully connected to Pardot!', 'big-orange-pardot' ) ),
-			'log_cleared'          => array( 'success', __( 'API log deleted and logging disabled.', 'big-orange-pardot' ) ),
+			'saved'                                 => array( 'success', __( 'Credentials saved.', 'big-orange-pardot' ) ),
+			'wrong_id_org_not_unit'                 => array( 'error', __( 'That looks like a Salesforce Organization ID (starts with 00D), not a Business Unit ID (starts with 0Uv). Find the correct 18-character Business Unit ID under Salesforce Setup → Account Engagement → Business Unit Setup.', 'big-orange-pardot' ) ),
+			'connected'                             => array( 'success', __( 'Successfully connected to Pardot!', 'big-orange-pardot' ) ),
+			'log_cleared'                           => array( 'success', __( 'API log deleted and logging disabled.', 'big-orange-pardot' ) ),
 			'connected_business_unit_not_supported' => array( 'warning', __( 'Connected to Pardot. Business Unit auto-discovery is unavailable for this Salesforce org, so please enter your Business Unit ID manually.', 'big-orange-pardot' ) ),
-			'connected_business_unit_set' => array( 'success', __( 'Successfully connected to Pardot and automatically selected your Business Unit.', 'big-orange-pardot' ) ),
-			'connected_select_business_unit' => array( 'warning', __( 'Successfully connected to Pardot. Multiple Business Units were found, so please select one and save credentials.', 'big-orange-pardot' ) ),
+			'connected_business_unit_set'           => array( 'success', __( 'Successfully connected to Pardot and automatically selected your Business Unit.', 'big-orange-pardot' ) ),
+			'connected_select_business_unit'        => array( 'warning', __( 'Successfully connected to Pardot. Multiple Business Units were found, so please select one and save credentials.', 'big-orange-pardot' ) ),
 			'connected_business_unit_lookup_failed' => array( 'warning', sprintf( /* translators: %s: error message */ __( 'Connected to Pardot, but Business Unit lookup failed: %s', 'big-orange-pardot' ), esc_html( $error_msg ) ) ),
-			'disconnected'         => array( 'success', __( 'Disconnected from Pardot.', 'big-orange-pardot' ) ),
-			'oauth_state_mismatch' => array( 'error', __( 'OAuth state mismatch — possible CSRF attempt. Please try connecting again.', 'big-orange-pardot' ) ),
-			'oauth_error'          => array( 'error', sprintf( /* translators: %s: error message */ __( 'OAuth error: %s', 'big-orange-pardot' ), esc_html( $error_msg ) ) ),
+			'disconnected'                          => array( 'success', __( 'Disconnected from Pardot.', 'big-orange-pardot' ) ),
+			'oauth_state_mismatch'                  => array( 'error', __( 'OAuth state mismatch — possible CSRF attempt. Please try connecting again.', 'big-orange-pardot' ) ),
+			'oauth_error'                           => array( 'error', sprintf( /* translators: %s: error message */ __( 'OAuth error: %s', 'big-orange-pardot' ), esc_html( $error_msg ) ) ),
 		);
 
 		if ( isset( $messages[ $notice ] ) ) {

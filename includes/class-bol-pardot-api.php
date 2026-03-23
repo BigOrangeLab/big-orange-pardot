@@ -298,11 +298,11 @@ class BOL_Pardot_API {
 		}
 
 		// Fallback scanner for concatenated JSON objects without reliable newlines.
-		$length       = strlen( $contents );
-		$depth        = 0;
-		$start        = -1;
-		$in_string    = false;
-		$is_escaped   = false;
+		$length     = strlen( $contents );
+		$depth      = 0;
+		$start      = -1;
+		$in_string  = false;
+		$is_escaped = false;
 
 		for ( $i = 0; $i < $length; $i++ ) {
 			$char = $contents[ $i ];
@@ -334,12 +334,12 @@ class BOL_Pardot_API {
 				if ( 0 === $depth ) {
 					$start = $i;
 				}
-				$depth++;
+				++$depth;
 				continue;
 			}
 
 			if ( '}' === $char && $depth > 0 ) {
-				$depth--;
+				--$depth;
 				if ( 0 === $depth && $start >= 0 ) {
 					$chunk   = substr( $contents, $start, $i - $start + 1 );
 					$decoded = json_decode( $chunk, true );
@@ -389,7 +389,7 @@ class BOL_Pardot_API {
 
 		$summary = implode( ' | ', array_unique( $summary_parts ) );
 
-		$request = isset( $entry['request'] ) ? $entry['request'] : array();
+		$request         = isset( $entry['request'] ) ? $entry['request'] : array();
 		$request_summary = '';
 		if ( is_array( $request ) && isset( $request['body']['grant_type'] ) ) {
 			$request_summary = sprintf(
@@ -399,7 +399,7 @@ class BOL_Pardot_API {
 			);
 		}
 
-		$url = isset( $entry['url'] ) ? (string) $entry['url'] : '';
+		$url  = isset( $entry['url'] ) ? (string) $entry['url'] : '';
 		$path = '';
 		if ( '' !== $url ) {
 			$parsed = wp_parse_url( $url );
@@ -409,17 +409,17 @@ class BOL_Pardot_API {
 		}
 
 		return array(
-			'timestamp'        => isset( $entry['timestamp'] ) ? (string) $entry['timestamp'] : '',
-			'service'          => isset( $entry['service'] ) ? (string) $entry['service'] : '',
-			'method'           => isset( $entry['method'] ) ? (string) $entry['method'] : '',
-			'status'           => '' !== $status ? $status : $response_code,
-			'url'              => $url,
-			'path'             => $path,
-			'summary'          => $summary,
-			'request_summary'  => $request_summary,
-			'raw_request'      => wp_json_encode( $request, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES ),
-			'raw_response'     => wp_json_encode( isset( $entry['response'] ) ? $entry['response'] : array(), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES ),
-			'raw_error'        => $error,
+			'timestamp'       => isset( $entry['timestamp'] ) ? (string) $entry['timestamp'] : '',
+			'service'         => isset( $entry['service'] ) ? (string) $entry['service'] : '',
+			'method'          => isset( $entry['method'] ) ? (string) $entry['method'] : '',
+			'status'          => '' !== $status ? $status : $response_code,
+			'url'             => $url,
+			'path'            => $path,
+			'summary'         => $summary,
+			'request_summary' => $request_summary,
+			'raw_request'     => wp_json_encode( $request, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES ),
+			'raw_response'    => wp_json_encode( isset( $entry['response'] ) ? $entry['response'] : array(), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES ),
+			'raw_error'       => $error,
 		);
 	}
 

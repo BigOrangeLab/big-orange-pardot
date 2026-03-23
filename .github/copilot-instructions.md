@@ -13,9 +13,9 @@ This plugin provides Gutenberg blocks for embedding and configuring Pardot (Acco
 - `includes/`: PHP classes for Pardot API integration and plugin admin/settings UI.
   - `includes/class-bol-pardot-api.php`: Static API client — OAuth token management, form handler cache, form handler fields.
   - `includes/class-bol-admin-page.php`: Two-tab settings page (Settings + Help). **Keep `render_help_tab()` current whenever plugin behaviour changes.**
-- `assets/attribution.js`: Front-end attribution and hidden field population script. No build step.
-- `assets/admin-bar-attribution.js`: Admin bar "Clear all cookies" handler — expires all 8 attribution cookies and reloads. No build step.
-- `assets/admin-bar-attribution.css`: Styles for the admin bar Attribution panel. No build step.
+- `src/attribution.js`: Front-end attribution and hidden field population script. Built to `build/attribution.js`.
+- `src/admin-bar-attribution.js`: Admin bar "Clear all cookies" handler — expires all 8 attribution cookies and reloads. Built to `build/admin-bar-attribution.js`. Imports `src/admin-bar-attribution.css`.
+- `src/admin-bar-attribution.css`: Styles for the admin bar Attribution panel. Imported from `admin-bar-attribution.js`; built to `build/admin-bar-attribution.css`.
 - `build/`: Generated assets and block manifest output. Treat as generated artifacts.
 
 ## Block context flow
@@ -59,7 +59,7 @@ Both require `manage_options`.
 
 ## Working guidance
 
-- Prefer editing source files in `src/`, `includes/`, `assets/`, and `big-orange-pardot.php`.
+- Prefer editing source files in `src/`, `includes/`, and `big-orange-pardot.php`.
 - Do not hand-edit generated files in `build/` unless explicitly requested.
 - If source changes affect block registration or front-end/editor assets, run `npm run build` to regenerate build output.
 - When updating `CLAUDE.md`, also update this file to match.
@@ -77,7 +77,7 @@ Follows **WordPress Core coding standards** throughout, enforced by linting.
 ## Commit and review guidance
 
 - For commit message generation and code review summaries, ignore changes under `build/` by default.
-- Focus commit/review descriptions on meaningful source changes in `src/`, `includes/`, `assets/`, and root plugin PHP files.
+- Focus commit/review descriptions on meaningful source changes in `src/`, `includes/`, and root plugin PHP files.
 - Only discuss `build/` changes when they are explicitly requested or required to explain release packaging artifacts.
 
 ## Quality checks

@@ -42,7 +42,7 @@ add_action( 'init', 'create_block_big_orange_pardot_block_init' );
 function big_orange_pardot_enqueue_attribution() {
 	wp_enqueue_script(
 		'big-orange-pardot-attribution',
-		plugins_url( 'assets/attribution.js', __FILE__ ),
+		plugins_url( 'build/attribution.js', __FILE__ ),
 		array(),
 		'0.1.0',
 		array( 'strategy' => 'defer' )
@@ -169,14 +169,14 @@ function bol_enqueue_admin_bar_assets() {
 	}
 	wp_enqueue_script(
 		'big-orange-pardot-admin-bar',
-		plugins_url( 'assets/admin-bar-attribution.js', __FILE__ ),
+		plugins_url( 'build/admin-bar-attribution.js', __FILE__ ),
 		array(),
 		'1.0.0',
 		array( 'strategy' => 'defer' )
 	);
 	wp_enqueue_style(
 		'big-orange-pardot-admin-bar',
-		plugins_url( 'assets/admin-bar-attribution.css', __FILE__ ),
+		plugins_url( 'build/admin-bar-attribution.css', __FILE__ ),
 		array( 'admin-bar' ),
 		'1.0.0'
 	);

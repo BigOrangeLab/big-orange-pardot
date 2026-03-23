@@ -28,9 +28,9 @@ The plugin provides two block types:
 | `src/pardot-form/save.js` | Returns `<InnerBlocks.Content />` (serializes inner blocks to post_content) |
 | `src/pardot-form/editor.scss` | Editor-only styles — CSS grid mirroring via `:has()` on `.block-editor-block-list__layout` so half-width fields sit side-by-side in the editor |
 | `src/pardot-form/style.scss` | Frontend (and editor) styles — CSS grid two-column layout on `form`; all field colours driven by `--bol-*` CSS custom properties |
-| `assets/attribution.js` | Global cookie capture + hidden field population (enqueued on every page, no build step) |
-| `assets/admin-bar-attribution.js` | Admin bar "Clear all cookies" click handler — expires all 8 attribution cookies and reloads (no build step, enqueued via `bol_enqueue_admin_bar_assets()`) |
-| `assets/admin-bar-attribution.css` | Styles for the admin bar Attribution panel — field name/value layout, dimmed empty state, red "Clear all" action (no build step) |
+| `src/attribution.js` | Global cookie capture + hidden field population (built to `build/attribution.js`, enqueued on every frontend page) |
+| `src/admin-bar-attribution.js` | Admin bar "Clear all cookies" click handler — expires all 8 attribution cookies and reloads (built to `build/admin-bar-attribution.js`, enqueued via `bol_enqueue_admin_bar_assets()`) |
+| `src/admin-bar-attribution.css` | Styles for the admin bar Attribution panel — imported from `admin-bar-attribution.js`, built to `build/admin-bar-attribution.css` |
 
 **Submit button pattern:** The submit button is part of the parent `pardot-form` block, not a separate child block. Button style attributes (`submitLabel`, `buttonTextColor`, `buttonBgColor`, `buttonBgGradient`, `buttonHoverBgColor`, `buttonBorderColor`, `buttonBorderWidth`, `buttonBorderStyle`, `buttonBorderRadius`, `buttonPadding`, `buttonShadow`, `buttonAlignment`) are all stored on the parent block. The editor renders the button as an inline `RichText` element; `render.php` outputs it as a `<button type="submit">` with inline styles. Hover color is emitted as `--bol-btn-hover-bg` CSS custom property.
 
@@ -61,8 +61,8 @@ The plugin provides two block types:
   - `GET /wp-json/big-orange-pardot/v1/form-handlers` — requires `manage_options`. Powers the block editor handler dropdown.
   - `GET /wp-json/big-orange-pardot/v1/form-handler-fields?handler_id={id}` — requires `manage_options`. Powers the "Import fields from Pardot" button in the editor.
 - **Help tab:** `BOL_Admin_Page::render_help_tab()` contains user-facing setup documentation. **Update it whenever the plugin's behaviour, setup steps, form fields, or attribution tracking changes.** This includes any significant new features — e.g. new block controls, new field options, changes to how the form or submit button work.
-- **Attribution fields:** 8 hidden fields populated by `assets/attribution.js` cookies: `utm_source`, `utm_medium`, `utm_campaign`, `utm_term`, `utm_content`, `referrer_url`, `landing_page_url`, `gclid`. The field names are also listed in `BOL_Pardot_API::ATTRIBUTION_FIELDS` (PHP constant).
-- **Admin bar inspector:** `bol_register_admin_bar_node()` in `big-orange-pardot.php` adds an "Attribution (N)" menu to the WP admin bar (visible to `manage_options` users only, on both frontend and wp-admin). PHP reads `$_COOKIE` for the 8 attribution values; `assets/admin-bar-attribution.js` handles the "Clear all cookies" button (expires cookies + reloads). Styles in `assets/admin-bar-attribution.css`; both enqueued by `bol_enqueue_admin_bar_assets()` (hooked to `wp_enqueue_scripts` and `admin_enqueue_scripts`).
+- **Attribution fields:** 8 hidden fields populated by `src/attribution.js` cookies: `utm_source`, `utm_medium`, `utm_campaign`, `utm_term`, `utm_content`, `referrer_url`, `landing_page_url`, `gclid`. The field names are also listed in `BOL_Pardot_API::ATTRIBUTION_FIELDS` (PHP constant).
+- **Admin bar inspector:** `bol_register_admin_bar_node()` in `big-orange-pardot.php` adds an "Attribution (N)" menu to the WP admin bar (visible to `manage_options` users only, on both frontend and wp-admin). PHP reads `$_COOKIE` for the 8 attribution values; `src/admin-bar-attribution.js` handles the "Clear all cookies" button (expires cookies + reloads). Styles in `src/admin-bar-attribution.css` (CSS imported from JS, built alongside it); both enqueued by `bol_enqueue_admin_bar_assets()` (hooked to `wp_enqueue_scripts` and `admin_enqueue_scripts`).
 
 ## Build System
 

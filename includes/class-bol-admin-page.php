@@ -655,6 +655,8 @@ class BOL_Admin_Page {
 			<h2 id="bol-help-overview"><?php esc_html_e( 'Overview', 'big-orange-pardot' ); ?></h2>
 			<p><?php esc_html_e( 'Big Orange Pardot adds a Gutenberg block that embeds a Pardot (Account Engagement) form directly on any page or post. Rather than using an iframe, it renders a native HTML form that submits directly to your Pardot form handler, giving you full control over styling and layout.', 'big-orange-pardot' ); ?></p>
 			<p><?php esc_html_e( 'The plugin also automatically captures marketing attribution data (UTM parameters, Google Click ID, landing page URL, and referrer) into cookies on every page load, then injects those values as hidden fields on any Pardot form found on the page — even forms loaded dynamically after the page renders.', 'big-orange-pardot' ); ?></p>
+			<p class="description"><strong><?php esc_html_e( 'A note on naming:', 'big-orange-pardot' ); ?></strong>
+			<?php esc_html_e( 'Salesforce has been rebranding Pardot as Marketing Cloud Account Engagement (sometimes shortened to just Account Engagement). You may see either name depending on where you are looking — in Salesforce Setup, API documentation, and some admin screens the new name is used, while the product URL, some legacy screens, and much third-party documentation still use Pardot. They refer to the same product.', 'big-orange-pardot' ); ?></p>
 
 			<hr />
 

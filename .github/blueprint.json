@@ -4,7 +4,7 @@
 		"php": "8.2",
 		"wp": "latest"
 	},
-	"landingPage": "/",
+	"landingPage": "/?utm_source=bol-test-source&utm_medium=bol-test-medium&utm_campaign=bol-test-campaign&utm_term=bol-test-term&utm_content=bol-test-content&gclid=bol-test-gclid",
 	"steps": [
 		{
 			"step": "login",

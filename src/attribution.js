@@ -114,6 +114,9 @@ function captureAttribution() {
 			// Malformed referrer — skip.
 		}
 	}
+
+	// Notify any listeners (e.g. admin bar inspector) that cookies may have changed.
+	document.dispatchEvent( new CustomEvent( 'bolAttributionUpdated' ) );
 }
 
 // -------------------------------------------------------------------------

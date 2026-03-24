@@ -40,11 +40,12 @@ add_action( 'init', 'create_block_big_orange_pardot_block_init' );
  * into any Pardot form hidden fields — even on pages without the form block.
  */
 function big_orange_pardot_enqueue_attribution() {
+	$asset = require __DIR__ . '/build/attribution.asset.php';
 	wp_enqueue_script(
 		'big-orange-pardot-attribution',
 		plugins_url( 'build/attribution.js', __FILE__ ),
-		array(),
-		'1.0.1',
+		$asset['dependencies'],
+		$asset['version'],
 		array( 'strategy' => 'defer' )
 	);
 }
@@ -167,18 +168,19 @@ function bol_enqueue_admin_bar_assets() {
 	if ( ! is_admin_bar_showing() || ! current_user_can( 'manage_options' ) ) {
 		return;
 	}
+	$asset = require __DIR__ . '/build/admin-bar-attribution.asset.php';
 	wp_enqueue_script(
 		'big-orange-pardot-admin-bar',
 		plugins_url( 'build/admin-bar-attribution.js', __FILE__ ),
-		array(),
-		'1.0.1',
+		$asset['dependencies'],
+		$asset['version'],
 		array( 'strategy' => 'defer' )
 	);
 	wp_enqueue_style(
 		'big-orange-pardot-admin-bar',
 		plugins_url( 'build/admin-bar-attribution.css', __FILE__ ),
 		array( 'admin-bar' ),
-		'1.0.1'
+		$asset['version']
 	);
 	wp_style_add_data( 'big-orange-pardot-admin-bar', 'rtl', 'replace' );
 }

@@ -66,7 +66,8 @@ function setCookie( name, value, days ) {
 		encodeURIComponent( value ) +
 		expires +
 		'; path=' +
-		COOKIE_PATH;
+		COOKIE_PATH +
+		'; SameSite=Lax';
 }
 
 function getCookie( name ) {
@@ -181,7 +182,7 @@ function expireAttributionCookies() {
 			name +
 			'=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=' +
 			COOKIE_PATH +
-			';';
+			'; SameSite=Lax';
 	} );
 
 	// Blank hidden inputs that were populated by populateForms() so that an

@@ -37,6 +37,18 @@ const HIDDEN_FIELD_NAMES = [
 // URL params Pardot appends to its error redirect — not visible form fields.
 const PARDOT_SYSTEM_PARAMS = [ 'errors', 'errorMessage', 'allFields' ];
 
+// Marketing tracking params that may appear in a page URL. Stripped from
+// last_form_submission_url so they aren't submitted raw — they are already
+// captured in attribution cookies (when consent is given).
+const URL_TRACKING_PARAMS = [
+	'utm_source',
+	'utm_medium',
+	'utm_campaign',
+	'utm_term',
+	'utm_content',
+	'gclid',
+];
+
 // -------------------------------------------------------------------------
 // Cookie utilities
 // -------------------------------------------------------------------------
@@ -331,7 +343,7 @@ function populateForms() {
 			PARDOT_SYSTEM_PARAMS.forEach( function ( p ) {
 				urlParams.delete( p );
 			} );
-			HIDDEN_FIELD_NAMES.forEach( function ( p ) {
+			URL_TRACKING_PARAMS.forEach( function ( p ) {
 				urlParams.delete( p );
 			} );
 			const cleanSearch = urlParams.toString();

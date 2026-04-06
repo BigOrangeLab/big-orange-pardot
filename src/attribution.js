@@ -205,11 +205,13 @@ function onConsentGranted() {
  * Expires attribution cookies when consent is revoked.
  * Called by Cookiebot's decline event and the operator `bolConsentRevoked`
  * custom event.
+ *
+ * Intentionally unconditional — the caller (CMP event or operator dispatch)
+ * is trusted directly. Re-checking hasMarketingConsent() here would silently
+ * no-op if the CMP state and the bolConsentCheck override disagreed.
  */
 function onConsentRevoked() {
-	if ( ! hasMarketingConsent() ) {
-		expireAttributionCookies();
-	}
+	expireAttributionCookies();
 }
 
 /**

@@ -112,14 +112,11 @@ function getPardotVisitorId() {
  *            return myCMP.hasConsent('marketing');
  *        };
  *
- * 2. **Cookiebot** — detected via `window.Cookiebot.consent.marketing`.
- *    Fires `captureAttribution` on the `CookiebotOnAccept` window event.
+ * 2. **Cookiebot** — reads `window.Cookiebot.consent.marketing`.
  *
- * 3. **CookieYes** — detected via `window.getCkyConsent().categories.advertisement`.
- *    Fires on the `ckyConsentUpdate` document event.
+ * 3. **CookieYes** — reads `window.getCkyConsent().categories.advertisement`.
  *
- * 4. **Complianz** — detected via the `cmplz_marketing` cookie (`allow` = consented).
- *    Fires on the `cmplzStatusChange` document event.
+ * 4. **Complianz** — reads the `cmplz_marketing` cookie (`allow` = consented).
  *
  * 5. **No CMP detected** — defaults to `true` (allow).
  *    Sites without a CMP are responsible for their own compliance.

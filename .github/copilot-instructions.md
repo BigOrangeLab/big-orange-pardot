@@ -13,8 +13,8 @@ This plugin provides Gutenberg blocks for embedding and configuring Pardot (Acco
 - `includes/`: PHP classes for Pardot API integration and plugin admin/settings UI.
     - `includes/class-bol-pardot-api.php`: Static API client — OAuth token management, optional Salesforce Business Unit discovery/cache (requires `api` scope), optional JSONL API request logging to uploads (sensitive values redacted), form handler cache, form handler fields.
     - `includes/class-bol-admin-page.php`: Three-tab settings page (Settings + Help + Logs), including connect-flow Business Unit auto-discovery, API logging toggle, and log viewer/delete controls. **Keep `render_help_tab()` current whenever plugin behaviour changes.**
-- `src/attribution.js`: Front-end attribution and hidden field population script. Built to `build/attribution.js`.
-- `src/admin-bar-attribution.js`: Admin bar "Clear all cookies" handler — expires all 8 attribution cookies and reloads. Built to `build/admin-bar-attribution.js`. Imports `src/admin-bar-attribution.scss`.
+- `src/attribution.js`: Front-end attribution, hidden field population, client-side submit validation, and Pardot error-redirect handling. Built to `build/attribution.js`.
+- `src/admin-bar-attribution.js`: Admin bar "Clear all cookies" handler — expires all 9 attribution cookies and reloads. Built to `build/admin-bar-attribution.js`. Imports `src/admin-bar-attribution.scss`.
 - `src/admin-bar-attribution.scss`: Styles for the admin bar Attribution panel. Imported from `admin-bar-attribution.js`; built to `build/admin-bar-attribution.css`.
 - `src/log-viewer.js` + `src/log-viewer-app.js` + `src/log-viewer.scss`: Logs tab app and styles. Built to `build/log-viewer.js` and `build/log-viewer.css`. Renders parsed API log entries in a WordPress DataViews table with status badges, a failed-only toggle, and row inspection actions.
 - `build/`: Generated assets and block manifest output. Treat as generated artifacts.
@@ -29,6 +29,7 @@ The parent `<form>` uses a two-column CSS grid. Child block wrapper divs are dir
 
 - `.bol-pardot-field--full` → `grid-column: span 2`
 - `.bol-pardot-field--half` → `grid-column: span 1`
+- `.bol-pardot-errors` → `grid-column: span 2`
 - `.bol-pardot-submit` → `grid-column: span 2`
 
 In the block editor, Gutenberg wraps each inner block in a `.wp-block` div, which breaks the grid. `editor.scss` targets `.block-editor-block-list__layout` as the grid container and uses `:has()` to apply `grid-column` to the `.wp-block` wrappers based on their child classes.
@@ -53,7 +54,7 @@ Both require `manage_options`.
 
 ## Admin bar attribution inspector
 
-`bol_register_admin_bar_node()` adds an "Attribution (N)" menu to the WP admin bar, visible only to `manage_options` users. PHP reads `$_COOKIE` for the 8 attribution field values (`BOL_Pardot_API::ATTRIBUTION_FIELDS`). `src/admin-bar-attribution.js` handles the "Clear all cookies" link (expires all cookies + reloads the page). Styles in `src/admin-bar-attribution.scss` (built to `build/admin-bar-attribution.css`). Both assets enqueued by `bol_enqueue_admin_bar_assets()`, hooked to both `wp_enqueue_scripts` and `admin_enqueue_scripts`.
+`bol_register_admin_bar_node()` adds an "Attribution (N)" menu to the WP admin bar, visible only to `manage_options` users. PHP reads `$_COOKIE` for the 9 cookie-backed attribution field values (`BOL_Pardot_API::ATTRIBUTION_FIELDS` — note: `last_form_submission_url` is not in this constant as it is set from `window.location.href`, not a cookie). `src/admin-bar-attribution.js` handles the "Clear all cookies" link (expires all cookies + reloads the page). Styles in `src/admin-bar-attribution.scss` (built to `build/admin-bar-attribution.css`). Both assets enqueued by `bol_enqueue_admin_bar_assets()`, hooked to both `wp_enqueue_scripts` and `admin_enqueue_scripts`.
 
 ## Debugging approach
 

@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-03-23T17:33:05+00:00\n"
+"POT-Creation-Date: 2026-04-06T17:16:34+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: big-orange-pardot\n"
@@ -18,7 +18,7 @@ msgstr ""
 #: big-orange-pardot.php
 #: includes/class-bol-admin-page.php:131
 #: includes/class-bol-admin-page.php:132
-#: includes/class-bol-admin-page.php:393
+#: includes/class-bol-admin-page.php:398
 msgid "Big Orange Pardot"
 msgstr ""
 
@@ -32,21 +32,25 @@ msgstr ""
 msgid "George Stephanis / Big Orange Lab"
 msgstr ""
 
-#: big-orange-pardot.php:83
+#: big-orange-pardot.php:84
 msgid "handler_id is required."
 msgstr ""
 
 #. translators: %d: number of attribution cookies currently set
-#: big-orange-pardot.php:129
-#, php-format
+#: big-orange-pardot.php:130
+#: build/admin-bar-attribution.js:2
+#: src/admin-bar-attribution.js:92
+#, php-format,js-format
 msgid "Attribution (%d)"
 msgstr ""
 
-#: big-orange-pardot.php:137
+#: big-orange-pardot.php:138
+#: build/admin-bar-attribution.js:1
+#: src/admin-bar-attribution.js:79
 msgid "(not set)"
 msgstr ""
 
-#: big-orange-pardot.php:154
+#: big-orange-pardot.php:155
 msgid "Clear all cookies"
 msgstr ""
 
@@ -68,850 +72,902 @@ msgid "Edit this page to configure it."
 msgstr ""
 
 #: includes/class-bol-admin-page.php:149
-#: includes/class-bol-admin-page.php:398
-#: includes/class-bol-admin-page.php:703
+#: includes/class-bol-admin-page.php:403
+#: includes/class-bol-admin-page.php:710
 msgid "Settings"
 msgstr ""
 
-#: includes/class-bol-admin-page.php:402
+#: includes/class-bol-admin-page.php:407
 msgid "Help"
 msgstr ""
 
-#: includes/class-bol-admin-page.php:407
+#: includes/class-bol-admin-page.php:412
 msgid "Logs"
 msgstr ""
 
-#: includes/class-bol-admin-page.php:449
+#: includes/class-bol-admin-page.php:454
 msgid "API Credentials"
 msgstr ""
 
 #. translators: %s: link to Salesforce Connected App documentation
-#: includes/class-bol-admin-page.php:454
+#: includes/class-bol-admin-page.php:459
 #, php-format
 msgid "Enter the credentials from your Salesforce %s. The redirect URI to register is shown below."
 msgstr ""
 
-#: includes/class-bol-admin-page.php:455
+#: includes/class-bol-admin-page.php:460
 msgid "Connected App"
 msgstr ""
 
-#: includes/class-bol-admin-page.php:460
+#: includes/class-bol-admin-page.php:465
 msgid "Redirect URI to register:"
 msgstr ""
 
-#: includes/class-bol-admin-page.php:467
+#: includes/class-bol-admin-page.php:472
 msgid "Consumer Key (Client ID)"
 msgstr ""
 
-#: includes/class-bol-admin-page.php:476
+#: includes/class-bol-admin-page.php:481
 msgid "Consumer Secret (Client Secret)"
 msgstr ""
 
-#: includes/class-bol-admin-page.php:485
+#: includes/class-bol-admin-page.php:490
 msgid "Business Unit ID"
 msgstr ""
 
-#: includes/class-bol-admin-page.php:490
+#: includes/class-bol-admin-page.php:495
 msgid "— Select a Business Unit —"
 msgstr ""
 
-#: includes/class-bol-admin-page.php:497
+#: includes/class-bol-admin-page.php:502
 msgid "Business units were loaded automatically from Salesforce after connecting."
 msgstr ""
 
-#: includes/class-bol-admin-page.php:502
+#: includes/class-bol-admin-page.php:507
 msgid "18-character ID starting with 0Uv. Connect first to auto-load your business units, or paste an ID manually from Salesforce Setup under Account Engagement → Business Unit Setup."
 msgstr ""
 
-#: includes/class-bol-admin-page.php:511
+#: includes/class-bol-admin-page.php:516
 msgid "API Logging"
 msgstr ""
 
-#: includes/class-bol-admin-page.php:516
+#: includes/class-bol-admin-page.php:521
 msgid "Log Salesforce/Pardot API requests to the uploads directory."
 msgstr ""
 
-#: includes/class-bol-admin-page.php:518
+#: includes/class-bol-admin-page.php:523
 msgid "Logs may contain metadata about requests and responses. Sensitive values like tokens and secrets are redacted."
 msgstr ""
 
-#: includes/class-bol-admin-page.php:525
+#: includes/class-bol-admin-page.php:530
 msgid "Save Credentials"
 msgstr ""
 
-#: includes/class-bol-admin-page.php:529
+#: includes/class-bol-admin-page.php:534
 msgid "Connect to Pardot"
 msgstr ""
 
-#: includes/class-bol-admin-page.php:554
+#: includes/class-bol-admin-page.php:559
 msgid "API Logs"
 msgstr ""
 
-#: includes/class-bol-admin-page.php:556
+#: includes/class-bol-admin-page.php:561
 msgid "Use this tab to inspect Salesforce/Pardot API activity when troubleshooting connection and data issues."
 msgstr ""
 
-#: includes/class-bol-admin-page.php:561
+#: includes/class-bol-admin-page.php:566
 msgid "Logging status"
 msgstr ""
 
-#: includes/class-bol-admin-page.php:562
+#: includes/class-bol-admin-page.php:567
 msgid "Enabled"
 msgstr ""
 
-#: includes/class-bol-admin-page.php:562
+#: includes/class-bol-admin-page.php:567
 msgid "Disabled"
 msgstr ""
 
-#: includes/class-bol-admin-page.php:565
+#: includes/class-bol-admin-page.php:570
 msgid "Log file path"
 msgstr ""
 
-#: includes/class-bol-admin-page.php:566
+#: includes/class-bol-admin-page.php:571
 msgid "(unavailable)"
 msgstr ""
 
-#: includes/class-bol-admin-page.php:570
+#: includes/class-bol-admin-page.php:575
 msgid "Log size"
 msgstr ""
 
-#: includes/class-bol-admin-page.php:574
+#: includes/class-bol-admin-page.php:579
 msgid "Parsed entries"
 msgstr ""
 
-#: includes/class-bol-admin-page.php:584
+#: includes/class-bol-admin-page.php:589
 msgid "Delete Log and Disable Logging"
 msgstr ""
 
-#: includes/class-bol-admin-page.php:590
+#: includes/class-bol-admin-page.php:595
 msgid "No log file exists yet."
 msgstr ""
 
-#: includes/class-bol-admin-page.php:593
+#: includes/class-bol-admin-page.php:598
 msgid "The log file exists but is not readable by WordPress."
 msgstr ""
 
-#: includes/class-bol-admin-page.php:596
+#: includes/class-bol-admin-page.php:601
 msgid "The log file is empty."
 msgstr ""
 
-#: includes/class-bol-admin-page.php:599
+#: includes/class-bol-admin-page.php:604
 msgid "Loading log viewer…"
 msgstr ""
 
-#: includes/class-bol-admin-page.php:622
+#: includes/class-bol-admin-page.php:627
 msgid "Table of contents"
 msgstr ""
 
-#: includes/class-bol-admin-page.php:623
+#: includes/class-bol-admin-page.php:628
 msgid "Contents"
 msgstr ""
 
-#: includes/class-bol-admin-page.php:625
-#: includes/class-bol-admin-page.php:650
+#: includes/class-bol-admin-page.php:630
+#: includes/class-bol-admin-page.php:655
 msgid "Overview"
 msgstr ""
 
-#: includes/class-bol-admin-page.php:627
-#: includes/class-bol-admin-page.php:656
+#: includes/class-bol-admin-page.php:632
+#: includes/class-bol-admin-page.php:663
 msgid "Setup: Connecting to Salesforce"
 msgstr ""
 
-#: includes/class-bol-admin-page.php:629
-#: includes/class-bol-admin-page.php:667
+#: includes/class-bol-admin-page.php:634
+#: includes/class-bol-admin-page.php:674
 msgid "Step 1 — Create a Salesforce Connected App"
 msgstr ""
 
-#: includes/class-bol-admin-page.php:630
+#: includes/class-bol-admin-page.php:635
 msgid "Step 2 — Find your Business Unit ID"
 msgstr ""
 
-#: includes/class-bol-admin-page.php:631
-#: includes/class-bol-admin-page.php:696
+#: includes/class-bol-admin-page.php:636
+#: includes/class-bol-admin-page.php:703
 msgid "Step 3 — Enter credentials and authorize"
 msgstr ""
 
-#: includes/class-bol-admin-page.php:635
-#: includes/class-bol-admin-page.php:714
+#: includes/class-bol-admin-page.php:640
+#: includes/class-bol-admin-page.php:721
 msgid "Using the Block"
 msgstr ""
 
-#: includes/class-bol-admin-page.php:637
-#: includes/class-bol-admin-page.php:720
+#: includes/class-bol-admin-page.php:642
+#: includes/class-bol-admin-page.php:727
 msgid "If connected to Pardot"
 msgstr ""
 
-#: includes/class-bol-admin-page.php:638
-#: includes/class-bol-admin-page.php:732
+#: includes/class-bol-admin-page.php:643
+#: includes/class-bol-admin-page.php:739
 msgid "If not connected to Pardot"
 msgstr ""
 
-#: includes/class-bol-admin-page.php:639
-#: includes/class-bol-admin-page.php:738
+#: includes/class-bol-admin-page.php:644
+#: includes/class-bol-admin-page.php:745
 msgid "Customising fields"
 msgstr ""
 
-#: includes/class-bol-admin-page.php:640
-#: includes/class-bol-admin-page.php:748
+#: includes/class-bol-admin-page.php:645
+#: includes/class-bol-admin-page.php:755
 msgid "Field styling"
 msgstr ""
 
-#: includes/class-bol-admin-page.php:641
-#: includes/class-bol-admin-page.php:759
+#: includes/class-bol-admin-page.php:646
+#: includes/class-bol-admin-page.php:766
 msgid "Form-level styling"
 msgstr ""
 
-#: includes/class-bol-admin-page.php:642
-#: includes/class-bol-admin-page.php:767
+#: includes/class-bol-admin-page.php:647
+#: includes/class-bol-admin-page.php:774
 msgid "Submit button styling"
 msgstr ""
 
-#: includes/class-bol-admin-page.php:645
-#: includes/class-bol-admin-page.php:784
+#: includes/class-bol-admin-page.php:650
+#: includes/class-bol-admin-page.php:791
 msgid "Attribution Tracking"
 msgstr ""
 
-#: includes/class-bol-admin-page.php:646
-#: includes/class-bol-admin-page.php:818
+#: includes/class-bol-admin-page.php:651
+#: includes/class-bol-admin-page.php:839
 msgid "Testing &amp; Debugging"
 msgstr ""
 
-#: includes/class-bol-admin-page.php:651
+#: includes/class-bol-admin-page.php:656
 msgid "Big Orange Pardot adds a Gutenberg block that embeds a Pardot (Account Engagement) form directly on any page or post. Rather than using an iframe, it renders a native HTML form that submits directly to your Pardot form handler, giving you full control over styling and layout."
 msgstr ""
 
-#: includes/class-bol-admin-page.php:652
+#: includes/class-bol-admin-page.php:657
 msgid "The plugin also automatically captures marketing attribution data (UTM parameters, Google Click ID, landing page URL, and referrer) into cookies on every page load, then injects those values as hidden fields on any Pardot form found on the page — even forms loaded dynamically after the page renders."
 msgstr ""
 
+#: includes/class-bol-admin-page.php:658
+msgid "A note on naming:"
+msgstr ""
+
+#: includes/class-bol-admin-page.php:659
+msgid "Salesforce has been rebranding Pardot as Marketing Cloud Account Engagement (sometimes shortened to just Account Engagement). You may see either name depending on where you are looking — in Salesforce Setup, API documentation, and some admin screens the new name is used, while the product URL, some legacy screens, and much third-party documentation still use Pardot. They refer to the same product."
+msgstr ""
+
 #. translators: %s: Salesforce OAuth documentation link
-#: includes/class-bol-admin-page.php:661
+#: includes/class-bol-admin-page.php:668
 #, php-format
 msgid "The plugin connects to Pardot using the %s. This requires creating a Connected App in Salesforce once, then authorizing it here. There is no simpler authentication path — Salesforce requires a Connected App for all API access."
 msgstr ""
 
-#: includes/class-bol-admin-page.php:662
+#: includes/class-bol-admin-page.php:669
 msgid "OAuth 2.0 Web Server Flow"
 msgstr ""
 
-#: includes/class-bol-admin-page.php:669
+#: includes/class-bol-admin-page.php:676
 msgid "In Salesforce, go to Setup → Apps → App Manager and click New Connected App."
 msgstr ""
 
-#: includes/class-bol-admin-page.php:670
+#: includes/class-bol-admin-page.php:677
 msgid "Give it a name (e.g. \"WordPress Pardot Integration\") and fill in a contact email."
 msgstr ""
 
-#: includes/class-bol-admin-page.php:671
+#: includes/class-bol-admin-page.php:678
 msgid "Under API (Enable OAuth Settings), check Enable OAuth Settings."
 msgstr ""
 
-#: includes/class-bol-admin-page.php:673
+#: includes/class-bol-admin-page.php:680
 msgid "Set the Callback URL (Redirect URI) to:"
 msgstr ""
 
-#: includes/class-bol-admin-page.php:677
+#: includes/class-bol-admin-page.php:684
 msgid "Under Selected OAuth Scopes, add:"
 msgstr ""
 
-#: includes/class-bol-admin-page.php:679
+#: includes/class-bol-admin-page.php:686
 msgid "Access and manage your Pardot data"
 msgstr ""
 
-#: includes/class-bol-admin-page.php:680
+#: includes/class-bol-admin-page.php:687
 msgid "Perform requests at any time (allows token refresh without re-authorization)"
 msgstr ""
 
-#: includes/class-bol-admin-page.php:681
+#: includes/class-bol-admin-page.php:688
 msgid "Optional: needed only if you want the plugin to auto-load Account Engagement Business Units."
 msgstr ""
 
-#: includes/class-bol-admin-page.php:684
+#: includes/class-bol-admin-page.php:691
 msgid "Save the Connected App. Salesforce may take a few minutes to activate it."
 msgstr ""
 
-#: includes/class-bol-admin-page.php:685
+#: includes/class-bol-admin-page.php:692
 msgid "From the Connected App detail page, click Manage Consumer Details to view your Consumer Key and Consumer Secret."
 msgstr ""
 
-#: includes/class-bol-admin-page.php:688
+#: includes/class-bol-admin-page.php:695
 msgid "Step 2 — Business Unit ID"
 msgstr ""
 
-#: includes/class-bol-admin-page.php:689
+#: includes/class-bol-admin-page.php:696
 msgid "After you authorize in Step 3, the plugin automatically queries Salesforce and fills in your Business Unit ID. If your org has only one Business Unit it is selected for you; if it has several, a dropdown appears so you can choose the right one."
 msgstr ""
 
-#: includes/class-bol-admin-page.php:690
+#: includes/class-bol-admin-page.php:697
 msgid "If auto-discovery is unavailable for your org, you can paste the ID in manually. Find it in Salesforce Setup by searching \"Account Engagement\" in the Quick Find box, then going to Account Engagement → Business Unit Setup. The ID is an 18-character value beginning with 0Uv."
 msgstr ""
 
-#: includes/class-bol-admin-page.php:692
+#: includes/class-bol-admin-page.php:699
 msgid "Common mistake:"
 msgstr ""
 
-#: includes/class-bol-admin-page.php:693
+#: includes/class-bol-admin-page.php:700
 msgid "Do not use the Salesforce Organization ID (found in Setup → Company Information). That ID starts with 00D and is not the same as the Business Unit ID. The plugin will warn you if it detects this mistake."
 msgstr ""
 
 #. translators: %s: link to the Settings tab
-#: includes/class-bol-admin-page.php:702
+#: includes/class-bol-admin-page.php:709
 #, php-format
 msgid "Go to the %s tab and enter your Consumer Key and Consumer Secret. You can enter a Business Unit ID now, or let the plugin load available business units after connecting. Click Save Credentials."
 msgstr ""
 
-#: includes/class-bol-admin-page.php:707
+#: includes/class-bol-admin-page.php:714
 msgid "Click Connect to Pardot. You will be redirected to Salesforce to log in and approve access."
 msgstr ""
 
-#: includes/class-bol-admin-page.php:708
+#: includes/class-bol-admin-page.php:715
 msgid "After approving, Salesforce redirects back here automatically. The connection status will show Connected."
 msgstr ""
 
-#: includes/class-bol-admin-page.php:710
+#: includes/class-bol-admin-page.php:717
 msgid "Access tokens are refreshed automatically in the background — you should only need to authorize once unless you explicitly disconnect or revoke access in Salesforce."
 msgstr ""
 
-#: includes/class-bol-admin-page.php:716
+#: includes/class-bol-admin-page.php:723
 msgid "In the block editor, insert the Big Orange Pardot block from the Widgets category (or search for \"Pardot\")."
 msgstr ""
 
-#: includes/class-bol-admin-page.php:717
+#: includes/class-bol-admin-page.php:724
 msgid "The block inserts with a default set of seven fields (First Name, Last Name, Email, Phone, Company, Job Title, Comments) plus a Submit button. Each field is its own block — you can reorder, delete, or add fields freely using the block editor."
 msgstr ""
 
-#: includes/class-bol-admin-page.php:722
+#: includes/class-bol-admin-page.php:729
 msgid "Open the block settings panel. A dropdown lists all form handlers from your Pardot account. Select the handler this form should submit to — the submission URL is set automatically."
 msgstr ""
 
-#: includes/class-bol-admin-page.php:723
+#: includes/class-bol-admin-page.php:730
 msgid "Any fields the handler expects that are not already in your form are added automatically when you select a handler. Review the added fields and adjust labels, types, or widths as needed."
 msgstr ""
 
-#: includes/class-bol-admin-page.php:724
+#: includes/class-bol-admin-page.php:731
 msgid "The settings panel shows how many Pardot fields are present in your form. Use the \"Add missing field(s)\" button to insert any remaining expected fields."
 msgstr ""
 
-#: includes/class-bol-admin-page.php:725
+#: includes/class-bol-admin-page.php:732
 msgid "To start fresh from Pardot's field list, click \"Replace all with Pardot fields\". This removes all current fields and rebuilds them from the handler's configuration."
 msgstr ""
 
-#: includes/class-bol-admin-page.php:729
+#: includes/class-bol-admin-page.php:736
 msgid "Until a form handler is configured, the form is hidden from site visitors. Editors viewing the page while logged in will see a notice above a non-submittable preview of the form, so they can review the layout in context before the form goes live."
 msgstr ""
 
-#: includes/class-bol-admin-page.php:734
+#: includes/class-bol-admin-page.php:741
 msgid "Open the block settings panel. Enter the Form Handler URL — found in your Pardot form handler's embed code — into the Form Handler URL field."
 msgstr ""
 
-#: includes/class-bol-admin-page.php:735
+#: includes/class-bol-admin-page.php:742
 msgid "Open the \"Common Pardot Fields\" panel to quickly add standard Pardot field names to your form. Fields already present show a check mark; click \"Add\" for any you want to include."
 msgstr ""
 
-#: includes/class-bol-admin-page.php:736
+#: includes/class-bol-admin-page.php:743
 msgid "You can also add fields manually via the block editor and type any Pardot field name directly into the Field Name setting on each field block."
 msgstr ""
 
-#: includes/class-bol-admin-page.php:739
+#: includes/class-bol-admin-page.php:746
 msgid "Select any Pardot Field block inside the form to edit it via the block settings panel. Available settings:"
 msgstr ""
 
-#: includes/class-bol-admin-page.php:741
+#: includes/class-bol-admin-page.php:748
 #: build/pardot-field/index.js:1
 #: src/pardot-field/edit.js:67
 msgid "Field Name (Pardot)"
 msgstr ""
 
-#: includes/class-bol-admin-page.php:741
+#: includes/class-bol-admin-page.php:748
 msgid "The HTML name attribute submitted to Pardot. Must match the field name in your form handler."
 msgstr ""
 
-#: includes/class-bol-admin-page.php:742
+#: includes/class-bol-admin-page.php:749
 #: build/pardot-field/index.js:1
 #: src/pardot-field/edit.js:81
 msgid "Field Type"
 msgstr ""
 
-#: includes/class-bol-admin-page.php:742
+#: includes/class-bol-admin-page.php:749
 msgid "Text, Email, Phone, or Textarea."
 msgstr ""
 
-#: includes/class-bol-admin-page.php:743
+#: includes/class-bol-admin-page.php:750
 #: build/pardot-field/index.js:1
 #: src/pardot-field/edit.js:106
 msgid "Required"
 msgstr ""
 
-#: includes/class-bol-admin-page.php:743
+#: includes/class-bol-admin-page.php:750
 msgid "Adds browser-side validation and a * indicator to the label."
 msgstr ""
 
-#: includes/class-bol-admin-page.php:744
+#: includes/class-bol-admin-page.php:751
 #: build/pardot-field/index.js:1
 #: src/pardot-field/edit.js:113
 msgid "Placeholder"
 msgstr ""
 
-#: includes/class-bol-admin-page.php:744
+#: includes/class-bol-admin-page.php:751
 msgid "Placeholder text shown inside the input."
 msgstr ""
 
-#: includes/class-bol-admin-page.php:745
+#: includes/class-bol-admin-page.php:752
 #: build/pardot-field/index.js:1
 #: src/pardot-field/edit.js:120
 msgid "Width"
 msgstr ""
 
-#: includes/class-bol-admin-page.php:745
+#: includes/class-bol-admin-page.php:752
 msgid "Full width (spans both grid columns) or Half width (spans one column). Two adjacent half-width fields sit side by side on the frontend."
 msgstr ""
 
-#: includes/class-bol-admin-page.php:749
+#: includes/class-bol-admin-page.php:756
 msgid "When any Pardot Field block is selected, the block settings panel shows a Field Styling section. Changes made here apply to every field in the form — the settings are stored once on the parent form block and cascade to all fields automatically."
 msgstr ""
 
-#: includes/class-bol-admin-page.php:751
+#: includes/class-bol-admin-page.php:758
 #: build/pardot-field/index.js:1
 #: src/pardot-field/edit.js:152
 msgid "Label Color"
 msgstr ""
 
-#: includes/class-bol-admin-page.php:751
+#: includes/class-bol-admin-page.php:758
 msgid "Text colour for all field labels."
 msgstr ""
 
-#: includes/class-bol-admin-page.php:752
+#: includes/class-bol-admin-page.php:759
 #: build/pardot-field/index.js:1
 #: src/pardot-field/edit.js:157
 msgid "Input Background"
 msgstr ""
 
-#: includes/class-bol-admin-page.php:752
+#: includes/class-bol-admin-page.php:759
 msgid "Background colour for text inputs and textareas."
 msgstr ""
 
-#: includes/class-bol-admin-page.php:753
+#: includes/class-bol-admin-page.php:760
 #: build/pardot-field/index.js:1
 #: src/pardot-field/edit.js:165
 msgid "Input Border Color"
 msgstr ""
 
-#: includes/class-bol-admin-page.php:753
+#: includes/class-bol-admin-page.php:760
 msgid "Border colour for text inputs and textareas."
 msgstr ""
 
-#: includes/class-bol-admin-page.php:754
+#: includes/class-bol-admin-page.php:761
 #: build/pardot-field/index.js:1
 #: src/pardot-field/edit.js:173
 msgid "Focus / Accent Color"
 msgstr ""
 
-#: includes/class-bol-admin-page.php:754
+#: includes/class-bol-admin-page.php:761
 msgid "Outline and border colour when a field is focused; also used for the hover border on inputs."
 msgstr ""
 
-#: includes/class-bol-admin-page.php:755
+#: includes/class-bol-admin-page.php:762
 #: build/pardot-field/index.js:1
 #: src/pardot-field/edit.js:181
 msgid "Input Border Radius (px)"
 msgstr ""
 
-#: includes/class-bol-admin-page.php:755
+#: includes/class-bol-admin-page.php:762
 msgid "Corner rounding applied to all inputs and textareas."
 msgstr ""
 
-#: includes/class-bol-admin-page.php:757
+#: includes/class-bol-admin-page.php:764
 msgid "When no custom colours are set, the form falls back to your active theme's color palette (Kadence global palette variables if Kadence Blocks is active, then WordPress preset colors, then sensible hard-coded defaults)."
 msgstr ""
 
-#: includes/class-bol-admin-page.php:760
+#: includes/class-bol-admin-page.php:767
 msgid "Select the outer Big Orange Pardot block itself (not a field inside it) to access additional styling controls in the block settings panel and the block toolbar:"
 msgstr ""
 
-#: includes/class-bol-admin-page.php:762
+#: includes/class-bol-admin-page.php:769
 msgid "Color → Background"
 msgstr ""
 
-#: includes/class-bol-admin-page.php:762
+#: includes/class-bol-admin-page.php:769
 msgid "Background colour of the entire form wrapper."
 msgstr ""
 
-#: includes/class-bol-admin-page.php:763
+#: includes/class-bol-admin-page.php:770
 msgid "Dimensions → Padding / Margin"
 msgstr ""
 
-#: includes/class-bol-admin-page.php:763
+#: includes/class-bol-admin-page.php:770
 msgid "Spacing inside and outside the form wrapper."
 msgstr ""
 
-#: includes/class-bol-admin-page.php:764
+#: includes/class-bol-admin-page.php:771
 #: build/pardot-form/index.js:4
 #: src/pardot-form/edit.js:838
 msgid "Border"
 msgstr ""
 
-#: includes/class-bol-admin-page.php:764
+#: includes/class-bol-admin-page.php:771
 msgid "Border color, width, style, and radius for the form wrapper."
 msgstr ""
 
-#: includes/class-bol-admin-page.php:768
+#: includes/class-bol-admin-page.php:775
 msgid "Select the Pardot Form block to access its submit button settings. The button uses standard WordPress button classes and will pick up Kadence or theme button styles automatically if available; the options below let you override individual properties:"
 msgstr ""
 
-#: includes/class-bol-admin-page.php:770
+#: includes/class-bol-admin-page.php:777
 msgid "Alignment"
 msgstr ""
 
-#: includes/class-bol-admin-page.php:770
+#: includes/class-bol-admin-page.php:777
 msgid "Left, center, or right — available in the block toolbar."
 msgstr ""
 
-#: includes/class-bol-admin-page.php:771
+#: includes/class-bol-admin-page.php:778
 msgid "Button Label"
 msgstr ""
 
-#: includes/class-bol-admin-page.php:771
+#: includes/class-bol-admin-page.php:778
 msgid "The button text (defaults to \"Submit\")."
 msgstr ""
 
-#: includes/class-bol-admin-page.php:772
+#: includes/class-bol-admin-page.php:779
 msgid "Button Colors → Text Color"
 msgstr ""
 
-#: includes/class-bol-admin-page.php:772
+#: includes/class-bol-admin-page.php:779
 msgid "Button label colour."
 msgstr ""
 
-#: includes/class-bol-admin-page.php:773
+#: includes/class-bol-admin-page.php:780
 msgid "Button Colors → Background"
 msgstr ""
 
-#: includes/class-bol-admin-page.php:773
+#: includes/class-bol-admin-page.php:780
 msgid "Solid background colour or gradient for the button."
 msgstr ""
 
-#: includes/class-bol-admin-page.php:774
+#: includes/class-bol-admin-page.php:781
 msgid "Button Colors → Hover Background"
 msgstr ""
 
-#: includes/class-bol-admin-page.php:774
+#: includes/class-bol-admin-page.php:781
 msgid "Background colour shown when the button is hovered."
 msgstr ""
 
-#: includes/class-bol-admin-page.php:775
+#: includes/class-bol-admin-page.php:782
 msgid "Button Appearance → Padding"
 msgstr ""
 
-#: includes/class-bol-admin-page.php:775
+#: includes/class-bol-admin-page.php:782
 msgid "Inner spacing on each side of the button label."
 msgstr ""
 
-#: includes/class-bol-admin-page.php:776
+#: includes/class-bol-admin-page.php:783
 msgid "Button Appearance → Border Radius (px)"
 msgstr ""
 
-#: includes/class-bol-admin-page.php:776
+#: includes/class-bol-admin-page.php:783
 msgid "Corner rounding for the button."
 msgstr ""
 
-#: includes/class-bol-admin-page.php:777
+#: includes/class-bol-admin-page.php:784
 msgid "Button Appearance → Border"
 msgstr ""
 
-#: includes/class-bol-admin-page.php:777
+#: includes/class-bol-admin-page.php:784
 msgid "Border color, width, and style."
 msgstr ""
 
-#: includes/class-bol-admin-page.php:778
+#: includes/class-bol-admin-page.php:785
 msgid "Button Appearance → Box Shadow"
 msgstr ""
 
-#: includes/class-bol-admin-page.php:778
+#: includes/class-bol-admin-page.php:785
 msgid "Any valid CSS box-shadow value (e.g. \"0 2px 8px rgba(0,0,0,0.15)\")."
 msgstr ""
 
-#: includes/class-bol-admin-page.php:779
+#: includes/class-bol-admin-page.php:786
 msgid "Dimensions → Margin"
 msgstr ""
 
-#: includes/class-bol-admin-page.php:779
+#: includes/class-bol-admin-page.php:786
 msgid "Outer spacing around the button wrapper."
 msgstr ""
 
-#: includes/class-bol-admin-page.php:785
+#: includes/class-bol-admin-page.php:792
 msgid "A small script runs on every page of your site (not just pages with the form). It captures marketing attribution data into cookies and injects that data as hidden fields on any Pardot form it finds on the page — including forms loaded dynamically after page load."
 msgstr ""
 
-#: includes/class-bol-admin-page.php:786
+#: includes/class-bol-admin-page.php:793
 msgid "The following hidden fields are submitted with every form and must be mapped in your Pardot form handler to be recorded:"
 msgstr ""
 
-#: includes/class-bol-admin-page.php:790
+#: includes/class-bol-admin-page.php:797
 msgid "Field name"
 msgstr ""
 
-#: includes/class-bol-admin-page.php:791
+#: includes/class-bol-admin-page.php:798
 msgid "What it captures"
 msgstr ""
 
-#: includes/class-bol-admin-page.php:792
+#: includes/class-bol-admin-page.php:799
 msgid "Cookie lifetime"
 msgstr ""
 
-#: includes/class-bol-admin-page.php:796
+#: includes/class-bol-admin-page.php:803
 msgid "UTM source parameter"
 msgstr ""
 
-#: includes/class-bol-admin-page.php:796
-#: includes/class-bol-admin-page.php:797
-#: includes/class-bol-admin-page.php:798
-#: includes/class-bol-admin-page.php:799
-#: includes/class-bol-admin-page.php:800
+#: includes/class-bol-admin-page.php:803
+#: includes/class-bol-admin-page.php:804
+#: includes/class-bol-admin-page.php:805
+#: includes/class-bol-admin-page.php:806
+#: includes/class-bol-admin-page.php:807
 msgid "30 days, overwritten on each visit"
 msgstr ""
 
-#: includes/class-bol-admin-page.php:797
+#: includes/class-bol-admin-page.php:804
 msgid "UTM medium parameter"
 msgstr ""
 
-#: includes/class-bol-admin-page.php:798
+#: includes/class-bol-admin-page.php:805
 msgid "UTM campaign parameter"
 msgstr ""
 
-#: includes/class-bol-admin-page.php:799
+#: includes/class-bol-admin-page.php:806
 msgid "UTM term parameter"
 msgstr ""
 
-#: includes/class-bol-admin-page.php:800
+#: includes/class-bol-admin-page.php:807
 msgid "UTM content parameter"
 msgstr ""
 
-#: includes/class-bol-admin-page.php:801
+#: includes/class-bol-admin-page.php:808
 msgid "Google Click ID (from Google Ads)"
 msgstr ""
 
-#: includes/class-bol-admin-page.php:801
+#: includes/class-bol-admin-page.php:808
 msgid "90 days, overwritten on each visit"
 msgstr ""
 
-#: includes/class-bol-admin-page.php:802
+#: includes/class-bol-admin-page.php:809
 msgid "Full URL of the first page visited"
 msgstr ""
 
-#: includes/class-bol-admin-page.php:802
-#: includes/class-bol-admin-page.php:803
+#: includes/class-bol-admin-page.php:809
+#: includes/class-bol-admin-page.php:810
 msgid "30 days, set once and never overwritten"
 msgstr ""
 
-#: includes/class-bol-admin-page.php:803
+#: includes/class-bol-admin-page.php:810
 msgid "Referring URL from outside this domain"
 msgstr ""
 
+#: includes/class-bol-admin-page.php:811
+msgid "Pardot visitor ID (set by the Pardot tracking script cookie)"
+msgstr ""
+
+#: includes/class-bol-admin-page.php:811
+msgid "Read from cookie on each page load"
+msgstr ""
+
+#: includes/class-bol-admin-page.php:812
+msgid "Full URL of the page containing the form at submission time"
+msgstr ""
+
+#: includes/class-bol-admin-page.php:812
+msgid "Set from window.location.href on each page load — not a cookie"
+msgstr ""
+
 #. translators: %s: link to Form Handler Inspector
-#: includes/class-bol-admin-page.php:810
+#: includes/class-bol-admin-page.php:819
 #, php-format
 msgid "Unmapped fields are silently ignored by Pardot. Use the %s on the Settings tab to verify which of these fields are configured in each of your form handlers."
 msgstr ""
 
-#: includes/class-bol-admin-page.php:811
-#: includes/class-bol-admin-page.php:878
+#: includes/class-bol-admin-page.php:820
+#: includes/class-bol-admin-page.php:899
 msgid "Form Handler Inspector"
 msgstr ""
 
-#: includes/class-bol-admin-page.php:820
-msgid "When you are logged in as an administrator, a small \"Attribution (N)\" menu appears in the WordPress admin bar on every page of the site. It shows the current value of each attribution cookie — or \"(not set)\" if that cookie has not been captured yet."
-msgstr ""
-
-#: includes/class-bol-admin-page.php:823
-msgid "The menu also includes a \"Clear all cookies\" link. Clicking it deletes all eight attribution cookies and reloads the page, so you can simulate a fresh visitor without opening a private browser window."
+#: includes/class-bol-admin-page.php:825
+msgid "Error handling"
 msgstr ""
 
 #: includes/class-bol-admin-page.php:826
-msgid "For API troubleshooting, enable API Logging on the Settings tab. Request/response activity for Salesforce and Pardot is written to your uploads directory and shown on the Logs tab in a filterable table with per-entry inspection. From that tab, \"Delete Log and Disable Logging\" removes the file and turns logging off."
+msgid "The plugin handles form errors in two ways:"
 msgstr ""
 
 #: includes/class-bol-admin-page.php:829
-msgid "The admin bar inspector is only visible to users with the manage_options capability and has no effect on site visitors."
+msgid "Client-side validation"
+msgstr ""
+
+#: includes/class-bol-admin-page.php:829
+msgid "Before the form is submitted to Pardot, JavaScript checks all required fields and field formats using the HTML5 Constraint Validation API. If any fields are invalid, an error message is shown above the fields and submission is blocked until the issues are corrected."
+msgstr ""
+
+#: includes/class-bol-admin-page.php:832
+msgid "Pardot server-side errors"
+msgstr ""
+
+#: includes/class-bol-admin-page.php:832
+msgid "If Pardot rejects a submission (for example, an email address fails its validation rules), it redirects back to the form page with an errorMessage parameter and the submitted field values in the URL. The plugin automatically detects this redirect, displays the error message in a notice above the form fields, and re-populates the visible fields so the visitor does not need to re-type their data."
+msgstr ""
+
+#: includes/class-bol-admin-page.php:835
+msgid "The error notice is styled with a red left border and appears inside the form, spanning the full width above all fields. It is only shown when errors are present and is cleared automatically when the visitor resubmits successfully."
+msgstr ""
+
+#: includes/class-bol-admin-page.php:841
+msgid "When you are logged in as an administrator, a small \"Attribution (N)\" menu appears in the WordPress admin bar on every page of the site. It shows the current value of each attribution cookie — or \"(not set)\" if that cookie has not been captured yet."
 msgstr ""
 
 #: includes/class-bol-admin-page.php:844
+msgid "The menu also includes a \"Clear all cookies\" link. Clicking it deletes all eight attribution cookies and reloads the page, so you can simulate a fresh visitor without opening a private browser window."
+msgstr ""
+
+#: includes/class-bol-admin-page.php:847
+msgid "For API troubleshooting, enable API Logging on the Settings tab. Request/response activity for Salesforce and Pardot is written to your uploads directory and shown on the Logs tab in a filterable table with per-entry inspection. From that tab, \"Delete Log and Disable Logging\" removes the file and turns logging off."
+msgstr ""
+
+#: includes/class-bol-admin-page.php:850
+msgid "The admin bar inspector is only visible to users with the manage_options capability and has no effect on site visitors."
+msgstr ""
+
+#: includes/class-bol-admin-page.php:865
 msgid "Pardot Connection"
 msgstr ""
 
-#: includes/class-bol-admin-page.php:848
+#: includes/class-bol-admin-page.php:869
 msgid "Connected"
 msgstr ""
 
-#: includes/class-bol-admin-page.php:853
+#: includes/class-bol-admin-page.php:874
 msgid "Disconnect"
 msgstr ""
 
-#: includes/class-bol-admin-page.php:858
+#: includes/class-bol-admin-page.php:879
 msgid "Not connected"
 msgstr ""
 
-#: includes/class-bol-admin-page.php:861
+#: includes/class-bol-admin-page.php:882
 msgid "Save your credentials above, then click Connect to Pardot."
 msgstr ""
 
-#: includes/class-bol-admin-page.php:880
+#: includes/class-bol-admin-page.php:901
 msgid "Select a form handler to see which attribution fields your plugin submits are actually mapped in Pardot."
 msgstr ""
 
-#: includes/class-bol-admin-page.php:895
+#: includes/class-bol-admin-page.php:916
 msgid "No form handlers found in your Pardot account."
 msgstr ""
 
-#: includes/class-bol-admin-page.php:906
+#: includes/class-bol-admin-page.php:927
 #: build/pardot-form/index.js:1
 #: src/pardot-form/edit.js:486
 msgid "— Select a form handler —"
 msgstr ""
 
-#: includes/class-bol-admin-page.php:918
+#: includes/class-bol-admin-page.php:939
 msgid "Inspect"
 msgstr ""
 
-#: includes/class-bol-admin-page.php:963
+#: includes/class-bol-admin-page.php:984
 msgid "Attribution Field Mapping"
 msgstr ""
 
-#: includes/class-bol-admin-page.php:967
+#: includes/class-bol-admin-page.php:988
 msgid "All attribution fields are mapped in this form handler."
 msgstr ""
 
-#: includes/class-bol-admin-page.php:971
+#: includes/class-bol-admin-page.php:992
 msgid "Some attribution fields are not mapped. Unmapped fields will be silently ignored by Pardot."
 msgstr ""
 
-#: includes/class-bol-admin-page.php:978
+#: includes/class-bol-admin-page.php:999
 msgid "Field Name (submitted by plugin)"
 msgstr ""
 
-#: includes/class-bol-admin-page.php:979
+#: includes/class-bol-admin-page.php:1000
 msgid "Mapped in Pardot?"
 msgstr ""
 
-#: includes/class-bol-admin-page.php:988
+#: includes/class-bol-admin-page.php:1009
 msgid "Mapped"
 msgstr ""
 
-#: includes/class-bol-admin-page.php:990
+#: includes/class-bol-admin-page.php:1011
 msgid "Not mapped"
 msgstr ""
 
-#: includes/class-bol-admin-page.php:998
+#: includes/class-bol-admin-page.php:1019
 msgid "All Form Handler Fields"
 msgstr ""
 
-#: includes/class-bol-admin-page.php:1000
+#: includes/class-bol-admin-page.php:1021
 msgid "No fields configured for this form handler."
 msgstr ""
 
-#: includes/class-bol-admin-page.php:1005
+#: includes/class-bol-admin-page.php:1026
 msgid "Name"
 msgstr ""
 
-#: includes/class-bol-admin-page.php:1006
+#: includes/class-bol-admin-page.php:1027
 msgid "Prospect Field"
 msgstr ""
 
-#: includes/class-bol-admin-page.php:1007
+#: includes/class-bol-admin-page.php:1028
 msgid "Required?"
 msgstr ""
 
-#: includes/class-bol-admin-page.php:1008
+#: includes/class-bol-admin-page.php:1029
 msgid "Format"
 msgstr ""
 
-#: includes/class-bol-admin-page.php:1016
+#: includes/class-bol-admin-page.php:1037
 msgid "Yes"
 msgstr ""
 
-#: includes/class-bol-admin-page.php:1016
+#: includes/class-bol-admin-page.php:1037
 msgid "No"
 msgstr ""
 
-#: includes/class-bol-admin-page.php:1042
+#: includes/class-bol-admin-page.php:1063
 msgid "Credentials saved."
 msgstr ""
 
-#: includes/class-bol-admin-page.php:1043
+#: includes/class-bol-admin-page.php:1064
 msgid "That looks like a Salesforce Organization ID (starts with 00D), not a Business Unit ID (starts with 0Uv). Find the correct 18-character Business Unit ID under Salesforce Setup → Account Engagement → Business Unit Setup."
 msgstr ""
 
-#: includes/class-bol-admin-page.php:1044
+#: includes/class-bol-admin-page.php:1065
 msgid "Successfully connected to Pardot!"
 msgstr ""
 
-#: includes/class-bol-admin-page.php:1045
+#: includes/class-bol-admin-page.php:1066
 msgid "API log deleted and logging disabled."
 msgstr ""
 
-#: includes/class-bol-admin-page.php:1046
+#: includes/class-bol-admin-page.php:1067
 msgid "Connected to Pardot. Business Unit auto-discovery is unavailable for this Salesforce org, so please enter your Business Unit ID manually."
 msgstr ""
 
-#: includes/class-bol-admin-page.php:1047
+#: includes/class-bol-admin-page.php:1068
 msgid "Successfully connected to Pardot and automatically selected your Business Unit."
 msgstr ""
 
-#: includes/class-bol-admin-page.php:1048
+#: includes/class-bol-admin-page.php:1069
 msgid "Successfully connected to Pardot. Multiple Business Units were found, so please select one and save credentials."
 msgstr ""
 
 #. translators: %s: error message
-#: includes/class-bol-admin-page.php:1049
+#: includes/class-bol-admin-page.php:1070
 #, php-format
 msgid "Connected to Pardot, but Business Unit lookup failed: %s"
 msgstr ""
 
 #. translators: %s: error message
-#: includes/class-bol-admin-page.php:1050
+#: includes/class-bol-admin-page.php:1071
 msgid "Disconnected from Pardot."
 msgstr ""
 
-#: includes/class-bol-admin-page.php:1051
+#: includes/class-bol-admin-page.php:1072
 msgid "OAuth state mismatch — possible CSRF attempt. Please try connecting again."
 msgstr ""
 
 #. translators: %s: error message
-#: includes/class-bol-admin-page.php:1052
+#: includes/class-bol-admin-page.php:1073
 #, php-format
 msgid "OAuth error: %s"
 msgstr ""
 
 #. translators: %s: OAuth grant type
-#: includes/class-bol-pardot-api.php:397
+#: includes/class-bol-pardot-api.php:402
 #, php-format
 msgid "grant_type: %s"
 msgstr ""
 
-#: includes/class-bol-pardot-api.php:611
+#: includes/class-bol-pardot-api.php:620
 msgid "No refresh token stored."
 msgstr ""
 
-#: includes/class-bol-pardot-api.php:659
+#: includes/class-bol-pardot-api.php:668
 msgid "Unknown token error."
 msgstr ""
 
 #. translators: %d: HTTP status code
-#: includes/class-bol-pardot-api.php:766
+#: includes/class-bol-pardot-api.php:775
 #, php-format
 msgid "Pardot API returned HTTP %d."
 msgstr ""
 
-#: includes/class-bol-pardot-api.php:866
+#: includes/class-bol-pardot-api.php:875
 msgid "Salesforce instance URL is not available yet. Please reconnect to Salesforce."
 msgstr ""
 
 #. translators: %d: HTTP status code
-#: includes/class-bol-pardot-api.php:911
+#: includes/class-bol-pardot-api.php:920
 #, php-format
 msgid "Salesforce API returned HTTP %d while loading Business Units."
 msgstr ""
 
-#: includes/class-bol-pardot-api.php:919
+#: includes/class-bol-pardot-api.php:928
 msgid "Connected to Salesforce, but this org cannot query Account Engagement Business Units via API. Please paste your Business Unit ID manually."
 msgstr ""
 

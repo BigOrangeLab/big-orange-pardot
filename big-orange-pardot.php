@@ -115,9 +115,21 @@ function bol_register_admin_bar_node( WP_Admin_Bar $wp_admin_bar ) {
 		return;
 	}
 
+	// Resolve cookie values for all attribution fields. visitor_id uses a
+	// dynamic cookie name (visitor_id{piAId}, e.g. visitor_id787913), so we
+	// scan $_COOKIE for that pattern rather than looking up by exact name.
+	$pardot_visitor_id = '';
+	foreach ( array_keys( $_COOKIE ) as $cookie_name ) {
+		if ( preg_match( '/^visitor_id\d+$/', $cookie_name ) && isset( $_COOKIE[ $cookie_name ] ) ) {
+			$pardot_visitor_id = sanitize_text_field( wp_unslash( $_COOKIE[ $cookie_name ] ) );
+			break;
+		}
+	}
+
 	$set_count = 0;
 	foreach ( BOL_Pardot_API::ATTRIBUTION_FIELDS as $field ) {
-		if ( ! empty( $_COOKIE[ $field ] ) ) {
+		$raw = 'visitor_id' === $field ? $pardot_visitor_id : ( isset( $_COOKIE[ $field ] ) ? sanitize_text_field( wp_unslash( $_COOKIE[ $field ] ) ) : '' );
+		if ( $raw ) {
 			++$set_count;
 		}
 	}
@@ -134,7 +146,7 @@ function bol_register_admin_bar_node( WP_Admin_Bar $wp_admin_bar ) {
 	);
 
 	foreach ( BOL_Pardot_API::ATTRIBUTION_FIELDS as $field ) {
-		$raw     = isset( $_COOKIE[ $field ] ) ? sanitize_text_field( wp_unslash( $_COOKIE[ $field ] ) ) : '';
+		$raw     = 'visitor_id' === $field ? $pardot_visitor_id : ( isset( $_COOKIE[ $field ] ) ? sanitize_text_field( wp_unslash( $_COOKIE[ $field ] ) ) : '' );
 		$display = $raw ? $raw : __( '(not set)', 'big-orange-pardot' );
 		$wp_admin_bar->add_node(
 			array(

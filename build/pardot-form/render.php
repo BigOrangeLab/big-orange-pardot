@@ -117,6 +117,9 @@ $extra_attrs = ! empty( $custom_props ) ? array( 'style' => implode( '; ', $cust
 		novalidate
 	>
 
+		<!-- Error container — shown by attribution.js when Pardot redirects back with errors=true -->
+		<div class="bol-pardot-errors" role="alert" style="display:none;"></div>
+
 		<?php echo $content; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- inner blocks HTML is already escaped by WordPress. ?>
 
 		<div class="bol-pardot-submit"<?php echo $wrapper_style; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- value is esc_attr() above. ?>>
@@ -126,14 +129,16 @@ $extra_attrs = ! empty( $custom_props ) ? array( 'style' => implode( '; ', $cust
 		</div>
 
 		<!-- Hidden attribution fields — populated by attribution.js -->
-		<input type="hidden" name="utm_source"       value="" />
-		<input type="hidden" name="utm_medium"       value="" />
-		<input type="hidden" name="utm_campaign"     value="" />
-		<input type="hidden" name="utm_term"         value="" />
-		<input type="hidden" name="utm_content"      value="" />
-		<input type="hidden" name="referrer_url"     value="" />
-		<input type="hidden" name="landing_page_url" value="" />
-		<input type="hidden" name="gclid"            value="" />
+		<input type="hidden" name="utm_source"              value="" />
+		<input type="hidden" name="utm_medium"              value="" />
+		<input type="hidden" name="utm_campaign"            value="" />
+		<input type="hidden" name="utm_term"                value="" />
+		<input type="hidden" name="utm_content"             value="" />
+		<input type="hidden" name="referrer_url"            value="" />
+		<input type="hidden" name="landing_page_url"        value="" />
+		<input type="hidden" name="gclid"                   value="" />
+		<input type="hidden" name="visitor_id"              value="" />
+		<input type="hidden" name="last_form_submission_url" value="" />
 
 	</form>
 </div>

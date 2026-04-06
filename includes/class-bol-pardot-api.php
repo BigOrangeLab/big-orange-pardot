@@ -67,6 +67,7 @@ class BOL_Pardot_API {
 		'referrer_url',
 		'landing_page_url',
 		'gclid',
+		'visitor_id',
 	);
 
 	// -------------------------------------------------------------------------

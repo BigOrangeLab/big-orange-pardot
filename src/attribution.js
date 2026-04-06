@@ -320,10 +320,13 @@ function populateForms() {
 				( cleanSearch ? '?' + cleanSearch : '' ) +
 				window.location.hash;
 		} else if ( input.name === 'visitor_id' ) {
-			// Pardot's visitor ID cookie is named visitor_id{piAId} — scan for it.
-			const visitorId = getPardotVisitorId();
-			if ( visitorId !== null ) {
-				input.value = visitorId;
+			// Pardot's visitor ID cookie identifies the visitor — only forward
+			// it when marketing consent is present.
+			if ( hasMarketingConsent() ) {
+				const visitorId = getPardotVisitorId();
+				if ( visitorId !== null ) {
+					input.value = visitorId;
+				}
 			}
 		} else if ( HIDDEN_FIELD_NAMES.indexOf( input.name ) !== -1 ) {
 			const cookieValue = getCookie( input.name );

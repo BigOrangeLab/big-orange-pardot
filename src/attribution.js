@@ -96,6 +96,96 @@ function getPardotVisitorId() {
 }
 
 // -------------------------------------------------------------------------
+// Consent check
+// -------------------------------------------------------------------------
+
+/**
+ * Returns true if marketing/analytics cookie consent has been granted.
+ *
+ * Detection priority:
+ *
+ * 1. **Operator override** — define `window.bolConsentCheck = function() { return bool; }`
+ *    anywhere before this script runs to take full control of the decision.
+ *    Returning `true` allows attribution cookies; `false` blocks them.
+ *    Example (inline script or wp_add_inline_script):
+ *        window.bolConsentCheck = function() {
+ *            return myCMP.hasConsent('marketing');
+ *        };
+ *
+ * 2. **Cookiebot** — detected via `window.Cookiebot.consent.marketing`.
+ *    Fires `captureAttribution` on the `CookiebotOnAccept` window event.
+ *
+ * 3. **CookieYes** — detected via `window.getCkyConsent().categories.advertisement`.
+ *    Fires on the `ckyConsentUpdate` document event.
+ *
+ * 4. **Complianz** — detected via the `cmplz_marketing` cookie (`allow` = consented).
+ *    Fires on the `cmplzStatusChange` document event.
+ *
+ * 5. **No CMP detected** — defaults to `true` (allow).
+ *    Sites without a CMP are responsible for their own compliance.
+ *
+ * @return {boolean} Whether marketing cookies may be set.
+ */
+function hasMarketingConsent() {
+	// 1. Operator override.
+	if ( typeof window.bolConsentCheck === 'function' ) {
+		return !! window.bolConsentCheck();
+	}
+
+	// 2. Cookiebot.
+	if ( window.Cookiebot && window.Cookiebot.consent !== undefined ) {
+		return !! window.Cookiebot.consent.marketing;
+	}
+
+	// 3. CookieYes.
+	if ( typeof window.getCkyConsent === 'function' ) {
+		const cky = window.getCkyConsent();
+		return !! ( cky && cky.categories && cky.categories.advertisement );
+	}
+
+	// 4. Complianz — cmplz_marketing cookie is set to 'allow' when consented.
+	const cmplz = getCookie( 'cmplz_marketing' );
+	if ( cmplz !== null ) {
+		return 'allow' === cmplz;
+	}
+
+	// 5. No CMP detected — allow by default.
+	return true;
+}
+
+/**
+ * Runs captureAttribution() + populateForms() once consent is confirmed.
+ * Called by each CMP's consent-granted event so that forms already on the
+ * page get their hidden fields populated before the visitor submits.
+ */
+function onConsentGranted() {
+	if ( hasMarketingConsent() ) {
+		captureAttribution();
+		populateForms();
+	}
+}
+
+/**
+ * Registers event listeners for consent-granted events from known CMPs and
+ * the operator-provided `bolConsentGranted` custom event.
+ * Safe to call unconditionally — listeners only fire if the CMP is present.
+ */
+function setupConsentListeners() {
+	// Cookiebot fires on window.
+	window.addEventListener( 'CookiebotOnAccept', onConsentGranted );
+
+	// CookieYes fires on document.
+	document.addEventListener( 'ckyConsentUpdate', onConsentGranted );
+
+	// Complianz fires on document.
+	document.addEventListener( 'cmplzStatusChange', onConsentGranted );
+
+	// Operator escape hatch — dispatch this event from your own CMP integration
+	// to trigger attribution capture when marketing consent is granted.
+	document.addEventListener( 'bolConsentGranted', onConsentGranted );
+}
+
+// -------------------------------------------------------------------------
 // URL param helpers
 // -------------------------------------------------------------------------
 
@@ -389,16 +479,23 @@ document.addEventListener( 'submit', function ( e ) {
 // Init
 // -------------------------------------------------------------------------
 
-captureAttribution();
+// captureAttribution() is gated on consent — it is the only function that
+// writes our tracking cookies. Everything else (form population, error
+// handling, observers, submit validation) runs unconditionally.
+if ( hasMarketingConsent() ) {
+	captureAttribution();
+}
 
 if ( document.readyState === 'loading' ) {
 	document.addEventListener( 'DOMContentLoaded', function () {
 		populateForms();
 		handlePardotErrors();
 		observeForForms();
+		setupConsentListeners();
 	} );
 } else {
 	populateForms();
 	handlePardotErrors();
 	observeForForms();
+	setupConsentListeners();
 }

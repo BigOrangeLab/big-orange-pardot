@@ -168,8 +168,20 @@ function populateForms() {
 	const hiddenInputs = document.querySelectorAll( 'input[type="hidden"]' );
 	hiddenInputs.forEach( function ( input ) {
 		if ( input.name === 'last_form_submission_url' ) {
-			// Always set from the current page URL, not a cookie.
-			input.value = window.location.href;
+			// Set from the current page URL, stripping any known Pardot error-redirect
+			// params (errors, errorMessage, allFields) to avoid submitting PII that
+			// Pardot echoes back in error redirects. Other query params are preserved
+			// as they may be relevant to CMS routing or other aspects of the page.
+			const urlParams = new URLSearchParams( window.location.search );
+			PARDOT_SYSTEM_PARAMS.forEach( function ( p ) {
+				urlParams.delete( p );
+			} );
+			const cleanSearch = urlParams.toString();
+			input.value =
+				window.location.origin +
+				window.location.pathname +
+				( cleanSearch ? '?' + cleanSearch : '' ) +
+				window.location.hash;
 		} else if ( input.name === 'visitor_id' ) {
 			// Pardot's visitor ID cookie is named visitor_id{piAId} — scan for it.
 			const visitorId = getPardotVisitorId();
@@ -332,7 +344,10 @@ let debounceTimer = null;
 
 function debouncedPopulate() {
 	clearTimeout( debounceTimer );
-	debounceTimer = setTimeout( populateForms, 50 );
+	debounceTimer = setTimeout( function () {
+		populateForms();
+		handlePardotErrors();
+	}, 50 );
 }
 
 function observeForForms() {

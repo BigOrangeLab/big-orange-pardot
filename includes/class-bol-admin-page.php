@@ -820,6 +820,7 @@ class BOL_Admin_Page {
 					'<a href="' . esc_url( $this->tab_url( 'settings' ) ) . '">' . esc_html__( 'Form Handler Inspector', 'big-orange-pardot' ) . '</a>'
 				);
 				?>
+				<?php esc_html_e( 'Note: the inspector only checks the nine cookie-backed attribution fields — last_form_submission_url is not cookie-backed and will not appear in the inspector.', 'big-orange-pardot' ); ?>
 			</p>
 
 			<h3><?php esc_html_e( 'Error handling', 'big-orange-pardot' ); ?></h3>

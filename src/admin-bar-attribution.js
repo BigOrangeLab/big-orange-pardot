@@ -12,6 +12,7 @@ import { __, sprintf } from '@wordpress/i18n';
  * attribution.js so the admin bar reflects new cookies without a page reload.
  */
 
+// Fields with simple 1:1 cookie names.
 const COOKIE_NAMES = [
 	'utm_source',
 	'utm_medium',
@@ -21,8 +22,35 @@ const COOKIE_NAMES = [
 	'referrer_url',
 	'landing_page_url',
 	'gclid',
-	'visitor_id',
 ];
+
+/**
+ * Finds the Pardot visitor ID from its dynamically-named cookie.
+ *
+ * Pardot names the cookie visitor_id{piAId} (e.g. visitor_id787913).
+ * Returns an object with the cookie name and value, or null if not found.
+ *
+ * @return {{name: string, value: string}|null} Cookie name+value, or null.
+ */
+function findPardotVisitorCookie() {
+	const cookies = document.cookie.split( ';' );
+	for ( let i = 0; i < cookies.length; i++ ) {
+		const eqPos = cookies[ i ].indexOf( '=' );
+		if ( eqPos === -1 ) {
+			continue;
+		}
+		const name = cookies[ i ].substring( 0, eqPos ).trim();
+		if ( /^visitor_id\d+$/.test( name ) ) {
+			return {
+				name,
+				value: decodeURIComponent(
+					cookies[ i ].substring( eqPos + 1 ).trim()
+				),
+			};
+		}
+	}
+	return null;
+}
 
 /**
  * Expires a cookie by setting its expiry date to the past.
@@ -81,6 +109,25 @@ function updateAdminBar() {
 		}
 	} );
 
+	// visitor_id is stored under a dynamic cookie name (visitor_id{piAId}).
+	const visitorItem = document.getElementById(
+		'wp-admin-bar-bol-attribution-field-visitor_id'
+	);
+	if ( visitorItem ) {
+		const valueSpan = visitorItem.querySelector( '.bol-ab-field-value' );
+		if ( valueSpan ) {
+			const pardotCookie = findPardotVisitorCookie();
+			if ( pardotCookie ) {
+				setCount++;
+				valueSpan.textContent = pardotCookie.value;
+				valueSpan.classList.remove( 'bol-ab-field-empty' );
+			} else {
+				valueSpan.textContent = __( '(not set)', 'big-orange-pardot' );
+				valueSpan.classList.add( 'bol-ab-field-empty' );
+			}
+		}
+	}
+
 	const parentItem = document.getElementById(
 		'wp-admin-bar-bol-attribution'
 	);
@@ -106,6 +153,11 @@ function init() {
 	clearLink.addEventListener( 'click', function ( e ) {
 		e.preventDefault();
 		COOKIE_NAMES.forEach( deleteCookie );
+		// Also delete the Pardot visitor cookie (dynamic name).
+		const pardotCookie = findPardotVisitorCookie();
+		if ( pardotCookie ) {
+			deleteCookie( pardotCookie.name );
+		}
 		window.location.reload();
 	} );
 

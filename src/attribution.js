@@ -21,6 +21,8 @@ const GCLID_EXPIRY_DAYS = 90;
 const COOKIE_PATH = '/';
 
 // Cookie-backed hidden fields — populated from their matching cookie values.
+// Note: visitor_id is handled separately because its cookie name is dynamic
+// (visitor_id{piAId}, e.g. visitor_id787913) — see getPardotVisitorId().
 const HIDDEN_FIELD_NAMES = [
 	'utm_source',
 	'utm_medium',
@@ -30,7 +32,6 @@ const HIDDEN_FIELD_NAMES = [
 	'referrer_url',
 	'landing_page_url',
 	'gclid',
-	'visitor_id',
 ];
 
 // URL params Pardot appends to its error redirect — not visible form fields.
@@ -63,6 +64,32 @@ function getCookie( name ) {
 		const c = cookies[ i ].trim();
 		if ( c.indexOf( nameEQ ) === 0 ) {
 			return decodeURIComponent( c.substring( nameEQ.length ) );
+		}
+	}
+	return null;
+}
+
+/**
+ * Finds the Pardot visitor ID from its dynamically-named cookie.
+ *
+ * Pardot's tracking script stores the visitor ID in a cookie named
+ * visitor_id{piAId} (e.g. visitor_id787913). We scan all cookies for the
+ * pattern visitor_id + digits, excluding the companion -hash variant.
+ *
+ * @return {string|null} Visitor ID value, or null if not found.
+ */
+function getPardotVisitorId() {
+	const cookies = document.cookie.split( ';' );
+	for ( let i = 0; i < cookies.length; i++ ) {
+		const eqPos = cookies[ i ].indexOf( '=' );
+		if ( eqPos === -1 ) {
+			continue;
+		}
+		const name = cookies[ i ].substring( 0, eqPos ).trim();
+		if ( /^visitor_id\d+$/.test( name ) ) {
+			return decodeURIComponent(
+				cookies[ i ].substring( eqPos + 1 ).trim()
+			);
 		}
 	}
 	return null;
@@ -143,6 +170,12 @@ function populateForms() {
 		if ( input.name === 'last_form_submission_url' ) {
 			// Always set from the current page URL, not a cookie.
 			input.value = window.location.href;
+		} else if ( input.name === 'visitor_id' ) {
+			// Pardot's visitor ID cookie is named visitor_id{piAId} — scan for it.
+			const visitorId = getPardotVisitorId();
+			if ( visitorId !== null ) {
+				input.value = visitorId;
+			}
 		} else if ( HIDDEN_FIELD_NAMES.indexOf( input.name ) !== -1 ) {
 			const cookieValue = getCookie( input.name );
 			if ( cookieValue !== null ) {

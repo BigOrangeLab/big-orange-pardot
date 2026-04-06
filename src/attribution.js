@@ -151,12 +151,17 @@ function hasMarketingConsent() {
 }
 
 /**
- * Expires all attribution cookies written by captureAttribution() and
- * notifies listeners that cookie state has changed.
+ * Expires all attribution cookies written by captureAttribution(), blanks
+ * their hidden input fields in any forms currently on the page, and notifies
+ * listeners that cookie state has changed.
  *
  * Called when marketing consent is revoked so stored tracking values are
- * cleared immediately and won't be forwarded on the next form submission.
- * Note: visitor_id is Pardot's own cookie — we do not expire it here.
+ * cleared immediately and cannot be submitted by an open form. Without the
+ * DOM clear, a form already rendered would still carry the old field values
+ * even after the cookies are gone.
+ *
+ * Note: visitor_id is Pardot's own cookie — we do not expire it here, but
+ * we do blank any visitor_id hidden inputs to prevent forwarding it.
  */
 function expireAttributionCookies() {
 	HIDDEN_FIELD_NAMES.forEach( function ( name ) {
@@ -166,6 +171,20 @@ function expireAttributionCookies() {
 			COOKIE_PATH +
 			';';
 	} );
+
+	// Blank hidden inputs that were populated by populateForms() so that an
+	// already-open form cannot submit stale attribution data after revocation.
+	document
+		.querySelectorAll( 'input[type="hidden"]' )
+		.forEach( function ( input ) {
+			if (
+				HIDDEN_FIELD_NAMES.indexOf( input.name ) !== -1 ||
+				input.name === 'visitor_id'
+			) {
+				input.value = '';
+			}
+		} );
+
 	// Notify listeners (e.g. admin bar inspector) that cookie state changed.
 	document.dispatchEvent( new CustomEvent( 'bolAttributionUpdated' ) );
 }

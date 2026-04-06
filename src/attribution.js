@@ -239,6 +239,10 @@ function validateForm( form, errorContainer ) {
  * Detects a Pardot error redirect (errors=true in the query string), displays
  * the error message, and re-populates visible form fields with the previously
  * submitted values that Pardot echoes back in the URL.
+ *
+ * After processing, strips the Pardot error params and any echoed field values
+ * from the address bar via history.replaceState to avoid leaving PII/error
+ * details in browser history, copied links, referrers, and analytics.
  */
 function handlePardotErrors() {
 	const params = new URLSearchParams( window.location.search );
@@ -253,6 +257,9 @@ function handlePardotErrors() {
 			return s.trim();
 		} )
 		.filter( Boolean );
+
+	// Track which field-name params were echoed back so we can strip them too.
+	const echoedFieldNames = [];
 
 	document
 		.querySelectorAll( '.wp-block-bigorangelab-pardot-form' )
@@ -291,10 +298,30 @@ function handlePardotErrors() {
 					const value = params.get( field.name );
 					if ( null !== value ) {
 						field.value = value;
+						echoedFieldNames.push( field.name );
 					}
 				}
 			} );
 		} );
+
+	// Remove Pardot error params and echoed field values from the address bar
+	// to avoid leaving PII/error details in browser history, copied links,
+	// referrer headers sent to third parties, and analytics tools.
+	if ( window.history && window.history.replaceState ) {
+		const cleanParams = new URLSearchParams( window.location.search );
+		PARDOT_SYSTEM_PARAMS.forEach( function ( p ) {
+			cleanParams.delete( p );
+		} );
+		echoedFieldNames.forEach( function ( name ) {
+			cleanParams.delete( name );
+		} );
+		const cleanSearch = cleanParams.toString();
+		const cleanUrl =
+			window.location.pathname +
+			( cleanSearch ? '?' + cleanSearch : '' ) +
+			window.location.hash;
+		window.history.replaceState( null, '', cleanUrl );
+	}
 }
 
 // -------------------------------------------------------------------------

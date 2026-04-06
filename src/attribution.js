@@ -154,6 +154,26 @@ function hasMarketingConsent() {
 }
 
 /**
+ * Expires all attribution cookies written by captureAttribution() and
+ * notifies listeners that cookie state has changed.
+ *
+ * Called when marketing consent is revoked so stored tracking values are
+ * cleared immediately and won't be forwarded on the next form submission.
+ * Note: visitor_id is Pardot's own cookie — we do not expire it here.
+ */
+function expireAttributionCookies() {
+	HIDDEN_FIELD_NAMES.forEach( function ( name ) {
+		document.cookie =
+			name +
+			'=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=' +
+			COOKIE_PATH +
+			';';
+	} );
+	// Notify listeners (e.g. admin bar inspector) that cookie state changed.
+	document.dispatchEvent( new CustomEvent( 'bolAttributionUpdated' ) );
+}
+
+/**
  * Runs captureAttribution() + populateForms() once consent is confirmed.
  * Called by each CMP's consent-granted event so that forms already on the
  * page get their hidden fields populated before the visitor submits.
@@ -166,23 +186,50 @@ function onConsentGranted() {
 }
 
 /**
- * Registers event listeners for consent-granted events from known CMPs and
- * the operator-provided `bolConsentGranted` custom event.
+ * Expires attribution cookies when consent is revoked.
+ * Called by Cookiebot's decline event and the operator `bolConsentRevoked`
+ * custom event.
+ */
+function onConsentRevoked() {
+	if ( ! hasMarketingConsent() ) {
+		expireAttributionCookies();
+	}
+}
+
+/**
+ * Handles CMPs that fire a single event for both grant and revoke
+ * (CookieYes `ckyConsentUpdate`, Complianz `cmplzStatusChange`).
+ * Captures attribution when consent is present; expires cookies when not.
+ */
+function onConsentChange() {
+	if ( hasMarketingConsent() ) {
+		captureAttribution();
+		populateForms();
+	} else {
+		expireAttributionCookies();
+	}
+}
+
+/**
+ * Registers event listeners for consent-granted and consent-revoked events
+ * from known CMPs and operator-provided custom events.
  * Safe to call unconditionally — listeners only fire if the CMP is present.
  */
 function setupConsentListeners() {
-	// Cookiebot fires on window.
+	// Cookiebot fires separate events for accept and decline.
 	window.addEventListener( 'CookiebotOnAccept', onConsentGranted );
+	window.addEventListener( 'CookiebotOnDecline', onConsentRevoked );
 
-	// CookieYes fires on document.
-	document.addEventListener( 'ckyConsentUpdate', onConsentGranted );
+	// CookieYes fires a single event for both grant and revoke.
+	document.addEventListener( 'ckyConsentUpdate', onConsentChange );
 
-	// Complianz fires on document.
-	document.addEventListener( 'cmplzStatusChange', onConsentGranted );
+	// Complianz fires a single event for both grant and revoke.
+	document.addEventListener( 'cmplzStatusChange', onConsentChange );
 
-	// Operator escape hatch — dispatch this event from your own CMP integration
-	// to trigger attribution capture when marketing consent is granted.
+	// Operator escape hatches — dispatch from your own CMP integration to
+	// trigger attribution capture or cookie expiry respectively.
 	document.addEventListener( 'bolConsentGranted', onConsentGranted );
+	document.addEventListener( 'bolConsentRevoked', onConsentRevoked );
 }
 
 // -------------------------------------------------------------------------

@@ -838,7 +838,9 @@ window.bolConsentCheck = function () {
 };</code></pre>
 			<p><?php esc_html_e( 'To trigger attribution capture the moment a visitor grants consent (so hidden fields in any open form get populated before submit), dispatch a bolConsentGranted event:', 'big-orange-pardot' ); ?></p>
 			<pre style="background:#f6f7f7;border:1px solid #dcdcde;padding:0.75em 1em;overflow-x:auto;font-size:0.8125rem;"><code>document.dispatchEvent( new CustomEvent( 'bolConsentGranted' ) );</code></pre>
-			<p class="description"><?php esc_html_e( 'Form field population, error handling, and client-side submit validation always run regardless of consent status — only the writing of attribution cookies is gated.', 'big-orange-pardot' ); ?></p>
+			<p><?php esc_html_e( 'When a visitor withdraws consent, dispatch bolConsentRevoked to immediately expire all attribution cookies:', 'big-orange-pardot' ); ?></p>
+			<pre style="background:#f6f7f7;border:1px solid #dcdcde;padding:0.75em 1em;overflow-x:auto;font-size:0.8125rem;"><code>document.dispatchEvent( new CustomEvent( 'bolConsentRevoked' ) );</code></pre>
+			<p class="description"><?php esc_html_e( 'Form field population, error handling, and client-side submit validation always run regardless of consent status — only the writing and retention of attribution cookies is gated.', 'big-orange-pardot' ); ?></p>
 
 			<h3><?php esc_html_e( 'Error handling', 'big-orange-pardot' ); ?></h3>
 			<p><?php esc_html_e( 'The plugin handles form errors in two ways:', 'big-orange-pardot' ); ?></p>

@@ -305,12 +305,15 @@ function populateForms() {
 	const hiddenInputs = document.querySelectorAll( 'input[type="hidden"]' );
 	hiddenInputs.forEach( function ( input ) {
 		if ( input.name === 'last_form_submission_url' ) {
-			// Set from the current page URL, stripping any known Pardot error-redirect
-			// params (errors, errorMessage, allFields) to avoid submitting PII that
-			// Pardot echoes back in error redirects. Other query params are preserved
-			// as they may be relevant to CMS routing or other aspects of the page.
+			// Set from the current page URL, stripping Pardot error-redirect params
+			// and marketing tracking params (UTM/gclid). Tracking values are already
+			// captured in attribution cookies (when consent is given); submitting
+			// them raw in the URL would bypass the consent gate.
 			const urlParams = new URLSearchParams( window.location.search );
 			PARDOT_SYSTEM_PARAMS.forEach( function ( p ) {
+				urlParams.delete( p );
+			} );
+			HIDDEN_FIELD_NAMES.forEach( function ( p ) {
 				urlParams.delete( p );
 			} );
 			const cleanSearch = urlParams.toString();

@@ -808,6 +808,8 @@ class BOL_Admin_Page {
 					<tr><td><code>gclid</code></td><td><?php esc_html_e( 'Google Click ID (from Google Ads)', 'big-orange-pardot' ); ?></td><td><?php esc_html_e( '90 days, overwritten on each visit', 'big-orange-pardot' ); ?></td></tr>
 					<tr><td><code>landing_page_url</code></td><td><?php esc_html_e( 'Full URL of the first page visited', 'big-orange-pardot' ); ?></td><td><?php esc_html_e( '30 days, set once and never overwritten', 'big-orange-pardot' ); ?></td></tr>
 					<tr><td><code>referrer_url</code></td><td><?php esc_html_e( 'Referring URL from outside this domain', 'big-orange-pardot' ); ?></td><td><?php esc_html_e( '30 days, set once and never overwritten', 'big-orange-pardot' ); ?></td></tr>
+					<tr><td><code>visitor_id</code></td><td><?php esc_html_e( 'Pardot visitor ID (set by the Pardot tracking script cookie)', 'big-orange-pardot' ); ?></td><td><?php esc_html_e( 'Read from cookie on each page load', 'big-orange-pardot' ); ?></td></tr>
+					<tr><td><code>last_form_submission_url</code></td><td><?php esc_html_e( 'Full URL of the page containing the form at submission time', 'big-orange-pardot' ); ?></td><td><?php esc_html_e( 'Set from window.location.href on each page load — not a cookie', 'big-orange-pardot' ); ?></td></tr>
 				</tbody>
 			</table>
 			<p class="description">
@@ -819,6 +821,18 @@ class BOL_Admin_Page {
 				);
 				?>
 			</p>
+
+			<h3><?php esc_html_e( 'Error handling', 'big-orange-pardot' ); ?></h3>
+			<p><?php esc_html_e( 'The plugin handles form errors in two ways:', 'big-orange-pardot' ); ?></p>
+			<ul style="list-style: disc; margin-left: 2em;">
+				<li>
+					<strong><?php esc_html_e( 'Client-side validation', 'big-orange-pardot' ); ?></strong> — <?php esc_html_e( 'Before the form is submitted to Pardot, JavaScript checks all required fields and field formats using the HTML5 Constraint Validation API. If any fields are invalid, an error message is shown above the fields and submission is blocked until the issues are corrected.', 'big-orange-pardot' ); ?>
+				</li>
+				<li>
+					<strong><?php esc_html_e( 'Pardot server-side errors', 'big-orange-pardot' ); ?></strong> — <?php esc_html_e( 'If Pardot rejects a submission (for example, an email address fails its validation rules), it redirects back to the form page with an errorMessage parameter and the submitted field values in the URL. The plugin automatically detects this redirect, displays the error message in a notice above the form fields, and re-populates the visible fields so the visitor does not need to re-type their data.', 'big-orange-pardot' ); ?>
+				</li>
+			</ul>
+			<p class="description"><?php esc_html_e( 'The error notice is styled with a red left border and appears inside the form, spanning the full width above all fields. It is only shown when errors are present and is cleared automatically when the visitor resubmits successfully.', 'big-orange-pardot' ); ?></p>
 
 			<hr />
 

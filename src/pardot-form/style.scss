@@ -119,6 +119,35 @@
 	}
 
 	// -------------------------------------------------------------------------
+	// Error container (shown when Pardot redirects back with errors=true, or
+	// when client-side submit validation fails)
+	// -------------------------------------------------------------------------
+
+	.bol-pardot-errors {
+		grid-column: span 2;
+		padding: 0.75rem 1rem;
+		background: #fdf2f2;
+		border-left: 3px solid #d63638;
+		border-radius: 0 0.25rem 0.25rem 0;
+		color: #d63638;
+		font-size: 0.875rem;
+
+		ul {
+			margin: 0;
+			padding-left: 1.25em;
+			list-style: disc;
+		}
+
+		li {
+			margin-bottom: 0.25em;
+
+			&:last-child {
+				margin-bottom: 0;
+			}
+		}
+	}
+
+	// -------------------------------------------------------------------------
 	// Unconfigured-form notice (shown to editors when no handler URL is set)
 	// -------------------------------------------------------------------------
 

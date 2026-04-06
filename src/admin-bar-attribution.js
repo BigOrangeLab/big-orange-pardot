@@ -21,6 +21,7 @@ const COOKIE_NAMES = [
 	'referrer_url',
 	'landing_page_url',
 	'gclid',
+	'visitor_id',
 ];
 
 /**

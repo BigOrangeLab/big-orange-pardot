@@ -823,6 +823,25 @@ class BOL_Admin_Page {
 				<?php esc_html_e( 'Note: the inspector only checks the nine cookie-backed attribution fields — last_form_submission_url is not cookie-backed and will not appear in the inspector.', 'big-orange-pardot' ); ?>
 			</p>
 
+			<h3><?php esc_html_e( 'Cookie consent integration', 'big-orange-pardot' ); ?></h3>
+			<p><?php esc_html_e( 'Attribution cookies are only written when marketing consent has been granted. The plugin detects the following Cookie Management Platforms (CMPs) automatically:', 'big-orange-pardot' ); ?></p>
+			<ul style="list-style: disc; margin-left: 2em;">
+				<li><strong>Cookiebot</strong> — <?php esc_html_e( 'checks window.Cookiebot.consent.marketing; listens for the CookiebotOnAccept event.', 'big-orange-pardot' ); ?></li>
+				<li><strong>CookieYes</strong> — <?php esc_html_e( 'checks getCkyConsent().categories.advertisement; listens for the ckyConsentUpdate event.', 'big-orange-pardot' ); ?></li>
+				<li><strong>Complianz</strong> — <?php esc_html_e( 'checks the cmplz_marketing cookie for a value of "allow"; listens for the cmplzStatusChange event.', 'big-orange-pardot' ); ?></li>
+			</ul>
+			<p><?php esc_html_e( 'If none of these CMPs are present, attribution cookies are set on every page load (opt-out default, suitable for sites without a consent requirement).', 'big-orange-pardot' ); ?></p>
+			<p><?php esc_html_e( 'To integrate with any other CMP, add a small inline script before this plugin\'s attribution.js loads:', 'big-orange-pardot' ); ?></p>
+			<pre style="background:#f6f7f7;border:1px solid #dcdcde;padding:0.75em 1em;overflow-x:auto;font-size:0.8125rem;"><code>// Return true to allow attribution cookies, false to block them.
+window.bolConsentCheck = function () {
+	return myCMP.hasConsent( 'marketing' );
+};</code></pre>
+			<p><?php esc_html_e( 'To trigger attribution capture the moment a visitor grants consent (so hidden fields in any open form get populated before submit), dispatch a bolConsentGranted event:', 'big-orange-pardot' ); ?></p>
+			<pre style="background:#f6f7f7;border:1px solid #dcdcde;padding:0.75em 1em;overflow-x:auto;font-size:0.8125rem;"><code>document.dispatchEvent( new CustomEvent( 'bolConsentGranted' ) );</code></pre>
+			<p><?php esc_html_e( 'When a visitor withdraws consent, dispatch bolConsentRevoked to immediately expire all attribution cookies:', 'big-orange-pardot' ); ?></p>
+			<pre style="background:#f6f7f7;border:1px solid #dcdcde;padding:0.75em 1em;overflow-x:auto;font-size:0.8125rem;"><code>document.dispatchEvent( new CustomEvent( 'bolConsentRevoked' ) );</code></pre>
+			<p class="description"><?php esc_html_e( 'Form field population, error handling, and client-side submit validation always run regardless of consent status — only the writing and retention of attribution cookies is gated.', 'big-orange-pardot' ); ?></p>
+
 			<h3><?php esc_html_e( 'Error handling', 'big-orange-pardot' ); ?></h3>
 			<p><?php esc_html_e( 'The plugin handles form errors in two ways:', 'big-orange-pardot' ); ?></p>
 			<ul style="list-style: disc; margin-left: 2em;">

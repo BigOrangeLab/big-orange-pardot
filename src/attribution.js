@@ -37,6 +37,18 @@ const HIDDEN_FIELD_NAMES = [
 // URL params Pardot appends to its error redirect — not visible form fields.
 const PARDOT_SYSTEM_PARAMS = [ 'errors', 'errorMessage', 'allFields' ];
 
+// Marketing tracking params that may appear in a page URL. Stripped from
+// last_form_submission_url so they aren't submitted raw — they are already
+// captured in attribution cookies (when consent is given).
+const URL_TRACKING_PARAMS = [
+	'utm_source',
+	'utm_medium',
+	'utm_campaign',
+	'utm_term',
+	'utm_content',
+	'gclid',
+];
+
 // -------------------------------------------------------------------------
 // Cookie utilities
 // -------------------------------------------------------------------------
@@ -54,7 +66,8 @@ function setCookie( name, value, days ) {
 		encodeURIComponent( value ) +
 		expires +
 		'; path=' +
-		COOKIE_PATH;
+		COOKIE_PATH +
+		'; SameSite=Lax';
 }
 
 function getCookie( name ) {
@@ -93,6 +106,161 @@ function getPardotVisitorId() {
 		}
 	}
 	return null;
+}
+
+// -------------------------------------------------------------------------
+// Consent check
+// -------------------------------------------------------------------------
+
+/**
+ * Returns true if marketing/analytics cookie consent has been granted.
+ *
+ * Detection priority:
+ *
+ * 1. **Operator override** — define `window.bolConsentCheck = function() { return bool; }`
+ *    anywhere before this script runs to take full control of the decision.
+ *    Returning `true` allows attribution cookies; `false` blocks them.
+ *    Example (inline script or wp_add_inline_script):
+ *        window.bolConsentCheck = function() {
+ *            return myCMP.hasConsent('marketing');
+ *        };
+ *
+ * 2. **Cookiebot** — reads `window.Cookiebot.consent.marketing`.
+ *
+ * 3. **CookieYes** — reads `window.getCkyConsent().categories.advertisement`.
+ *
+ * 4. **Complianz** — reads the `cmplz_marketing` cookie (`allow` = consented).
+ *
+ * 5. **No CMP detected** — defaults to `true` (allow).
+ *    Sites without a CMP are responsible for their own compliance.
+ *
+ * @return {boolean} Whether marketing cookies may be set.
+ */
+function hasMarketingConsent() {
+	// 1. Operator override.
+	if ( typeof window.bolConsentCheck === 'function' ) {
+		return !! window.bolConsentCheck();
+	}
+
+	// 2. Cookiebot.
+	if ( window.Cookiebot && window.Cookiebot.consent !== undefined ) {
+		return !! window.Cookiebot.consent.marketing;
+	}
+
+	// 3. CookieYes.
+	if ( typeof window.getCkyConsent === 'function' ) {
+		const cky = window.getCkyConsent();
+		return !! ( cky && cky.categories && cky.categories.advertisement );
+	}
+
+	// 4. Complianz — cmplz_marketing cookie is set to 'allow' when consented.
+	const cmplz = getCookie( 'cmplz_marketing' );
+	if ( cmplz !== null ) {
+		return 'allow' === cmplz;
+	}
+
+	// 5. No CMP detected — allow by default.
+	return true;
+}
+
+/**
+ * Expires all attribution cookies written by captureAttribution(), blanks
+ * their hidden input fields in any forms currently on the page, and notifies
+ * listeners that cookie state has changed.
+ *
+ * Called when marketing consent is revoked so stored tracking values are
+ * cleared immediately and cannot be submitted by an open form. Without the
+ * DOM clear, a form already rendered would still carry the old field values
+ * even after the cookies are gone.
+ *
+ * Note: visitor_id is Pardot's own cookie — we do not expire it here, but
+ * we do blank any visitor_id hidden inputs to prevent forwarding it.
+ */
+function expireAttributionCookies() {
+	HIDDEN_FIELD_NAMES.forEach( function ( name ) {
+		document.cookie =
+			name +
+			'=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=' +
+			COOKIE_PATH +
+			'; SameSite=Lax';
+	} );
+
+	// Blank hidden inputs that were populated by populateForms() so that an
+	// already-open form cannot submit stale attribution data after revocation.
+	document
+		.querySelectorAll( 'input[type="hidden"]' )
+		.forEach( function ( input ) {
+			if (
+				HIDDEN_FIELD_NAMES.indexOf( input.name ) !== -1 ||
+				input.name === 'visitor_id'
+			) {
+				input.value = '';
+			}
+		} );
+
+	// Notify listeners (e.g. admin bar inspector) that cookie state changed.
+	document.dispatchEvent( new CustomEvent( 'bolAttributionUpdated' ) );
+}
+
+/**
+ * Runs captureAttribution() + populateForms() once consent is confirmed.
+ * Called by each CMP's consent-granted event so that forms already on the
+ * page get their hidden fields populated before the visitor submits.
+ */
+function onConsentGranted() {
+	if ( hasMarketingConsent() ) {
+		captureAttribution();
+		populateForms();
+	}
+}
+
+/**
+ * Expires attribution cookies when consent is revoked.
+ * Called by Cookiebot's decline event and the operator `bolConsentRevoked`
+ * custom event.
+ *
+ * Intentionally unconditional — the caller (CMP event or operator dispatch)
+ * is trusted directly. Re-checking hasMarketingConsent() here would silently
+ * no-op if the CMP state and the bolConsentCheck override disagreed.
+ */
+function onConsentRevoked() {
+	expireAttributionCookies();
+}
+
+/**
+ * Handles CMPs that fire a single event for both grant and revoke
+ * (CookieYes `ckyConsentUpdate`, Complianz `cmplzStatusChange`).
+ * Captures attribution when consent is present; expires cookies when not.
+ */
+function onConsentChange() {
+	if ( hasMarketingConsent() ) {
+		captureAttribution();
+		populateForms();
+	} else {
+		expireAttributionCookies();
+	}
+}
+
+/**
+ * Registers event listeners for consent-granted and consent-revoked events
+ * from known CMPs and operator-provided custom events.
+ * Safe to call unconditionally — listeners only fire if the CMP is present.
+ */
+function setupConsentListeners() {
+	// Cookiebot fires separate events for accept and decline.
+	window.addEventListener( 'CookiebotOnAccept', onConsentGranted );
+	window.addEventListener( 'CookiebotOnDecline', onConsentRevoked );
+
+	// CookieYes fires a single event for both grant and revoke.
+	document.addEventListener( 'ckyConsentUpdate', onConsentChange );
+
+	// Complianz fires a single event for both grant and revoke.
+	document.addEventListener( 'cmplzStatusChange', onConsentChange );
+
+	// Operator escape hatches — dispatch from your own CMP integration to
+	// trigger attribution capture or cookie expiry respectively.
+	document.addEventListener( 'bolConsentGranted', onConsentGranted );
+	document.addEventListener( 'bolConsentRevoked', onConsentRevoked );
 }
 
 // -------------------------------------------------------------------------
@@ -168,12 +336,15 @@ function populateForms() {
 	const hiddenInputs = document.querySelectorAll( 'input[type="hidden"]' );
 	hiddenInputs.forEach( function ( input ) {
 		if ( input.name === 'last_form_submission_url' ) {
-			// Set from the current page URL, stripping any known Pardot error-redirect
-			// params (errors, errorMessage, allFields) to avoid submitting PII that
-			// Pardot echoes back in error redirects. Other query params are preserved
-			// as they may be relevant to CMS routing or other aspects of the page.
+			// Set from the current page URL, stripping Pardot error-redirect params
+			// and marketing tracking params (UTM/gclid). Tracking values are already
+			// captured in attribution cookies (when consent is given); submitting
+			// them raw in the URL would bypass the consent gate.
 			const urlParams = new URLSearchParams( window.location.search );
 			PARDOT_SYSTEM_PARAMS.forEach( function ( p ) {
+				urlParams.delete( p );
+			} );
+			URL_TRACKING_PARAMS.forEach( function ( p ) {
 				urlParams.delete( p );
 			} );
 			const cleanSearch = urlParams.toString();
@@ -183,10 +354,13 @@ function populateForms() {
 				( cleanSearch ? '?' + cleanSearch : '' ) +
 				window.location.hash;
 		} else if ( input.name === 'visitor_id' ) {
-			// Pardot's visitor ID cookie is named visitor_id{piAId} — scan for it.
-			const visitorId = getPardotVisitorId();
-			if ( visitorId !== null ) {
-				input.value = visitorId;
+			// Pardot's visitor ID cookie identifies the visitor — only forward
+			// it when marketing consent is present.
+			if ( hasMarketingConsent() ) {
+				const visitorId = getPardotVisitorId();
+				if ( visitorId !== null ) {
+					input.value = visitorId;
+				}
 			}
 		} else if ( HIDDEN_FIELD_NAMES.indexOf( input.name ) !== -1 ) {
 			const cookieValue = getCookie( input.name );
@@ -389,16 +563,23 @@ document.addEventListener( 'submit', function ( e ) {
 // Init
 // -------------------------------------------------------------------------
 
-captureAttribution();
+// captureAttribution() is gated on consent — it is the only function that
+// writes our tracking cookies. Everything else (form population, error
+// handling, observers, submit validation) runs unconditionally.
+if ( hasMarketingConsent() ) {
+	captureAttribution();
+}
 
 if ( document.readyState === 'loading' ) {
 	document.addEventListener( 'DOMContentLoaded', function () {
 		populateForms();
 		handlePardotErrors();
 		observeForForms();
+		setupConsentListeners();
 	} );
 } else {
 	populateForms();
 	handlePardotErrors();
 	observeForForms();
+	setupConsentListeners();
 }

@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-04-06T17:16:34+00:00\n"
+"POT-Creation-Date: 2026-04-06T19:50:50+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: big-orange-pardot\n"
@@ -37,20 +37,21 @@ msgid "handler_id is required."
 msgstr ""
 
 #. translators: %d: number of attribution cookies currently set
-#: big-orange-pardot.php:130
+#: big-orange-pardot.php:142
 #: build/admin-bar-attribution.js:2
-#: src/admin-bar-attribution.js:92
+#: src/admin-bar-attribution.js:139
 #, php-format,js-format
 msgid "Attribution (%d)"
 msgstr ""
 
-#: big-orange-pardot.php:138
+#: big-orange-pardot.php:150
 #: build/admin-bar-attribution.js:1
-#: src/admin-bar-attribution.js:79
+#: src/admin-bar-attribution.js:107
+#: src/admin-bar-attribution.js:125
 msgid "(not set)"
 msgstr ""
 
-#: big-orange-pardot.php:155
+#: big-orange-pardot.php:167
 msgid "Clear all cookies"
 msgstr ""
 
@@ -276,7 +277,7 @@ msgid "Attribution Tracking"
 msgstr ""
 
 #: includes/class-bol-admin-page.php:651
-#: includes/class-bol-admin-page.php:839
+#: includes/class-bol-admin-page.php:859
 msgid "Testing &amp; Debugging"
 msgstr ""
 
@@ -742,197 +743,241 @@ msgid "Unmapped fields are silently ignored by Pardot. Use the %s on the Setting
 msgstr ""
 
 #: includes/class-bol-admin-page.php:820
-#: includes/class-bol-admin-page.php:899
+#: includes/class-bol-admin-page.php:919
 msgid "Form Handler Inspector"
 msgstr ""
 
-#: includes/class-bol-admin-page.php:825
-msgid "Error handling"
+#: includes/class-bol-admin-page.php:823
+msgid "Note: the inspector only checks the nine cookie-backed attribution fields — last_form_submission_url is not cookie-backed and will not appear in the inspector."
 msgstr ""
 
 #: includes/class-bol-admin-page.php:826
-msgid "The plugin handles form errors in two ways:"
+msgid "Cookie consent integration"
+msgstr ""
+
+#: includes/class-bol-admin-page.php:827
+msgid "Attribution cookies are only written when marketing consent has been granted. The plugin detects the following Cookie Management Platforms (CMPs) automatically:"
 msgstr ""
 
 #: includes/class-bol-admin-page.php:829
-msgid "Client-side validation"
+msgid "checks window.Cookiebot.consent.marketing; listens for the CookiebotOnAccept event."
 msgstr ""
 
-#: includes/class-bol-admin-page.php:829
-msgid "Before the form is submitted to Pardot, JavaScript checks all required fields and field formats using the HTML5 Constraint Validation API. If any fields are invalid, an error message is shown above the fields and submission is blocked until the issues are corrected."
+#: includes/class-bol-admin-page.php:830
+msgid "checks getCkyConsent().categories.advertisement; listens for the ckyConsentUpdate event."
 msgstr ""
 
-#: includes/class-bol-admin-page.php:832
-msgid "Pardot server-side errors"
+#: includes/class-bol-admin-page.php:831
+msgid "checks the cmplz_marketing cookie for a value of \"allow\"; listens for the cmplzStatusChange event."
 msgstr ""
 
-#: includes/class-bol-admin-page.php:832
-msgid "If Pardot rejects a submission (for example, an email address fails its validation rules), it redirects back to the form page with an errorMessage parameter and the submitted field values in the URL. The plugin automatically detects this redirect, displays the error message in a notice above the form fields, and re-populates the visible fields so the visitor does not need to re-type their data."
+#: includes/class-bol-admin-page.php:833
+msgid "If none of these CMPs are present, attribution cookies are set on every page load (opt-out default, suitable for sites without a consent requirement)."
 msgstr ""
 
-#: includes/class-bol-admin-page.php:835
-msgid "The error notice is styled with a red left border and appears inside the form, spanning the full width above all fields. It is only shown when errors are present and is cleared automatically when the visitor resubmits successfully."
+#: includes/class-bol-admin-page.php:834
+msgid "To integrate with any other CMP, add a small inline script before this plugin's attribution.js loads:"
+msgstr ""
+
+#: includes/class-bol-admin-page.php:839
+msgid "To trigger attribution capture the moment a visitor grants consent (so hidden fields in any open form get populated before submit), dispatch a bolConsentGranted event:"
 msgstr ""
 
 #: includes/class-bol-admin-page.php:841
+msgid "When a visitor withdraws consent, dispatch bolConsentRevoked to immediately expire all attribution cookies:"
+msgstr ""
+
+#: includes/class-bol-admin-page.php:843
+msgid "Form field population, error handling, and client-side submit validation always run regardless of consent status — only the writing and retention of attribution cookies is gated."
+msgstr ""
+
+#: includes/class-bol-admin-page.php:845
+msgid "Error handling"
+msgstr ""
+
+#: includes/class-bol-admin-page.php:846
+msgid "The plugin handles form errors in two ways:"
+msgstr ""
+
+#: includes/class-bol-admin-page.php:849
+msgid "Client-side validation"
+msgstr ""
+
+#: includes/class-bol-admin-page.php:849
+msgid "Before the form is submitted to Pardot, JavaScript checks all required fields and field formats using the HTML5 Constraint Validation API. If any fields are invalid, an error message is shown above the fields and submission is blocked until the issues are corrected."
+msgstr ""
+
+#: includes/class-bol-admin-page.php:852
+msgid "Pardot server-side errors"
+msgstr ""
+
+#: includes/class-bol-admin-page.php:852
+msgid "If Pardot rejects a submission (for example, an email address fails its validation rules), it redirects back to the form page with an errorMessage parameter and the submitted field values in the URL. The plugin automatically detects this redirect, displays the error message in a notice above the form fields, and re-populates the visible fields so the visitor does not need to re-type their data."
+msgstr ""
+
+#: includes/class-bol-admin-page.php:855
+msgid "The error notice is styled with a red left border and appears inside the form, spanning the full width above all fields. It is only shown when errors are present and is cleared automatically when the visitor resubmits successfully."
+msgstr ""
+
+#: includes/class-bol-admin-page.php:861
 msgid "When you are logged in as an administrator, a small \"Attribution (N)\" menu appears in the WordPress admin bar on every page of the site. It shows the current value of each attribution cookie — or \"(not set)\" if that cookie has not been captured yet."
 msgstr ""
 
-#: includes/class-bol-admin-page.php:844
+#: includes/class-bol-admin-page.php:864
 msgid "The menu also includes a \"Clear all cookies\" link. Clicking it deletes all eight attribution cookies and reloads the page, so you can simulate a fresh visitor without opening a private browser window."
 msgstr ""
 
-#: includes/class-bol-admin-page.php:847
+#: includes/class-bol-admin-page.php:867
 msgid "For API troubleshooting, enable API Logging on the Settings tab. Request/response activity for Salesforce and Pardot is written to your uploads directory and shown on the Logs tab in a filterable table with per-entry inspection. From that tab, \"Delete Log and Disable Logging\" removes the file and turns logging off."
 msgstr ""
 
-#: includes/class-bol-admin-page.php:850
+#: includes/class-bol-admin-page.php:870
 msgid "The admin bar inspector is only visible to users with the manage_options capability and has no effect on site visitors."
 msgstr ""
 
-#: includes/class-bol-admin-page.php:865
+#: includes/class-bol-admin-page.php:885
 msgid "Pardot Connection"
 msgstr ""
 
-#: includes/class-bol-admin-page.php:869
+#: includes/class-bol-admin-page.php:889
 msgid "Connected"
 msgstr ""
 
-#: includes/class-bol-admin-page.php:874
+#: includes/class-bol-admin-page.php:894
 msgid "Disconnect"
 msgstr ""
 
-#: includes/class-bol-admin-page.php:879
+#: includes/class-bol-admin-page.php:899
 msgid "Not connected"
 msgstr ""
 
-#: includes/class-bol-admin-page.php:882
+#: includes/class-bol-admin-page.php:902
 msgid "Save your credentials above, then click Connect to Pardot."
 msgstr ""
 
-#: includes/class-bol-admin-page.php:901
+#: includes/class-bol-admin-page.php:921
 msgid "Select a form handler to see which attribution fields your plugin submits are actually mapped in Pardot."
 msgstr ""
 
-#: includes/class-bol-admin-page.php:916
+#: includes/class-bol-admin-page.php:936
 msgid "No form handlers found in your Pardot account."
 msgstr ""
 
-#: includes/class-bol-admin-page.php:927
+#: includes/class-bol-admin-page.php:947
 #: build/pardot-form/index.js:1
 #: src/pardot-form/edit.js:486
 msgid "— Select a form handler —"
 msgstr ""
 
-#: includes/class-bol-admin-page.php:939
+#: includes/class-bol-admin-page.php:959
 msgid "Inspect"
 msgstr ""
 
-#: includes/class-bol-admin-page.php:984
+#: includes/class-bol-admin-page.php:1004
 msgid "Attribution Field Mapping"
 msgstr ""
 
-#: includes/class-bol-admin-page.php:988
+#: includes/class-bol-admin-page.php:1008
 msgid "All attribution fields are mapped in this form handler."
 msgstr ""
 
-#: includes/class-bol-admin-page.php:992
+#: includes/class-bol-admin-page.php:1012
 msgid "Some attribution fields are not mapped. Unmapped fields will be silently ignored by Pardot."
 msgstr ""
 
-#: includes/class-bol-admin-page.php:999
+#: includes/class-bol-admin-page.php:1019
 msgid "Field Name (submitted by plugin)"
 msgstr ""
 
-#: includes/class-bol-admin-page.php:1000
+#: includes/class-bol-admin-page.php:1020
 msgid "Mapped in Pardot?"
 msgstr ""
 
-#: includes/class-bol-admin-page.php:1009
+#: includes/class-bol-admin-page.php:1029
 msgid "Mapped"
 msgstr ""
 
-#: includes/class-bol-admin-page.php:1011
+#: includes/class-bol-admin-page.php:1031
 msgid "Not mapped"
 msgstr ""
 
-#: includes/class-bol-admin-page.php:1019
+#: includes/class-bol-admin-page.php:1039
 msgid "All Form Handler Fields"
 msgstr ""
 
-#: includes/class-bol-admin-page.php:1021
+#: includes/class-bol-admin-page.php:1041
 msgid "No fields configured for this form handler."
 msgstr ""
 
-#: includes/class-bol-admin-page.php:1026
+#: includes/class-bol-admin-page.php:1046
 msgid "Name"
 msgstr ""
 
-#: includes/class-bol-admin-page.php:1027
+#: includes/class-bol-admin-page.php:1047
 msgid "Prospect Field"
 msgstr ""
 
-#: includes/class-bol-admin-page.php:1028
+#: includes/class-bol-admin-page.php:1048
 msgid "Required?"
 msgstr ""
 
-#: includes/class-bol-admin-page.php:1029
+#: includes/class-bol-admin-page.php:1049
 msgid "Format"
 msgstr ""
 
-#: includes/class-bol-admin-page.php:1037
+#: includes/class-bol-admin-page.php:1057
 msgid "Yes"
 msgstr ""
 
-#: includes/class-bol-admin-page.php:1037
+#: includes/class-bol-admin-page.php:1057
 msgid "No"
 msgstr ""
 
-#: includes/class-bol-admin-page.php:1063
+#: includes/class-bol-admin-page.php:1083
 msgid "Credentials saved."
 msgstr ""
 
-#: includes/class-bol-admin-page.php:1064
+#: includes/class-bol-admin-page.php:1084
 msgid "That looks like a Salesforce Organization ID (starts with 00D), not a Business Unit ID (starts with 0Uv). Find the correct 18-character Business Unit ID under Salesforce Setup → Account Engagement → Business Unit Setup."
 msgstr ""
 
-#: includes/class-bol-admin-page.php:1065
+#: includes/class-bol-admin-page.php:1085
 msgid "Successfully connected to Pardot!"
 msgstr ""
 
-#: includes/class-bol-admin-page.php:1066
+#: includes/class-bol-admin-page.php:1086
 msgid "API log deleted and logging disabled."
 msgstr ""
 
-#: includes/class-bol-admin-page.php:1067
+#: includes/class-bol-admin-page.php:1087
 msgid "Connected to Pardot. Business Unit auto-discovery is unavailable for this Salesforce org, so please enter your Business Unit ID manually."
 msgstr ""
 
-#: includes/class-bol-admin-page.php:1068
+#: includes/class-bol-admin-page.php:1088
 msgid "Successfully connected to Pardot and automatically selected your Business Unit."
 msgstr ""
 
-#: includes/class-bol-admin-page.php:1069
+#: includes/class-bol-admin-page.php:1089
 msgid "Successfully connected to Pardot. Multiple Business Units were found, so please select one and save credentials."
 msgstr ""
 
 #. translators: %s: error message
-#: includes/class-bol-admin-page.php:1070
+#: includes/class-bol-admin-page.php:1090
 #, php-format
 msgid "Connected to Pardot, but Business Unit lookup failed: %s"
 msgstr ""
 
 #. translators: %s: error message
-#: includes/class-bol-admin-page.php:1071
+#: includes/class-bol-admin-page.php:1091
 msgid "Disconnected from Pardot."
 msgstr ""
 
-#: includes/class-bol-admin-page.php:1072
+#: includes/class-bol-admin-page.php:1092
 msgid "OAuth state mismatch — possible CSRF attempt. Please try connecting again."
 msgstr ""
 
 #. translators: %s: error message
-#: includes/class-bol-admin-page.php:1073
+#: includes/class-bol-admin-page.php:1093
 #, php-format
 msgid "OAuth error: %s"
 msgstr ""
